@@ -906,10 +906,16 @@
   .dig-stat-label { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: var(--ink-soft); margin-top: 4px; }
 
   .dig-texto-box {
-    background: var(--bg-2); border-radius: var(--radius); padding: 32px;
+    background: var(--bg-2); border-radius: var(--radius); padding: 28px;
     box-shadow: var(--shadow-sm); margin-bottom: 14px;
-    font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; line-height: 1.7;
-    letter-spacing: 0.5px; min-height: 160px; border: 1px solid var(--line);
+    font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 20px; line-height: 1.9;
+    letter-spacing: 0.3px; min-height: 160px; border: 1px solid var(--line);
+    word-break: break-word; overflow-wrap: break-word; white-space: normal;
+    position: relative;
+  }
+  #rankeadaTextoBox {
+    height: 300px; overflow-y: auto; overflow-x: hidden;
+    font-size: 17px; line-height: 2.1; scroll-behavior: smooth;
   }
   .dig-char { color: var(--ink-light); transition: color 0.1s; }
   .dig-char.done { color: var(--ink); }
@@ -1730,7 +1736,7 @@
       <div class="dig-stat"><div class="dig-stat-val" id="rankeadaProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
     </div>
 
-    <div class="dig-texto-box" id="rankeadaTextoBox" style="height:320px;overflow-y:auto;overflow-x:hidden;font-size:18px;line-height:2;word-break:break-word;white-space:pre-wrap;"></div>
+    <div class="dig-texto-box" id="rankeadaTextoBox"></div>
     <div id="rankeadaResultado"></div>
   </div>
 </div>
@@ -5555,15 +5561,11 @@ function renderTextoRankeada() {
   }).join('');
   const box = document.getElementById('rankeadaTextoBox');
   box.innerHTML = html;
-  // auto-scroll: mantém o caractere atual visível no centro da caixa
+  // scroll: centraliza o caractere atual dentro da caixa
   const cur = box.querySelector('.current');
   if (cur) {
-    const boxTop = box.scrollTop;
-    const boxH = box.clientHeight;
-    const charTop = cur.offsetTop;
-    const charH = cur.offsetHeight;
-    const target = charTop - boxH / 2 + charH / 2;
-    box.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+    const target = cur.offsetTop - (box.clientHeight / 2) + (cur.offsetHeight / 2);
+    box.scrollTop = Math.max(0, target);
   }
 }
 
@@ -5853,7 +5855,7 @@ function renderPainelPro() {
     <div style="background:white;border-radius:16px;padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
         <div style="font-size:18px;font-weight:900;color:#CBD5E1;min-width:24px;">${i+1}</div>
-        <img src="${avatarUrl(a.nome,nivel)}" style="width:40px;height:40px;border-radius:50%;background:#EEF2FF;" onerror="this.style.display='none'">
+        <img src="${dicebearUrl(a.nome + a.id, nivel)}" style="width:40px;height:40px;border-radius:50%;background:#EEF2FF;" onerror="this.style.display='none'">
         <div style="flex:1;">
           <div style="font-weight:800;font-size:16px;">${a.nome} ${badge}</div>
           <div style="font-size:12px;color:#64748B;">${a.idade} anos · <span style="color:${corNivel[nivel]};font-weight:700;">Nível ${nivel}</span>${wpm?` · ⌨️ ${wpm} WPM`:""}${provaFeita?` · 🎓 Prova: ${Math.round((provaFeita.score/provaFeita.total)*100)}%`:""}</div>
