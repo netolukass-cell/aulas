@@ -2462,9 +2462,10 @@ async function syncPush(aluno) {
   const url = getSyncUrl();
   if (!url) return;
   try {
+    // no-cors necessário para Google Apps Script aceitar POST cross-origin
     await fetch(url, {
       method: "POST",
-      mode: "cors",
+      mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ action: "save", aluno })
     });
@@ -2477,7 +2478,7 @@ async function syncDeleteRemote(id) {
   try {
     await fetch(url, {
       method: "POST",
-      mode: "cors",
+      mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ action: "delete", id })
     });
@@ -2537,8 +2538,8 @@ function showScreen(id) {
 function goHome() {
   alunoAtivo = null;
   localStorage.removeItem(ATIVO_KEY);
-  renderHome();
   showScreen("home");
+  syncPull().then(() => renderHome());
 }
 
 function goCadastro() {
@@ -2688,8 +2689,10 @@ function finalizarCadastro() {
 function confirmarExcluir() {
   if (!alunoAtivo) return;
   if (!confirm(`Tem certeza que quer apagar o cadastro de ${alunoAtivo.nome}? Todo o progresso será perdido.`)) return;
-  const todos = getAlunos().filter(a => a.id !== alunoAtivo.id);
+  const id = alunoAtivo.id;
+  const todos = getAlunos().filter(a => a.id !== id);
   saveAlunos(todos);
+  syncDeleteRemote(id);
   goHome();
 }
 
