@@ -1285,7 +1285,7 @@
   <div class="container">
     <div class="home-hero">
       <div>
-        <div class="home-tag" ondblclick="abrirPainelProfessor()" style="cursor:default;">
+        <div class="home-tag" id="tagProfessor" style="cursor:default;user-select:none;">
           <iconify-icon icon="ph:star-fill"></iconify-icon>
           PROFESSOR LUSCA
         </div>
@@ -5663,6 +5663,25 @@ function sairRankeada() {
 // PAINEL DO PROFESSOR
 // =============================================================
 const SENHA_PROFESSOR = "lusca123";
+
+// Gatilho: clique longo (2s) no tag ou digitar "prof" na home
+let _profTimer = null;
+let _profSeq = "";
+document.addEventListener("DOMContentLoaded", () => {
+  const tag = document.getElementById("tagProfessor");
+  if (tag) {
+    tag.addEventListener("mousedown", () => { _profTimer = setTimeout(abrirPainelProfessor, 2000); });
+    tag.addEventListener("touchstart", () => { _profTimer = setTimeout(abrirPainelProfessor, 2000); }, {passive:true});
+    tag.addEventListener("mouseup",   () => clearTimeout(_profTimer));
+    tag.addEventListener("touchend",  () => clearTimeout(_profTimer));
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (document.getElementById("screen-home")?.classList.contains("active")) {
+    _profSeq = (_profSeq + e.key).slice(-4).toLowerCase();
+    if (_profSeq === "prof") abrirPainelProfessor();
+  }
+});
 
 function abrirPainelProfessor() {
   document.getElementById("inputSenhaPro").value = "";
