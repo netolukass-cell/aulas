@@ -3059,6 +3059,9 @@ function responderQuiz(idx) {
   } else {
     fb.innerHTML = `✗ A resposta certa era: <strong>${textoCerto}</strong>`;
     fb.className = "quiz-feedback show wrong";
+    // rastreia erro
+    if (!estadoQuiz.erros) estadoQuiz.erros = [];
+    estadoQuiz.erros.push({ q: q.q, errou: idx, certo: correctIdx });
   }
 
   const next = document.getElementById("nextQBtn");
@@ -3196,6 +3199,8 @@ function finalizarQuizModulo() {
   alunoAtivo.progresso[estadoQuiz.modulo].quizDone = true;
   alunoAtivo.progresso[estadoQuiz.modulo].quizScore = score;
   alunoAtivo.progresso[estadoQuiz.modulo].quizTotal = total;
+  alunoAtivo.progresso[estadoQuiz.modulo].erros = estadoQuiz.erros || [];
+  alunoAtivo.progresso[estadoQuiz.modulo].ultimoQuiz = new Date().toISOString();
   salvarAluno(alunoAtivo);
 
   let emoji, title, msg;
@@ -5716,15 +5721,37 @@ async function painelRefresh() {
 
 function renderPainelPro() {
   const alunos = getAlunos();
-  const agora = Date.now();
   const statsEl = document.getElementById("painelStats");
   const alunosEl = document.getElementById("painelAlunos");
-
-  // stats gerais
-  const totalAlunos = alunos.length;
-  const totalModulos = alunos.reduce((s,a) => s + Object.values(a.progresso||{}).filter(p=>p.quizDone).length, 0);
-  const mediaScore = alunos.length ? Math.round(alunos.reduce((s,a) => s + calcularPontos(a), 0) / alunos.length) : 0;
+  const nomeModulo = { hardware:"Hardware", software:"Word", navegadores:"Navegadores", antivirus:"Antivírus" };
+  const corNivel = { 1:"#FB923C", 2:"#6366F1", 3:"#8B5CF6" };
   const syncUrl = getSyncUrl();
+
+  // ---- STATS GERAIS ----
+  const totalAlunos = alunos.length;
+  const totalModulos = alunos.reduce((s,a) => s + ORDEM_MODULOS.filter(m=>a.progresso?.[m]?.quizDone).length, 0);
+  const mediaScore = totalAlunos ? Math.round(alunos.reduce((s,a)=>s+calcularPontos(a),0)/totalAlunos) : 0;
+  const mediaWpm = (() => { const c=alunos.filter(a=>a.digitacao?.melhorWpm); return c.length?Math.round(c.reduce((s,a)=>s+a.digitacao.melhorWpm,0)/c.length):0; })();
+
+  // ---- DEFICIÊNCIAS DA TURMA ----
+  const defModulo = ORDEM_MODULOS.map(m => {
+    const feitos = alunos.filter(a=>a.progresso?.[m]?.quizDone);
+    if (!feitos.length) return { m, media: null, label: nomeModulo[m] };
+    const media = Math.round(feitos.reduce((s,a)=>s+(a.progresso[m].quizScore/a.progresso[m].quizTotal)*100,0)/feitos.length);
+    return { m, media, label: nomeModulo[m] };
+  }).filter(x=>x.media!==null).sort((a,b)=>a.media-b.media);
+
+  // questões mais erradas (agregado)
+  const errosAgg = {};
+  alunos.forEach(a => {
+    ORDEM_MODULOS.forEach(m => {
+      (a.progresso?.[m]?.erros||[]).forEach(e => {
+        const key = e.q.slice(0,60);
+        errosAgg[key] = (errosAgg[key]||0)+1;
+      });
+    });
+  });
+  const topErros = Object.entries(errosAgg).sort((a,b)=>b[1]-a[1]).slice(0,5);
 
   statsEl.innerHTML = `
     <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
@@ -5739,6 +5766,10 @@ function renderPainelPro() {
       <div style="font-size:28px;font-weight:900;color:#F59E0B;">${mediaScore}</div>
       <div style="font-size:12px;color:#64748B;font-weight:600;">Pontos (média)</div>
     </div>
+    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="font-size:28px;font-weight:900;color:#3B82F6;">${mediaWpm||"—"}</div>
+      <div style="font-size:12px;color:#64748B;font-weight:600;">WPM médio</div>
+    </div>
     <div style="background:${syncUrl?'#ECFDF5':'#FEF2F2'};border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
       <div style="font-size:22px;font-weight:900;color:${syncUrl?'#10B981':'#EF4444'};">${syncUrl?'✅':'❌'}</div>
       <div style="font-size:12px;color:#64748B;font-weight:600;">Sync Google</div>
@@ -5747,46 +5778,85 @@ function renderPainelPro() {
 
   document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizar";
 
+  // ---- DEFICIÊNCIAS ----
+  let defHtml = "";
+  if (defModulo.length > 0) {
+    defHtml = `
+    <div style="margin-bottom:24px;">
+      <div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:10px;">⚠️ DEFICIÊNCIAS DA TURMA</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+        ${defModulo.map(d=>{
+          const cor = d.media>=80?"#10B981":d.media>=60?"#F59E0B":"#EF4444";
+          const bg = d.media>=80?"#ECFDF5":d.media>=60?"#FFFBEB":"#FEF2F2";
+          return `<div style="background:${bg};border-radius:12px;padding:14px;border-left:4px solid ${cor};">
+            <div style="font-weight:800;font-size:14px;">${d.label}</div>
+            <div style="font-size:24px;font-weight:900;color:${cor};">${d.media}%</div>
+            <div style="font-size:11px;color:#64748B;">média de acerto</div>
+          </div>`;
+        }).join("")}
+      </div>
+      ${topErros.length?`
+      <div style="margin-top:14px;background:#FFF7ED;border-radius:12px;padding:14px;border-left:4px solid #F97316;">
+        <div style="font-size:12px;font-weight:700;color:#C2410C;margin-bottom:8px;">🔴 QUESTÕES MAIS ERRADAS</div>
+        ${topErros.map(([q,n])=>`<div style="font-size:13px;color:#7C3AED;margin-bottom:4px;">• "${q}..." <span style="font-weight:700;color:#EF4444;">${n}x errada</span></div>`).join("")}
+      </div>`:""}
+    </div>`;
+  }
+
   if (alunos.length === 0) {
-    alunosEl.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:40px;">Nenhum aluno cadastrado ainda.</div>`;
+    alunosEl.innerHTML = defHtml + `<div style="text-align:center;color:#94A3B8;padding:40px;">Nenhum aluno cadastrado ainda.</div>`;
     return;
   }
 
-  const ordenados = [...alunos].sort((a,b) => calcularPontos(b) - calcularPontos(a));
-  const nomeModulo = { hardware:"Hardware", software:"Word", navegadores:"Navegadores", antivirus:"Antivírus" };
-  const corNivel = { 1:"#FB923C", 2:"#6366F1", 3:"#8B5CF6" };
+  // ---- LISTA DE ALUNOS DETALHADA ----
+  const ordenados = [...alunos].sort((a,b)=>calcularPontos(b)-calcularPontos(a));
 
-  alunosEl.innerHTML = ordenados.map((a, i) => {
+  const alunosHtml = ordenados.map((a,i)=>{
     const pontos = calcularPontos(a);
-    const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso?.[m]?.quizDone);
-    const pct = Math.round((modulosFeitos.length / ORDEM_MODULOS.length) * 100);
     const nivel = a.nivel || calcularNivel(a.idade);
-    const digitacao = a.digitacao ? `${a.digitacao.melhorWpm||0} WPM` : "—";
+    const wpm = a.digitacao?.melhorWpm || 0;
+    const provaFeita = a.provaFinal;
 
-    const barraModulos = ORDEM_MODULOS.map(m => {
+    const modulosHtml = ORDEM_MODULOS.map(m=>{
       const p = a.progresso?.[m];
-      const score = p?.quizDone ? Math.round((p.quizScore/p.quizTotal)*100) : null;
-      const cor = score === null ? "#E2E8F0" : score >= 80 ? "#10B981" : score >= 50 ? "#F59E0B" : "#EF4444";
-      const label = nomeModulo[m];
-      return `<div title="${label}: ${score !== null ? score+'%' : 'não feito'}" style="flex:1;height:8px;background:${cor};border-radius:4px;"></div>`;
+      if (!p?.quizDone) return `<div style="background:#F1F5F9;border-radius:8px;padding:8px 10px;font-size:12px;color:#94A3B8;">
+        <div style="font-weight:700;">${nomeModulo[m]}</div><div>Não feito</div></div>`;
+      const pct = Math.round((p.quizScore/p.quizTotal)*100);
+      const cor = pct>=80?"#10B981":pct>=60?"#F59E0B":"#EF4444";
+      const bg = pct>=80?"#ECFDF5":pct>=60?"#FFFBEB":"#FEF2F2";
+      const errosN = (p.erros||[]).length;
+      const data = p.ultimoQuiz ? new Date(p.ultimoQuiz).toLocaleDateString("pt-BR") : "";
+      return `<div style="background:${bg};border-radius:8px;padding:8px 10px;border-top:3px solid ${cor};">
+        <div style="font-size:11px;font-weight:700;color:#475569;">${nomeModulo[m]}</div>
+        <div style="font-size:20px;font-weight:900;color:${cor};">${pct}%</div>
+        <div style="font-size:11px;color:#64748B;">${p.quizScore}/${p.quizTotal} corretas</div>
+        ${errosN?`<div style="font-size:11px;color:#EF4444;">${errosN} erro${errosN>1?"s":""}</div>`:"<div style='font-size:11px;color:#10B981;'>Sem erros!</div>"}
+        ${data?`<div style="font-size:10px;color:#94A3B8;">${data}</div>`:""}
+      </div>`;
     }).join("");
 
+    const medalhas = ["🥉","🥈","🥇","👑"];
+    const badge = pontos>=500?"👑":pontos>=200?"🥇":pontos>=100?"🥈":pontos>=50?"🥉":"";
+
     return `
-    <div style="background:white;border-radius:16px;padding:16px 20px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <div style="font-size:20px;font-weight:900;color:#CBD5E1;min-width:28px;">${i+1}</div>
-      <img src="${avatarUrl(a.nome, nivel)}" style="width:44px;height:44px;border-radius:50%;background:#EEF2FF;" onerror="this.style.display='none'">
-      <div style="flex:1;min-width:160px;">
-        <div style="font-weight:800;font-size:15px;">${a.nome}</div>
-        <div style="font-size:12px;color:#64748B;">${a.idade} anos · <span style="color:${corNivel[nivel]};font-weight:700;">N${nivel}</span> · ⌨️ ${digitacao}</div>
-        <div style="display:flex;gap:4px;margin-top:8px;">${barraModulos}</div>
-        <div style="font-size:11px;color:#94A3B8;margin-top:4px;">${modulosFeitos.length}/${ORDEM_MODULOS.length} módulos · ${pct}%</div>
+    <div style="background:white;border-radius:16px;padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div style="font-size:18px;font-weight:900;color:#CBD5E1;min-width:24px;">${i+1}</div>
+        <img src="${avatarUrl(a.nome,nivel)}" style="width:40px;height:40px;border-radius:50%;background:#EEF2FF;" onerror="this.style.display='none'">
+        <div style="flex:1;">
+          <div style="font-weight:800;font-size:16px;">${a.nome} ${badge}</div>
+          <div style="font-size:12px;color:#64748B;">${a.idade} anos · <span style="color:${corNivel[nivel]};font-weight:700;">Nível ${nivel}</span>${wpm?` · ⌨️ ${wpm} WPM`:""}${provaFeita?` · 🎓 Prova: ${Math.round((provaFeita.score/provaFeita.total)*100)}%`:""}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:20px;font-weight:900;color:#6366F1;">★ ${pontos}</div>
+          <div style="font-size:11px;color:#94A3B8;">pontos</div>
+        </div>
       </div>
-      <div style="text-align:right;min-width:60px;">
-        <div style="font-size:22px;font-weight:900;color:#6366F1;">★ ${pontos}</div>
-        <div style="font-size:11px;color:#94A3B8;">pontos</div>
-      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">${modulosHtml}</div>
     </div>`;
   }).join("");
+
+  alunosEl.innerHTML = defHtml + `<div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:12px;">ALUNOS (${ordenados.length})</div>` + alunosHtml;
 }
 
 // =============================================================
