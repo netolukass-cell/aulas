@@ -1730,7 +1730,7 @@
       <div class="dig-stat"><div class="dig-stat-val" id="rankeadaProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
     </div>
 
-    <div class="dig-texto-box" id="rankeadaTextoBox" style="max-height:340px;overflow-y:auto;font-size:20px;line-height:1.9;"></div>
+    <div class="dig-texto-box" id="rankeadaTextoBox" style="height:320px;overflow-y:auto;overflow-x:hidden;font-size:18px;line-height:2;word-break:break-word;white-space:pre-wrap;"></div>
     <div id="rankeadaResultado"></div>
   </div>
 </div>
@@ -5553,7 +5553,18 @@ function renderTextoRankeada() {
     const disp = c==='\n' ? '↵<br>' : (c===' ' ? '·' : escapeHtml(c));
     return `<span class="${cls}" data-i="${i}">${disp}</span>`;
   }).join('');
-  document.getElementById('rankeadaTextoBox').innerHTML = html;
+  const box = document.getElementById('rankeadaTextoBox');
+  box.innerHTML = html;
+  // auto-scroll: mantém o caractere atual visível no centro da caixa
+  const cur = box.querySelector('.current');
+  if (cur) {
+    const boxTop = box.scrollTop;
+    const boxH = box.clientHeight;
+    const charTop = cur.offsetTop;
+    const charH = cur.offsetHeight;
+    const target = charTop - boxH / 2 + charH / 2;
+    box.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+  }
 }
 
 function atualizarTimerDisplay() {
