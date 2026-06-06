@@ -1485,8 +1485,35 @@
     <div class="section-titulo">
       <iconify-icon icon="ph:trophy-bold"></iconify-icon>
       RANKING DA TURMA
+      <button onclick="abrirConfSync()" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;color:var(--ink-soft);display:flex;align-items:center;gap:6px;" id="btnSync">
+        <iconify-icon icon="ph:cloud-arrow-up-bold"></iconify-icon> <span id="syncStatus">Sync</span>
+      </button>
     </div>
     <div class="ranking-card" id="rankingCard"></div>
+  </div>
+</div>
+
+<!-- ====================== MODAL SYNC ====================== -->
+<div id="modalSync" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:32px;max-width:520px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.2);">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px;">☁️ Ranking Compartilhado</h2>
+    <p style="color:#475569;font-size:14px;margin-bottom:20px;">Cole aqui a URL do seu Google Apps Script para sincronizar o ranking entre os 3 PCs da sala.</p>
+    <div style="background:#F1F5F9;border-radius:12px;padding:16px;margin-bottom:20px;font-size:13px;color:#334155;line-height:1.6;">
+      <strong>Como configurar (1 vez só):</strong><br>
+      1. Acesse <strong>script.google.com</strong> e crie um novo projeto<br>
+      2. Cole o código do arquivo <strong>apps-script.gs</strong> (enviado junto)<br>
+      3. Clique em <strong>Implantar → Nova implantação → App da Web</strong><br>
+      4. Acesso: <em>"Qualquer pessoa"</em> → Implantar → copie a URL<br>
+      5. Cole a URL abaixo e clique em Salvar
+    </div>
+    <input id="inputSyncUrl" type="text" placeholder="https://script.google.com/macros/s/..." style="width:100%;padding:12px 16px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:14px;margin-bottom:12px;outline:none;">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="salvarSyncUrl()" style="flex:1;background:#6366F1;color:white;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;">Salvar e Sincronizar</button>
+      <button onclick="testarSync()" style="flex:1;background:#F1F5F9;color:#334155;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;">Testar Conexão</button>
+      <button onclick="removerSync()" style="background:#FEE2E2;color:#DC2626;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;">Remover</button>
+      <button onclick="fecharConfSync()" style="background:#F1F5F9;color:#334155;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;">Fechar</button>
+    </div>
+    <div id="syncMsgModal" style="margin-top:12px;font-size:13px;min-height:20px;"></div>
   </div>
 </div>
 
@@ -2398,26 +2425,84 @@ const WORD_PROMPTS = {
 // =============================================================
 const ALUNOS_KEY = "professorlusca_alunos";
 const ATIVO_KEY = "professorlusca_aluno_ativo";
+const SYNC_URL_KEY = "professorlusca_sync_url";
 
 let alunoAtivo = null;
 let estadoQuiz = { modulo: null, idx: 0, score: 0, answered: false };
 let estadoProva = { idx: 0, score: 0, answered: false };
 let aulaState = { modulo: null, pagina: 0 };
+let syncPendente = false;
 
-function getAlunos() {
+// ---- SYNC GOOGLE SHEETS ----
+function getSyncUrl() {
+  return localStorage.getItem(SYNC_URL_KEY) || "";
+}
+
+async function syncPull() {
+  const url = getSyncUrl();
+  if (!url) return;
+  try {
+    const r = await fetch(url + "?action=get", { mode: "cors" });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (Array.isArray(data) && data.length > 0) {
+      // Merge: remote wins por id, novos locais são mantidos
+      const local = getAlunosLocal();
+      const merged = [...data];
+      local.forEach(la => {
+        if (!merged.find(ra => ra.id === la.id)) merged.push(la);
+      });
+      saveAlunosLocal(merged);
+    }
+  } catch (e) {}
+}
+
+async function syncPush(aluno) {
+  const url = getSyncUrl();
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "save", aluno })
+    });
+  } catch (e) { syncPendente = true; }
+}
+
+async function syncDeleteRemote(id) {
+  const url = getSyncUrl();
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "delete", id })
+    });
+  } catch (e) {}
+}
+
+// ---- LOCAL STORAGE ----
+function getAlunosLocal() {
   try { return JSON.parse(localStorage.getItem(ALUNOS_KEY) || "[]"); }
   catch (e) { return []; }
 }
-function saveAlunos(arr) {
+function saveAlunosLocal(arr) {
   try { localStorage.setItem(ALUNOS_KEY, JSON.stringify(arr)); }
   catch (e) {}
 }
+
+function getAlunos() { return getAlunosLocal(); }
+function saveAlunos(arr) { saveAlunosLocal(arr); }
+
 function salvarAluno(aluno) {
-  const todos = getAlunos();
+  const todos = getAlunosLocal();
   const idx = todos.findIndex(a => a.id === aluno.id);
   if (idx >= 0) todos[idx] = aluno;
   else todos.push(aluno);
-  saveAlunos(todos);
+  saveAlunosLocal(todos);
+  syncPush(aluno);
 }
 
 function calcularNivel(idade) {
@@ -5537,23 +5622,93 @@ function sairRankeada() {
 }
 
 // =============================================================
+// SYNC UI FUNCTIONS
+// =============================================================
+function atualizarStatusSync() {
+  const url = getSyncUrl();
+  const el = document.getElementById("syncStatus");
+  if (!el) return;
+  el.textContent = url ? "☁️ Sync ativo" : "Sync";
+  document.getElementById("btnSync").style.color = url ? "#6366F1" : "";
+  document.getElementById("btnSync").style.borderColor = url ? "#6366F1" : "";
+}
+
+function abrirConfSync() {
+  document.getElementById("inputSyncUrl").value = getSyncUrl();
+  document.getElementById("syncMsgModal").textContent = "";
+  document.getElementById("modalSync").style.display = "flex";
+}
+
+function fecharConfSync() {
+  document.getElementById("modalSync").style.display = "none";
+}
+
+function salvarSyncUrl() {
+  const url = document.getElementById("inputSyncUrl").value.trim();
+  localStorage.setItem(SYNC_URL_KEY, url);
+  atualizarStatusSync();
+  const msg = document.getElementById("syncMsgModal");
+  if (url) {
+    msg.style.color = "#10B981";
+    msg.textContent = "Salvando e sincronizando...";
+    syncPull().then(() => {
+      renderHome();
+      msg.textContent = "✅ Sincronizado! Os dados dos 3 PCs agora são compartilhados.";
+    });
+  } else {
+    msg.textContent = "URL removida. Usando armazenamento local.";
+  }
+}
+
+function removerSync() {
+  localStorage.removeItem(SYNC_URL_KEY);
+  document.getElementById("inputSyncUrl").value = "";
+  atualizarStatusSync();
+  const msg = document.getElementById("syncMsgModal");
+  msg.style.color = "#EF4444";
+  msg.textContent = "Sync removido. Dados ficam apenas neste PC.";
+}
+
+async function testarSync() {
+  const url = document.getElementById("inputSyncUrl").value.trim();
+  const msg = document.getElementById("syncMsgModal");
+  if (!url) { msg.style.color="#EF4444"; msg.textContent = "Cole a URL primeiro."; return; }
+  msg.style.color = "#94A3B8"; msg.textContent = "Testando conexão...";
+  try {
+    const r = await fetch(url + "?action=ping", { mode: "cors" });
+    const t = await r.text();
+    if (t.includes("ok") || r.ok) {
+      msg.style.color = "#10B981"; msg.textContent = "✅ Conexão OK! Pode salvar.";
+    } else {
+      msg.style.color = "#F59E0B"; msg.textContent = "⚠️ Resposta inesperada. Verifique o script.";
+    }
+  } catch(e) {
+    msg.style.color = "#EF4444"; msg.textContent = "❌ Erro de conexão. Verifique a URL e o Apps Script.";
+  }
+}
+
+// fechar modal clicando fora
+document.getElementById("modalSync").addEventListener("click", function(e) {
+  if (e.target === this) fecharConfSync();
+});
+
+// =============================================================
 // INIT
 // =============================================================
 document.getElementById("inputIdade").addEventListener("input", atualizarPreviewNivel);
 
-// auto-login se houver aluno ativo salvo
-const ativoId = localStorage.getItem(ATIVO_KEY);
-if (ativoId) {
-  const a = getAlunos().find(x => x.id === ativoId);
-  if (a) {
-    alunoAtivo = a;
-    goDashboard();
+// Sync pull ao carregar
+syncPull().then(() => {
+  atualizarStatusSync();
+  const ativoId = localStorage.getItem(ATIVO_KEY);
+  if (ativoId) {
+    const a = getAlunos().find(x => x.id === ativoId);
+    if (a) { alunoAtivo = a; goDashboard(); }
+    else renderHome();
   } else {
     renderHome();
   }
-} else {
-  renderHome();
-}
+});
 </script>
 
 </body>
