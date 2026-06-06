@@ -1285,7 +1285,7 @@
   <div class="container">
     <div class="home-hero">
       <div>
-        <div class="home-tag">
+        <div class="home-tag" ondblclick="abrirPainelProfessor()" style="cursor:default;">
           <iconify-icon icon="ph:star-fill"></iconify-icon>
           PROFESSOR LUSCA
         </div>
@@ -1490,6 +1490,40 @@
       </button>
     </div>
     <div class="ranking-card" id="rankingCard"></div>
+  </div>
+</div>
+
+<!-- ====================== MODAL PAINEL PROFESSOR ====================== -->
+<div id="modalProfSenha" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:32px;max-width:380px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.3);">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:6px;">🔒 Painel do Professor</h2>
+    <p style="color:#64748B;font-size:14px;margin-bottom:20px;">Digite a senha para acessar.</p>
+    <input id="inputSenhaPro" type="password" placeholder="Senha" style="width:100%;padding:12px 16px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:16px;margin-bottom:12px;outline:none;" onkeydown="if(event.key==='Enter')verificarSenhaPro()">
+    <div style="display:flex;gap:10px;">
+      <button onclick="verificarSenhaPro()" style="flex:1;background:#6366F1;color:white;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;">Entrar</button>
+      <button onclick="document.getElementById('modalProfSenha').style.display='none'" style="background:#F1F5F9;color:#334155;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;">Cancelar</button>
+    </div>
+    <div id="senhaProfErro" style="color:#EF4444;font-size:13px;margin-top:8px;min-height:18px;"></div>
+  </div>
+</div>
+
+<div id="modalPainelPro" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#F8FAFC;border-radius:24px;width:100%;max-width:900px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.25);">
+    <div style="background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:24px 28px;border-radius:24px 24px 0 0;display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;">
+        <div style="color:rgba(255,255,255,.7);font-size:12px;font-weight:700;letter-spacing:1px;">PROFESSOR LUSCA</div>
+        <div style="color:white;font-size:22px;font-weight:900;">Painel da Turma</div>
+      </div>
+      <div id="painelSyncIndicator" style="background:rgba(255,255,255,.15);border-radius:12px;padding:8px 14px;color:white;font-size:13px;font-weight:600;cursor:pointer;" onclick="painelRefresh()">⟳ Atualizar</div>
+      <button onclick="document.getElementById('modalPainelPro').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:white;border-radius:12px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div style="padding:24px;">
+      <!-- Stats row -->
+      <div id="painelStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;"></div>
+      <!-- Students list -->
+      <div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:12px;">ALUNOS</div>
+      <div id="painelAlunos"></div>
+    </div>
   </div>
 </div>
 
@@ -5623,6 +5657,117 @@ function sairRankeada() {
   if (rankeadaState.timerId) clearInterval(rankeadaState.timerId);
   document.removeEventListener('keydown', listenerRankeada);
   abrirMenuRankeada();
+}
+
+// =============================================================
+// PAINEL DO PROFESSOR
+// =============================================================
+const SENHA_PROFESSOR = "lusca123";
+
+function abrirPainelProfessor() {
+  document.getElementById("inputSenhaPro").value = "";
+  document.getElementById("senhaProfErro").textContent = "";
+  document.getElementById("modalProfSenha").style.display = "flex";
+  setTimeout(() => document.getElementById("inputSenhaPro").focus(), 100);
+}
+
+function verificarSenhaPro() {
+  const v = document.getElementById("inputSenhaPro").value;
+  if (v === SENHA_PROFESSOR) {
+    document.getElementById("modalProfSenha").style.display = "none";
+    abrirPainelPro();
+  } else {
+    document.getElementById("senhaProfErro").textContent = "Senha incorreta.";
+    document.getElementById("inputSenhaPro").value = "";
+  }
+}
+
+async function abrirPainelPro() {
+  document.getElementById("modalPainelPro").style.display = "flex";
+  document.getElementById("painelSyncIndicator").textContent = "⟳ Carregando...";
+  await syncPull();
+  renderPainelPro();
+}
+
+async function painelRefresh() {
+  document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizando...";
+  await syncPull();
+  renderPainelPro();
+}
+
+function renderPainelPro() {
+  const alunos = getAlunos();
+  const agora = Date.now();
+  const statsEl = document.getElementById("painelStats");
+  const alunosEl = document.getElementById("painelAlunos");
+
+  // stats gerais
+  const totalAlunos = alunos.length;
+  const totalModulos = alunos.reduce((s,a) => s + Object.values(a.progresso||{}).filter(p=>p.quizDone).length, 0);
+  const mediaScore = alunos.length ? Math.round(alunos.reduce((s,a) => s + calcularPontos(a), 0) / alunos.length) : 0;
+  const syncUrl = getSyncUrl();
+
+  statsEl.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="font-size:28px;font-weight:900;color:#6366F1;">${totalAlunos}</div>
+      <div style="font-size:12px;color:#64748B;font-weight:600;">Alunos</div>
+    </div>
+    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="font-size:28px;font-weight:900;color:#10B981;">${totalModulos}</div>
+      <div style="font-size:12px;color:#64748B;font-weight:600;">Módulos completos</div>
+    </div>
+    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="font-size:28px;font-weight:900;color:#F59E0B;">${mediaScore}</div>
+      <div style="font-size:12px;color:#64748B;font-weight:600;">Pontos (média)</div>
+    </div>
+    <div style="background:${syncUrl?'#ECFDF5':'#FEF2F2'};border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="font-size:22px;font-weight:900;color:${syncUrl?'#10B981':'#EF4444'};">${syncUrl?'✅':'❌'}</div>
+      <div style="font-size:12px;color:#64748B;font-weight:600;">Sync Google</div>
+    </div>
+  `;
+
+  document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizar";
+
+  if (alunos.length === 0) {
+    alunosEl.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:40px;">Nenhum aluno cadastrado ainda.</div>`;
+    return;
+  }
+
+  const ordenados = [...alunos].sort((a,b) => calcularPontos(b) - calcularPontos(a));
+  const nomeModulo = { hardware:"Hardware", software:"Word", navegadores:"Navegadores", antivirus:"Antivírus" };
+  const corNivel = { 1:"#FB923C", 2:"#6366F1", 3:"#8B5CF6" };
+
+  alunosEl.innerHTML = ordenados.map((a, i) => {
+    const pontos = calcularPontos(a);
+    const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso?.[m]?.quizDone);
+    const pct = Math.round((modulosFeitos.length / ORDEM_MODULOS.length) * 100);
+    const nivel = a.nivel || calcularNivel(a.idade);
+    const digitacao = a.digitacao ? `${a.digitacao.melhorWpm||0} WPM` : "—";
+
+    const barraModulos = ORDEM_MODULOS.map(m => {
+      const p = a.progresso?.[m];
+      const score = p?.quizDone ? Math.round((p.quizScore/p.quizTotal)*100) : null;
+      const cor = score === null ? "#E2E8F0" : score >= 80 ? "#10B981" : score >= 50 ? "#F59E0B" : "#EF4444";
+      const label = nomeModulo[m];
+      return `<div title="${label}: ${score !== null ? score+'%' : 'não feito'}" style="flex:1;height:8px;background:${cor};border-radius:4px;"></div>`;
+    }).join("");
+
+    return `
+    <div style="background:white;border-radius:16px;padding:16px 20px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="font-size:20px;font-weight:900;color:#CBD5E1;min-width:28px;">${i+1}</div>
+      <img src="${avatarUrl(a.nome, nivel)}" style="width:44px;height:44px;border-radius:50%;background:#EEF2FF;" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-weight:800;font-size:15px;">${a.nome}</div>
+        <div style="font-size:12px;color:#64748B;">${a.idade} anos · <span style="color:${corNivel[nivel]};font-weight:700;">N${nivel}</span> · ⌨️ ${digitacao}</div>
+        <div style="display:flex;gap:4px;margin-top:8px;">${barraModulos}</div>
+        <div style="font-size:11px;color:#94A3B8;margin-top:4px;">${modulosFeitos.length}/${ORDEM_MODULOS.length} módulos · ${pct}%</div>
+      </div>
+      <div style="text-align:right;min-width:60px;">
+        <div style="font-size:22px;font-weight:900;color:#6366F1;">★ ${pontos}</div>
+        <div style="font-size:11px;color:#94A3B8;">pontos</div>
+      </div>
+    </div>`;
+  }).join("");
 }
 
 // =============================================================
