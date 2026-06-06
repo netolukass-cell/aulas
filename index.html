@@ -2426,6 +2426,7 @@ const WORD_PROMPTS = {
 const ALUNOS_KEY = "professorlusca_alunos";
 const ATIVO_KEY = "professorlusca_aluno_ativo";
 const SYNC_URL_KEY = "professorlusca_sync_url";
+const SYNC_URL_DEFAULT = "https://script.google.com/macros/s/AKfycby9IX10w_SrGSRk_JXhe4ip53SNvb8RrSo9rgcxLRn2LhklLQ3S2AzPARmXqYVj3UCm/exec";
 
 let alunoAtivo = null;
 let estadoQuiz = { modulo: null, idx: 0, score: 0, answered: false };
@@ -2435,7 +2436,7 @@ let syncPendente = false;
 
 // ---- SYNC GOOGLE SHEETS ----
 function getSyncUrl() {
-  return localStorage.getItem(SYNC_URL_KEY) || "";
+  return localStorage.getItem(SYNC_URL_KEY) || SYNC_URL_DEFAULT;
 }
 
 async function syncPull() {
