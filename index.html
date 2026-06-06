@@ -928,6 +928,10 @@
     0%, 50% { background: var(--ink); }
     51%, 100% { background: var(--ink-soft); }
   }
+  @keyframes guia-pulse {
+    0%, 100% { r: 12; opacity: 0.4; }
+    50% { r: 16; opacity: 0.15; }
+  }
   .dig-char.space.done { background: var(--green-soft); color: var(--green); }
 
   /* Teclado virtual */
@@ -1723,20 +1727,26 @@
       <div class="top-bar-title" id="rankeadaTopTitle"></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:16px;align-items:center;background:var(--bg-2);border-radius:var(--radius);padding:16px 22px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:14px;">
-      <div style="text-align:center;">
-        <div id="rankeadaTimer" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:900;line-height:1;transition:color 0.3s,transform 0.2s;">3:00</div>
-        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);">TEMPO</div>
+    <div style="background:var(--bg-2);border-radius:16px;padding:16px 22px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:16px;align-items:center;margin-bottom:12px;">
+        <div style="text-align:center;">
+          <div id="rankeadaTimer" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:900;line-height:1;transition:color 0.3s,transform 0.2s;">3:00</div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);">TEMPO</div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-soft);text-align:center;">⚠️ Cada erro de digitação reduz o tempo!</div>
+        <div class="dig-stat"><div class="dig-stat-val" id="rankeadaWpm">0</div><div class="dig-stat-label">WPM</div></div>
+        <div class="dig-stat"><div class="dig-stat-val" id="rankeadaProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
       </div>
-      <div>
-        <div class="timer-bar" style="margin-bottom:6px;"><div id="rankeadaTimerBar" style="height:100%;background:linear-gradient(90deg,#10B981,#FBBF24,#EF4444);border-radius:6px;transition:width 1s linear;width:100%;"></div></div>
-        <div style="font-size:12px;color:var(--ink-soft);">⚠️ Cada erro de digitação reduz o tempo!</div>
+      <!-- Barra de tempo colorida: verde → amarelo → vermelho conforme diminui -->
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:9px;font-weight:800;letter-spacing:1px;color:var(--ink-soft);white-space:nowrap;">TEMPO RESTANTE</span>
+        <div style="flex:1;height:10px;background:var(--bg-soft);border-radius:5px;overflow:hidden;">
+          <div id="rankeadaTimerBar" style="height:100%;background:linear-gradient(90deg,#EF4444,#FBBF24,#10B981);background-size:300% 100%;background-position:right center;border-radius:5px;transition:width 1s linear;width:100%;"></div>
+        </div>
       </div>
-      <div class="dig-stat"><div class="dig-stat-val" id="rankeadaWpm">0</div><div class="dig-stat-label">WPM</div></div>
-      <div class="dig-stat"><div class="dig-stat-val" id="rankeadaProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
     </div>
 
-    <div class="dig-texto-box" id="rankeadaTextoBox"></div>
+    <div class="dig-texto-box" id="rankeadaTextoBox" style="border-radius:16px;border:2px solid var(--line);background:var(--bg-2);"></div>
     <div id="rankeadaResultado"></div>
   </div>
 </div>
@@ -1803,8 +1813,19 @@
       <div class="dig-stat"><div class="dig-stat-val" id="digProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
     </div>
 
-    <div class="dig-texto-box" id="digTextoBox"></div>
-    <div class="teclado-virtual" id="tecladoVirtual"></div>
+    <!-- Barra de progresso visual -->
+    <div style="background:var(--bg-2);border-radius:10px;padding:10px 16px;margin-bottom:14px;border:1px solid var(--line);box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);">PROGRESSO DO TEXTO</span>
+        <span id="digProgressoPct" style="font-size:10px;font-weight:800;color:var(--green);">0%</span>
+      </div>
+      <div style="height:8px;background:var(--bg-soft);border-radius:4px;overflow:hidden;">
+        <div id="digProgressoBar" style="height:100%;width:0%;background:linear-gradient(90deg,#10B981,#3B82F6);border-radius:4px;transition:width 0.3s ease;"></div>
+      </div>
+    </div>
+
+    <div class="dig-texto-box" id="digTextoBox" style="height:220px;overflow-y:auto;scroll-behavior:smooth;border-radius:16px;border:2px solid var(--line);"></div>
+    <div class="teclado-virtual" id="tecladoVirtual" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);"></div>
 
     <div id="digResultado"></div>
   </div>
@@ -4278,7 +4299,17 @@ function renderTextoDigitacao() {
     const display = c === ' ' ? '·' : escapeHtml(c);
     return `<span class="${cls}" data-i="${i}">${display}</span>`;
   }).join('');
-  document.getElementById('digTextoBox').innerHTML = html;
+  const box = document.getElementById('digTextoBox');
+  box.innerHTML = html;
+  // auto-scroll para manter o cursor visível no centro
+  const cur = box.querySelector('.dig-char.current');
+  if (cur) box.scrollTop = cur.offsetTop - box.clientHeight / 2 + cur.offsetHeight / 2;
+  // atualizar barra de progresso visual
+  const pct = digState.texto.length > 0 ? Math.round(digState.pos / digState.texto.length * 100) : 0;
+  const bar = document.getElementById('digProgressoBar');
+  const pctEl = document.getElementById('digProgressoPct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
 }
 
 function renderTecladoVirtual() {
@@ -4905,53 +4936,82 @@ function renderGuiaMao() {
   const cores = ['', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 
   function buildHand(side) {
-    // positions of finger circles for a hand SVG (100x140)
+    // Detailed hand SVG with dark theme, 120x160 viewBox
     // fingers: 1(pinky), 2(ring), 3(middle), 4(index), 5(thumb)
-    let positions;
+    let fingerPos, fingerLen;
     if (side === 'left') {
-      positions = {5:{x:18,y:110}, 4:{x:35,y:60}, 3:{x:52,y:48}, 2:{x:68,y:55}, 1:{x:84,y:72}};
+      // [tipX, tipY, baseX, baseY] for each finger
+      fingerPos = {
+        1:{tx:88,ty:75, bx:84,by:108}, // pinky
+        2:{tx:70,ty:55, bx:68,by:105}, // ring
+        3:{tx:52,ty:46, bx:52,by:105}, // middle
+        4:{tx:34,ty:53, bx:36,by:105}, // index
+        5:{tx:14,ty:108,bx:28,by:120}  // thumb
+      };
     } else {
-      positions = {5:{x:82,y:110}, 4:{x:65,y:60}, 3:{x:48,y:48}, 2:{x:32,y:55}, 1:{x:16,y:72}};
+      fingerPos = {
+        1:{tx:32,ty:75, bx:36,by:108}, // pinky
+        2:{tx:50,ty:55, bx:52,by:105}, // ring
+        3:{tx:68,ty:46, bx:68,by:105}, // middle
+        4:{tx:86,ty:53, bx:84,by:105}, // index
+        5:{tx:106,ty:108,bx:92,by:120} // thumb
+      };
     }
-    let circles = '';
-    for (let f = 1; f <= 5; f++) {
-      const p = positions[f];
-      const ativo = dedosNecessarios.has(f);
-      const fill = ativo ? cores[f] : '#E2E8F0';
-      const stroke = ativo ? cores[f] : '#CBD5E1';
-      circles += `<circle cx="${p.x}" cy="${p.y}" r="10" fill="${fill}" stroke="${stroke}" stroke-width="2" opacity="${ativo ? 1 : 0.5}"/>`;
-      if (ativo) circles += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="none" stroke="${cores[f]}" stroke-width="1.5" opacity="0.4"/>`;
-    }
-    // palm
-    const palmColor = '#F1F5F9';
     const palmPath = side === 'left'
-      ? `M20,120 Q18,95 25,80 L35,68 L52,56 L68,63 L82,80 L86,100 Q84,118 75,125 Z`
-      : `M80,120 Q82,95 75,80 L65,68 L48,56 L32,63 L18,80 L14,100 Q16,118 25,125 Z`;
-    return `<svg width="100" height="140" viewBox="0 0 100 140">
-      <path d="${palmPath}" fill="${palmColor}" stroke="#CBD5E1" stroke-width="1.5"/>
-      ${circles}
+      ? `M22,128 Q18,100 22,85 L36,112 L52,112 L68,112 L84,112 L90,90 Q95,105 92,128 Q78,136 52,136 Q28,136 22,128 Z`
+      : `M98,128 Q102,100 98,85 L84,112 L68,112 L52,112 L36,112 L30,90 Q25,105 28,128 Q42,136 68,136 Q92,136 98,128 Z`;
+    // finger rectangles with rounded caps
+    let fingers = '';
+    for (let f = 1; f <= 5; f++) {
+      const p = fingerPos[f];
+      const ativo = dedosNecessarios.has(f);
+      const col = ativo ? cores[f] : '#334155';
+      const glowId = `glow-${side}-${f}`;
+      // draw finger as rounded rect from base to tip
+      const dx = p.tx - p.bx, dy = p.ty - p.by;
+      const len = Math.sqrt(dx*dx+dy*dy);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      const w = f === 5 ? 14 : 12; // thumb wider
+      fingers += `<g transform="translate(${p.bx},${p.by}) rotate(${angle})">
+        <rect x="${-w/2}" y="${-len}" width="${w}" height="${len}" rx="${w/2}" fill="${col}" opacity="${ativo ? 1 : 0.6}"/>
+        ${ativo ? `<rect x="${-w/2}" y="${-len}" width="${w}" height="${len}" rx="${w/2}" fill="url(#${glowId})" opacity="0.5"/>` : ''}
+      </g>`;
+      if (ativo) {
+        fingers = `<defs><radialGradient id="${glowId}"><stop offset="0%" stop-color="${col}" stop-opacity="0.8"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient></defs>` + fingers;
+      }
+      // fingertip circle with number
+      fingers += `<circle cx="${p.tx}" cy="${p.ty}" r="${f===5?9:8}" fill="${col}" opacity="${ativo?1:0.7}"/>`;
+      if (ativo) {
+        fingers += `<circle cx="${p.tx}" cy="${p.ty}" r="${f===5?13:12}" fill="none" stroke="${col}" stroke-width="2" opacity="0.4" class="guia-pulse-${side}-${f}"/>`;
+      }
+      fingers += `<text x="${p.tx}" y="${p.ty+4}" text-anchor="middle" fill="white" font-size="8" font-weight="800" font-family="sans-serif">${f}</text>`;
+    }
+    const svgW = side === 'left' ? 120 : 120;
+    return `<svg width="${svgW}" height="145" viewBox="0 0 120 145" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))">
+      <path d="${palmPath}" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+      ${fingers}
     </svg>`;
   }
 
   const legendItems = Array.from(dedosNecessarios).map(f =>
-    `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${cores[f]};font-weight:600;">
-      <span style="width:10px;height:10px;border-radius:50%;background:${cores[f]};display:inline-block;"></span>${nomes[f]}
+    `<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:${cores[f]};font-weight:700;background:${cores[f]}18;border:1px solid ${cores[f]}40;border-radius:20px;padding:3px 8px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${cores[f]};display:inline-block;box-shadow:0 0 6px ${cores[f]};"></span>${nomes[f]}
     </span>`
-  ).join(' ');
+  ).join('');
 
-  const html = `<div style="text-align:center;margin:12px 0 8px;">
-    <div style="font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Posição dos Dedos</div>
-    <div style="display:inline-flex;gap:24px;align-items:flex-end;justify-content:center;">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-        <span style="font-size:10px;color:var(--ink-light);">Esquerda</span>
+  const html = `<div style="background:#0F172A;border-radius:16px;padding:16px;margin:12px 0 8px;box-shadow:0 4px 24px rgba(0,0,0,0.4);">
+    <div style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center;">Posição dos Dedos</div>
+    <div style="display:flex;gap:16px;align-items:flex-end;justify-content:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;">Esquerda</span>
         ${buildHand('left')}
       </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-        <span style="font-size:10px;color:var(--ink-light);">Direita</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;">Direita</span>
         ${buildHand('right')}
       </div>
     </div>
-    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">${legendItems}</div>
+    <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">${legendItems}</div>
   </div>`;
 
   let guia = document.getElementById('licaoGuiaMao');
