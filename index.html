@@ -5522,10 +5522,10 @@ A tecnologia 5G, com velocidades ate cem vezes maiores que o 4G, vai viabilizar 
 ];
 
 const RANKEADA_CONFIG = {
-  facil:   { tempoBase: 300, penalidade: 2,  mult: {1:1.5, 2:1.0, 3:0.8} },
-  medio:   { tempoBase: 240, penalidade: 4,  mult: {1:1.3, 2:1.0, 3:0.75} },
-  dificil: { tempoBase: 180, penalidade: 6,  mult: {1:1.2, 2:1.0, 3:0.7} },
-  elite:   { tempoBase: 120, penalidade: 10, mult: {1:1.1, 2:1.0, 3:0.65} }
+  facil:   { tempoBase: 600, penalidade: 1,  bonus: 0.3, mult: {1:1.5, 2:1.2, 3:1.0} },
+  medio:   { tempoBase: 420, penalidade: 3,  bonus: 0.2, mult: {1:1.3, 2:1.0, 3:0.85} },
+  dificil: { tempoBase: 270, penalidade: 6,  bonus: 0.1, mult: {1:1.2, 2:1.0, 3:0.75} },
+  elite:   { tempoBase: 150, penalidade: 10, bonus: 0,   mult: {1:1.1, 2:1.0, 3:0.65} }
 };
 
 let rankeadaState = { texto:null, pos:0, erros:0, tempoRestante:0, tempoTotal:0, timerId:null, finalizado:false, inicio:0, dif:'facil', cfg:null };
@@ -5546,7 +5546,7 @@ function renderMenuRankeada() {
     <div style="background:linear-gradient(135deg,#0F172A,#1E293B);border-radius:var(--radius);padding:28px;color:white;margin-bottom:20px;">
       <div style="font-size:11px;font-weight:800;letter-spacing:2px;opacity:0.6;margin-bottom:6px;">RANKEADA DE TEXTOS</div>
       <div style="font-size:26px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:8px;">Corrida contra o relógio ⏱️</div>
-      <div style="font-size:14px;opacity:0.75;line-height:1.6;">Complete o texto antes do tempo acabar. Cada erro de digitação <strong style="color:#EF4444;">reduz o tempo</strong>. Quanto mais preciso, mais rápido você termina!</div>
+      <div style="font-size:14px;opacity:0.75;line-height:1.6;">Complete o texto antes do tempo acabar. Cada <strong style="color:#10B981;">acerto ganha tempo</strong>, cada <strong style="color:#EF4444;">erro perde tempo</strong>. Quanto mais preciso, mais fácil fica!</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
       <div style="background:var(--bg-2);border:2px solid var(--line);border-radius:var(--radius-sm);padding:16px;text-align:center;">
@@ -5672,7 +5672,12 @@ function listenerRankeada(e) {
     rankeadaState.pos++;
     if (rankeadaState.pos>=texto.length) { finalizarRankeada(true); return; }
     spans[rankeadaState.pos]?.classList.add('current');
-    spans[rankeadaState.pos]?.scrollIntoView({block:'nearest',behavior:'smooth'});
+    // bônus de tempo por acerto
+    const bon = rankeadaState.cfg?.bonus || 0;
+    if (bon > 0) {
+      rankeadaState.tempoRestante = Math.min(rankeadaState.tempoTotal, rankeadaState.tempoRestante + bon);
+      atualizarTimerDisplay();
+    }
   } else {
     rankeadaState.erros++;
     const pen = rankeadaState.cfg?.penalidade||3;
