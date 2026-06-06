@@ -1490,6 +1490,11 @@
         <div class="pratique-title">Atirador de Palavras</div>
         <div class="pratique-desc">Palavras voam pela tela! Digite rápido pra destruir os balões antes que cheguem ao fim!</div>
       </div>
+      <div class="pratique-card" onclick="iniciarRedePuzzle()" style="background:linear-gradient(135deg,#0F172A,#1E293B);color:white;border:none;">
+        <div class="pratique-icon-wrap" style="background:rgba(99,102,241,0.2);"><iconify-icon icon="ph:graph-bold" style="color:#818CF8;"></iconify-icon></div>
+        <div class="pratique-title" style="color:white;">Reparar a Rede</div>
+        <div class="pratique-desc" style="color:#94A3B8;">Vírus infectou a rede! Responda perguntas para consertar os nós e salvar o sistema.</div>
+      </div>
     </div>
 
     <div class="section-titulo">
@@ -1928,6 +1933,39 @@
       <button class="btn success" onclick="saveWord()" style="height: 38px; padding: 0 14px;">💾 Salvar</button>
     </div>
     <div id="wordEditor" contenteditable="true"></div>
+  </div>
+</div>
+
+<!-- ====================== REPARAR A REDE ====================== -->
+<div class="screen" id="screen-rede-puzzle">
+  <div style="max-width:900px;margin:0 auto;">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="sairRedePuzzle()">← Voltar</button>
+      <div class="top-bar-title">🌐 Reparar a Rede</div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:#6366F1;" id="rpPontos">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">PONTOS</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:#EF4444;" id="rpInfectados">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">INFECTADOS</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:#10B981;" id="rpReparados">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">REPARADOS</div></div>
+      </div>
+    </div>
+    <canvas id="redeCanvas" style="border-radius:16px;background:#0F172A;display:block;width:100%;border:2px solid #1E293B;cursor:pointer;"></canvas>
+    <div id="rpMensagem" style="text-align:center;margin-top:12px;font-size:14px;color:#64748B;min-height:20px;"></div>
+    <div id="rpGameOver" style="display:none;text-align:center;padding:40px;background:#0F172A;border-radius:16px;margin-top:16px;">
+      <div id="rpGameOverEmoji" style="font-size:64px;margin-bottom:12px;"></div>
+      <div id="rpGameOverTitulo" style="font-size:24px;font-weight:900;color:white;margin-bottom:8px;"></div>
+      <div id="rpGameOverMsg" style="color:#94A3B8;margin-bottom:20px;"></div>
+      <button class="btn" onclick="iniciarRedePuzzle()" style="margin-right:8px;">🔄 Nova Partida</button>
+      <button class="btn ghost" onclick="sairRedePuzzle()">Voltar</button>
+    </div>
+  </div>
+  <!-- Modal de pergunta -->
+  <div id="rpModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;align-items:center;justify-content:center;">
+    <div style="background:#1E293B;border-radius:20px;padding:28px;max-width:480px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid #334155;">
+      <div id="rpModalNode" style="font-size:12px;font-weight:700;color:#6366F1;letter-spacing:1px;margin-bottom:8px;"></div>
+      <div id="rpModalQ" style="font-size:17px;font-weight:700;color:white;margin-bottom:20px;line-height:1.5;"></div>
+      <div id="rpModalOpts" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="rpModalFb" style="margin-top:14px;font-size:14px;min-height:20px;text-align:center;"></div>
+    </div>
   </div>
 </div>
 
@@ -5165,6 +5203,295 @@ const PALAVRAS_ATIRADOR = [
 
 let atiradorState = null;
 let atiradorRAF = null;
+
+// =============================================================
+// REPARAR A REDE — PUZZLE EDUCACIONAL
+// =============================================================
+const RP_PERGUNTAS = [
+  { q:"O que é um roteador?", opts:["Dispositivo que direciona dados entre redes","Tipo de vírus","Memória RAM da rede"], c:0 },
+  { q:"O que faz um Firewall?", opts:["Acelera a internet","Bloqueia acessos não autorizados","Armazena arquivos"], c:1 },
+  { q:"IP significa…", opts:["Internet Protocol","Internal Program","Input Processing"], c:0 },
+  { q:"O que é um servidor?", opts:["Computador que serve arquivos/serviços para outros","Tipo de cabo de rede","Programa de edição de texto"], c:0 },
+  { q:"HTTP serve para…", opts:["Proteger senhas","Transferir páginas web","Conectar ao Wi-Fi"], c:1 },
+  { q:"O que é malware?", opts:["Software educacional","Software malicioso que causa danos","Atualização do sistema"], c:1 },
+  { q:"DNS converte…", opts:["Imagens em texto","Nomes de domínio em endereços IP","Senhas em códigos"], c:1 },
+  { q:"O que é phishing?", opts:["Técnica de pesca esportiva","Golpe para roubar dados pessoais","Tipo de cabo de rede"], c:1 },
+  { q:"RAM é…", opts:["Memória temporária usada pelo processador","Disco rígido permanente","Placa de vídeo"], c:0 },
+  { q:"O que é backup?", opts:["Tipo de vírus","Cópia de segurança dos dados","Nome do processador"], c:1 },
+  { q:"Wi-Fi funciona por…", opts:["Cabos de fibra óptica","Ondas de rádio sem fio","Satélites"], c:1 },
+  { q:"CPU é chamada de…", opts:["Memória do PC","Cérebro do computador","Placa-mãe"], c:1 },
+  { q:"HTTPS é mais seguro pois…", opts:["É mais rápido","Usa criptografia SSL/TLS","Usa menos dados"], c:1 },
+  { q:"O que é um vírus de computador?", opts:["Erro de hardware","Programa que se replica e causa danos","Atualização de segurança"], c:1 },
+  { q:"Nuvem (cloud) significa…", opts:["Armazenamento online em servidores remotos","Memória interna do PC","Tipo de processador"], c:0 },
+];
+
+const RP_NOS = [
+  { id:0, label:"PC\nEscritório",  icon:"💻", x:0.15, y:0.25, tipo:"pc" },
+  { id:1, label:"PC\nAluno",       icon:"🖥️", x:0.15, y:0.70, tipo:"pc" },
+  { id:2, label:"Roteador",        icon:"📡", x:0.38, y:0.48, tipo:"router" },
+  { id:3, label:"Firewall",        icon:"🛡️", x:0.62, y:0.48, tipo:"firewall" },
+  { id:4, label:"Servidor",        icon:"🖧",  x:0.82, y:0.25, tipo:"server" },
+  { id:5, label:"Nuvem",           icon:"☁️", x:0.82, y:0.70, tipo:"cloud" },
+  { id:6, label:"PC\nProf",        icon:"👨‍🏫", x:0.50, y:0.15, tipo:"pc" },
+  { id:7, label:"Banco\nDados",    icon:"🗄️", x:0.50, y:0.82, tipo:"server" },
+];
+const RP_ARESTAS = [[0,2],[1,2],[2,3],[3,4],[3,5],[6,3],[7,2],[4,5]];
+
+let rpState = null;
+let rpRAF = null;
+let rpPergsUsadas = [];
+
+function iniciarRedePuzzle() {
+  showScreen('rede-puzzle');
+  document.getElementById('rpGameOver').style.display = 'none';
+  document.getElementById('rpModal').style.display = 'none';
+  document.getElementById('rpMensagem').textContent = 'Clique nos nós infectados (🔴) para repará-los!';
+
+  // estado inicial: infecta 3 nós aleatórios
+  const infectados = new Set();
+  while (infectados.size < 3) infectados.add(Math.floor(Math.random() * RP_NOS.length));
+
+  rpState = {
+    nos: RP_NOS.map(n => ({ ...n, status: infectados.has(n.id) ? 'infectado' : 'ok', glitch: Math.random() * Math.PI * 2 })),
+    pontos: 0, reparados: 0, infectadosTotal: infectados.size,
+    ativo: true, pergAtual: null, noAtual: null,
+  };
+  rpPergsUsadas = [];
+  atualizarStatsRede();
+  cancelAnimationFrame(rpRAF);
+  rpLoop();
+
+  const canvas = document.getElementById('redeCanvas');
+  canvas.onclick = rpHandleClick;
+}
+
+function sairRedePuzzle() {
+  cancelAnimationFrame(rpRAF);
+  rpState = null;
+  goDashboard();
+}
+
+function rpHandleClick(e) {
+  if (!rpState?.ativo) return;
+  const canvas = document.getElementById('redeCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  for (const no of rpState.nos) {
+    if (no.status !== 'infectado') continue;
+    const nx = no.x * canvas.width;
+    const ny = no.y * canvas.height;
+    const dist = Math.hypot(mx - nx, my - ny);
+    if (dist < 44) { abrirPerguntaRede(no); return; }
+  }
+}
+
+function abrirPerguntaRede(no) {
+  rpState.noAtual = no;
+  const disponiveis = RP_PERGUNTAS.filter((_,i) => !rpPergsUsadas.includes(i));
+  const pool = disponiveis.length ? disponiveis : RP_PERGUNTAS;
+  const idx = Math.floor(Math.random() * pool.length);
+  const perg = pool[idx];
+  rpState.pergAtual = perg;
+  if (!rpPergsUsadas.includes(RP_PERGUNTAS.indexOf(perg))) rpPergsUsadas.push(RP_PERGUNTAS.indexOf(perg));
+
+  const tipos = { pc:"💻 PC", router:"📡 Roteador", firewall:"🛡️ Firewall", server:"🖧 Servidor", cloud:"☁️ Nuvem" };
+  document.getElementById('rpModalNode').textContent = `REPARAR: ${tipos[no.tipo]||no.label}`;
+  document.getElementById('rpModalQ').textContent = perg.q;
+  document.getElementById('rpModalFb').textContent = '';
+
+  const letras = ['A','B','C'];
+  document.getElementById('rpModalOpts').innerHTML = perg.opts.map((op,i) =>
+    `<button onclick="responderRedePuzzle(${i})" style="background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:14px 16px;color:white;font-size:14px;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center;transition:border-color .2s;" onmouseover="this.style.borderColor='#6366F1'" onmouseout="this.style.borderColor='#334155'">
+      <span style="background:#1E293B;border-radius:8px;padding:4px 10px;font-weight:800;color:#6366F1;font-size:13px;">${letras[i]}</span>
+      <span>${op}</span>
+    </button>`
+  ).join('');
+  document.getElementById('rpModal').style.display = 'flex';
+}
+
+function responderRedePuzzle(idx) {
+  const perg = rpState.pergAtual;
+  const no = rpState.noAtual;
+  const fb = document.getElementById('rpModalFb');
+  const btns = document.querySelectorAll('#rpModalOpts button');
+  btns.forEach(b => b.style.pointerEvents = 'none');
+
+  if (idx === perg.c) {
+    btns[idx].style.background = '#064E3B';
+    btns[idx].style.borderColor = '#10B981';
+    fb.innerHTML = '<span style="color:#10B981;font-weight:700;">✅ Correto! Nó reparado!</span>';
+    no.status = 'reparando';
+    rpState.reparados++;
+    rpState.pontos += 20;
+    atualizarStatsRede();
+    setTimeout(() => {
+      no.status = 'ok';
+      document.getElementById('rpModal').style.display = 'none';
+      verificarFimRede();
+    }, 1000);
+  } else {
+    btns[idx].style.background = '#450A0A';
+    btns[idx].style.borderColor = '#EF4444';
+    btns[perg.c].style.background = '#064E3B';
+    btns[perg.c].style.borderColor = '#10B981';
+    fb.innerHTML = '<span style="color:#EF4444;font-weight:700;">❌ Errou! O vírus se espalha...</span>';
+    rpState.pontos = Math.max(0, rpState.pontos - 5);
+    atualizarStatsRede();
+    // espalha vírus para nó vizinho saudável
+    setTimeout(() => {
+      espalharVirusRede(no);
+      document.getElementById('rpModal').style.display = 'none';
+      verificarFimRede();
+    }, 1500);
+  }
+}
+
+function espalharVirusRede(noOrigem) {
+  const vizinhos = RP_ARESTAS
+    .filter(([a,b]) => a === noOrigem.id || b === noOrigem.id)
+    .map(([a,b]) => a === noOrigem.id ? b : a);
+  const saudaveis = rpState.nos.filter(n => vizinhos.includes(n.id) && n.status === 'ok');
+  if (saudaveis.length) {
+    const alvo = saudaveis[Math.floor(Math.random() * saudaveis.length)];
+    alvo.status = 'infectado';
+    rpState.infectadosTotal++;
+    atualizarStatsRede();
+    document.getElementById('rpMensagem').textContent = `⚠️ Vírus se espalhou para ${alvo.label.replace('\n',' ')}!`;
+  }
+}
+
+function verificarFimRede() {
+  const infectados = rpState.nos.filter(n => n.status === 'infectado').length;
+  const todos_ok = rpState.nos.every(n => n.status === 'ok');
+  if (todos_ok) {
+    rpState.ativo = false;
+    adicionarPontosJogo(rpState.pontos);
+    document.getElementById('rpGameOverEmoji').textContent = '🏆';
+    document.getElementById('rpGameOverTitulo').textContent = 'Rede Salva!';
+    document.getElementById('rpGameOverMsg').innerHTML = `Você reparou todos os nós e ganhou <strong style="color:#10B981;">${rpState.pontos} pontos</strong>!`;
+    document.getElementById('rpGameOver').style.display = 'block';
+  } else if (infectados >= rpState.nos.length - 1) {
+    rpState.ativo = false;
+    document.getElementById('rpGameOverEmoji').textContent = '💀';
+    document.getElementById('rpGameOverTitulo').textContent = 'Rede Comprometida!';
+    document.getElementById('rpGameOverMsg').innerHTML = `O vírus dominou a rede. Você fez <strong style="color:#6366F1;">${rpState.pontos} pontos</strong>. Tente novamente!`;
+    document.getElementById('rpGameOver').style.display = 'block';
+  }
+}
+
+function atualizarStatsRede() {
+  if (!rpState) return;
+  document.getElementById('rpPontos').textContent = rpState.pontos;
+  document.getElementById('rpInfectados').textContent = rpState.nos.filter(n=>n.status==='infectado').length;
+  document.getElementById('rpReparados').textContent = rpState.reparados;
+}
+
+function rpLoop() {
+  const canvas = document.getElementById('redeCanvas');
+  if (!canvas || !rpState) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth * devicePixelRatio || 800;
+  const H = canvas.height = Math.min(W * 0.6, 520 * devicePixelRatio);
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0F172A';
+  ctx.fillRect(0, 0, W, H);
+
+  const t = Date.now() / 1000;
+
+  // desenha arestas
+  RP_ARESTAS.forEach(([a,b]) => {
+    const na = rpState.nos[a], nb = rpState.nos[b];
+    const ax = na.x*W, ay = na.y*H, bx = nb.x*W, by = nb.y*H;
+    const infectada = na.status==='infectado' || nb.status==='infectado';
+    ctx.save();
+    if (infectada) {
+      ctx.strokeStyle = `rgba(239,68,68,${0.4 + 0.3*Math.sin(t*4)})`;
+      ctx.setLineDash([8,8]);
+      ctx.lineDashOffset = -t*20;
+    } else {
+      ctx.strokeStyle = '#1E3A5F';
+      ctx.setLineDash([]);
+    }
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+
+    // pacotes de dados viajando na linha
+    if (!infectada) {
+      const prog = ((t * 0.4 + a*0.3 + b*0.7) % 1);
+      const px = ax + (bx-ax)*prog, py = ay + (by-ay)*prog;
+      ctx.fillStyle = '#3B82F6';
+      ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  });
+
+  // desenha nós
+  rpState.nos.forEach(no => {
+    const x = no.x*W, y = no.y*H;
+    const r = 36;
+    no.glitch += 0.05;
+
+    ctx.save();
+    if (no.status === 'infectado') {
+      // glow vermelho pulsante
+      const pulse = 0.5 + 0.5*Math.sin(t*5 + no.glitch);
+      const grd = ctx.createRadialGradient(x,y,r*0.5,x,y,r*1.8);
+      grd.addColorStop(0, `rgba(239,68,68,${0.3*pulse})`);
+      grd.addColorStop(1, 'rgba(239,68,68,0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(x,y,r*1.8,0,Math.PI*2); ctx.fill();
+      // borda pulsante
+      ctx.strokeStyle = `rgba(239,68,68,${0.6+0.4*pulse})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+      // fundo
+      ctx.fillStyle = '#1A0A0A';
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    } else if (no.status === 'reparando') {
+      // glow amarelo
+      ctx.strokeStyle = '#FBBF24';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#1A1500';
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    } else {
+      // ok: verde suave
+      const grd2 = ctx.createRadialGradient(x,y,0,x,y,r);
+      grd2.addColorStop(0, '#0D2B1F'); grd2.addColorStop(1, '#0F172A');
+      ctx.fillStyle = grd2;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#1E3A2F';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    }
+
+    // ícone
+    ctx.font = `${r*0.7}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (no.status === 'infectado') {
+      // glitch: desenha ícone levemente deslocado
+      const gx = (Math.random()-0.5)*4;
+      ctx.fillText('⚠️', x+gx, y-4);
+    } else {
+      ctx.fillText(no.icon, x, y-4);
+    }
+
+    // label
+    const label = no.label.replace('\n',' ');
+    ctx.font = `bold ${Math.max(10, r*0.28)}px sans-serif`;
+    ctx.fillStyle = no.status==='infectado' ? '#EF4444' : '#94A3B8';
+    ctx.fillText(label, x, y+r+12);
+    ctx.restore();
+  });
+
+  rpRAF = requestAnimationFrame(rpLoop);
+}
 
 function iniciarAtiradorPalavras() {
   showScreen('atirador');
