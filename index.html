@@ -1202,68 +1202,41 @@
   .atirador-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
   .atirador-vida { font-size: 22px; letter-spacing: 2px; }
 
-  /* ===== MONTA O PC ===== */
-  .monta-layout {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 20px;
-    align-items: start;
+  /* Quiz drag-to-match */
+  .drag-area { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px; }
+  .drag-col-title { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 10px; }
+  .drag-items { display: flex; flex-direction: column; gap: 8px; }
+  .drag-item {
+    padding: 12px 16px; border-radius: var(--radius-sm); background: var(--bg-soft);
+    border: 2px solid var(--line); cursor: grab; font-size: 14px; font-weight: 600;
+    transition: all 0.15s ease; user-select: none;
   }
-  @media (max-width: 780px) {
-    .monta-layout { grid-template-columns: 1fr; }
+  .drag-item:hover { border-color: var(--ink); background: var(--bg-2); }
+  .drag-item.selected { border-color: #6366F1; background: #EEF2FF; cursor: pointer; }
+  .drag-item.matched { border-color: var(--green); background: var(--green-soft); cursor: default; opacity: 0.7; }
+  .drag-item.wrong-flash { border-color: var(--red); background: var(--red-soft); animation: shakeErro 0.4s ease; }
+  .drop-zone {
+    padding: 12px 16px; border-radius: var(--radius-sm); min-height: 48px;
+    border: 2px dashed var(--line); font-size: 14px; font-weight: 600;
+    transition: all 0.15s ease; color: var(--ink-soft); cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
   }
-  .pc-slot {
-    cursor: pointer;
-    border: 2px dashed #94A3B8;
-    border-radius: 8px;
-    transition: all 0.2s;
-    fill: #F8FAFC;
+  .drop-zone:hover { border-color: #6366F1; background: #EEF2FF; }
+  .drop-zone.filled { border-style: solid; border-color: var(--green); background: var(--green-soft); color: var(--ink); cursor: default; }
+  .drop-zone.wrong-flash { border-color: var(--red); background: var(--red-soft); animation: shakeErro 0.4s ease; }
+
+  /* Quiz image-choice */
+  .img-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-top: 16px; }
+  .img-choice {
+    border: 3px solid var(--line); border-radius: var(--radius-sm); padding: 16px 12px;
+    cursor: pointer; text-align: center; transition: all 0.2s ease;
+    background: var(--bg-2); display: flex; flex-direction: column; align-items: center; gap: 10px;
   }
-  .pc-slot:hover { border-color: var(--blue); fill: #EEF2FF; }
-  .pc-slot.selected { border-color: var(--blue); fill: var(--blue-soft); }
-  .pc-slot.correct { border-color: var(--green); fill: var(--green-soft); animation: slotCorrect 0.4s ease; }
-  .pc-slot.wrong { border-color: var(--red); fill: var(--red-soft); animation: slotShake 0.4s ease; }
-  @keyframes slotCorrect { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
-  @keyframes slotShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-  .peca-item {
-    padding: 10px 14px;
-    border-radius: var(--radius-xs);
-    border: 2px solid var(--line);
-    background: var(--bg-2);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.2s;
-    user-select: none;
-  }
-  .peca-item:hover { border-color: var(--blue); background: var(--blue-soft); }
-  .peca-item.selected { border-color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
-  .peca-item.placed { border-color: var(--green); background: var(--green-soft); opacity: 0.6; cursor: default; pointer-events: none; }
-  .monta-info-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-xl);
-    padding: 28px 32px;
-    z-index: 999;
-    max-width: 420px;
-    width: 90vw;
-    text-align: center;
-    animation: popupIn 0.3s ease;
-  }
-  @keyframes popupIn { from{transform:translate(-50%,-50%) scale(0.8);opacity:0} to{transform:translate(-50%,-50%) scale(1);opacity:1} }
-  .monta-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 998;
-  }
+  .img-choice:hover { border-color: var(--ink); transform: translateY(-3px); box-shadow: var(--shadow); }
+  .img-choice.correct { border-color: var(--green); background: var(--green-soft); }
+  .img-choice.wrong { border-color: var(--red); background: var(--red-soft); }
+  .img-choice svg { display: block; }
+  .img-choice-label { font-size: 13px; font-weight: 700; color: var(--ink); }
 
   /* ===== CHAR BOXES — digitação lição ===== */
   .char-boxes {
@@ -1438,8 +1411,43 @@
     </div>
 
     <div class="section-titulo">
+      <iconify-icon icon="ph:keyboard-bold"></iconify-icon>
+      ⌨️ DIGITAÇÃO — FOCO PRINCIPAL
+    </div>
+    <div class="pratique-grid">
+      <div class="pratique-card" onclick="abrirMenuDigitacao()" style="grid-column: 1/-1; background: linear-gradient(135deg,#0F172A 0%,#1E293B 100%); color:white; border:none; display:flex; align-items:center; gap:28px; padding:32px;">
+        <div style="flex-shrink:0;">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <rect width="80" height="80" rx="20" fill="rgba(255,255,255,0.1)"/>
+            <rect x="12" y="22" width="56" height="36" rx="6" fill="none" stroke="white" stroke-width="2"/>
+            <rect x="16" y="26" width="8" height="7" rx="2" fill="#6366F1"/>
+            <rect x="26" y="26" width="8" height="7" rx="2" fill="#F97316"/>
+            <rect x="36" y="26" width="8" height="7" rx="2" fill="#10B981"/>
+            <rect x="46" y="26" width="8" height="7" rx="2" fill="#6366F1"/>
+            <rect x="56" y="26" width="8" height="7" rx="2" fill="#F97316"/>
+            <rect x="16" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="26" y="36" width="8" height="7" rx="2" fill="#FBBF24"/>
+            <rect x="36" y="36" width="8" height="7" rx="2" fill="#FBBF24"/>
+            <rect x="46" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="56" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="20" y="46" width="40" height="7" rx="2" fill="rgba(255,255,255,0.2)"/>
+          </svg>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:2px;opacity:0.6;margin-bottom:4px;">MÓDULO PRINCIPAL</div>
+          <div class="pratique-title" style="color:white;font-size:26px;margin-bottom:6px;">Digitação</div>
+          <div class="pratique-desc" style="color:rgba(255,255,255,0.7);font-size:15px;">Aprenda a digitar de verdade — lições por fileira, treino livre e modo ranqueado com ranking da turma.</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <div style="font-size:42px;font-weight:900;color:#FBBF24;font-family:'Plus Jakarta Sans',sans-serif;line-height:1;">→</div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;opacity:0.6;margin-top:4px;">ENTRAR</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-titulo">
       <iconify-icon icon="ph:game-controller-bold"></iconify-icon>
-      PRATIQUE — JOGOS E ATIVIDADES
+      🎮 JOGOS E ATIVIDADES
     </div>
     <div class="pratique-grid">
       <div class="pratique-card" onclick="goPaint()">
@@ -1467,20 +1475,10 @@
         <div class="pratique-title">Desafio Relâmpago</div>
         <div class="pratique-desc">60 segundos pra acertar o máximo que conseguir. Vale pontos extras!</div>
       </div>
-      <div class="pratique-card" onclick="abrirMenuDigitacao()">
-        <div class="pratique-icon-wrap"><iconify-icon icon="ph:keyboard-bold"></iconify-icon></div>
-        <div class="pratique-title">Digitação</div>
-        <div class="pratique-desc">Treine digitação com teclado visual. Modo treino ou ranqueado com cronômetro!</div>
-      </div>
       <div class="pratique-card" onclick="iniciarAtiradorPalavras()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
         <div class="pratique-desc">Palavras voam pela tela! Digite rápido pra destruir os balões antes que cheguem ao fim!</div>
-      </div>
-      <div class="pratique-card" onclick="goMontaPC()">
-        <div class="pratique-icon-wrap"><iconify-icon icon="ph:cpu-bold"></iconify-icon></div>
-        <div class="pratique-title">Monta o PC</div>
-        <div class="pratique-desc">Coloque cada peça no lugar certo dentro do computador. Aprenda onde cada componente vai!</div>
       </div>
     </div>
 
@@ -1621,6 +1619,11 @@
         <div class="dig-modo-titulo">Ranqueado</div>
         <div class="dig-modo-desc">Cronômetro ativo! WPM (palavras/min), precisão e pontos no ranking.</div>
       </div>
+      <div class="dig-modo-card" style="border-color:#EF4444;" onclick="abrirMenuRankeada()">
+        <div class="dig-modo-icon" style="background:linear-gradient(135deg,#EF4444,#B91C1C);">⏱️</div>
+        <div class="dig-modo-titulo">Rankeada de Textos</div>
+        <div class="dig-modo-desc">Textos longos de informática com cronômetro regressivo. Cada erro reduz seu tempo!</div>
+      </div>
     </div>
 
     <div class="section-titulo" style="margin-top:20px;">DIFICULDADE</div>
@@ -1631,6 +1634,43 @@
     </div>
 
     <div id="digHistorico" style="margin-top:32px;"></div>
+  </div>
+</div>
+
+<!-- ====================== RANKEADA DE TEXTOS — MENU ====================== -->
+<div class="screen" id="screen-digitacao-rankeada-menu">
+  <div class="container-narrow">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="abrirMenuDigitacao()">← Voltar</button>
+      <div class="top-bar-title">⏱️ Rankeada de Textos</div>
+    </div>
+    <div id="rankeadaMenuContent"></div>
+  </div>
+</div>
+
+<!-- ====================== RANKEADA DE TEXTOS — JOGO ====================== -->
+<div class="screen" id="screen-digitacao-rankeada">
+  <div class="container">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="sairRankeada()">← Sair</button>
+      <div class="top-bar-title" id="rankeadaTopTitle"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:16px;align-items:center;background:var(--bg-2);border-radius:var(--radius);padding:16px 22px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:14px;">
+      <div style="text-align:center;">
+        <div id="rankeadaTimer" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:900;line-height:1;transition:color 0.3s,transform 0.2s;">3:00</div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);">TEMPO</div>
+      </div>
+      <div>
+        <div class="timer-bar" style="margin-bottom:6px;"><div id="rankeadaTimerBar" style="height:100%;background:linear-gradient(90deg,#10B981,#FBBF24,#EF4444);border-radius:6px;transition:width 1s linear;width:100%;"></div></div>
+        <div style="font-size:12px;color:var(--ink-soft);">⚠️ Cada erro de digitação reduz o tempo!</div>
+      </div>
+      <div class="dig-stat"><div class="dig-stat-val" id="rankeadaWpm">0</div><div class="dig-stat-label">WPM</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="rankeadaProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
+    </div>
+
+    <div class="dig-texto-box" id="rankeadaTextoBox" style="max-height:340px;overflow-y:auto;font-size:20px;line-height:1.9;"></div>
+    <div id="rankeadaResultado"></div>
   </div>
 </div>
 
@@ -1834,16 +1874,6 @@
 </div>
 
 <!-- ====================== MONTA O PC ====================== -->
-<div class="screen" id="screen-monta-pc">
-  <div class="container">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Voltar</button>
-      <div class="top-bar-title">🖥️ Monta o PC</div>
-    </div>
-    <div id="montaPCContent"></div>
-  </div>
-</div>
-
 <script>
 // =============================================================
 // DADOS DOS MÓDULOS — texto, ilustração e quiz por nível
@@ -1921,7 +1951,18 @@ const MODULOS = {
         { tipo: "mc", q: "Pra que serve o monitor?", options: ["Pra mostrar imagens", "Pra digitar letras", "Pra ouvir música"], correct: 0 },
         { tipo: "mc", q: "Pra que serve o teclado?", options: ["Pra mover a setinha", "Pra digitar letras e números", "Pra mostrar imagens"], correct: 1 },
         { tipo: "vf", q: "Impressora é hardware.", correct: true },
-        { tipo: "mc", q: "Pra que serve o mouse?", options: ["Pra digitar", "Pra mover a setinha e clicar", "Pra imprimir"], correct: 1 }
+        { tipo: "mc", q: "Pra que serve o mouse?", options: ["Pra digitar", "Pra mover a setinha e clicar", "Pra imprimir"], correct: 1 },
+        { tipo: "img", q: "Qual destes é um MOUSE?", correct: 0, options: [
+          { label: "Mouse", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="15" y="10" width="30" height="40" rx="15" fill="#94A3B8" stroke="#64748B" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="30" stroke="#64748B" stroke-width="2"/><circle cx="30" cy="26" r="4" fill="#6366F1"/></svg>` },
+          { label: "Teclado", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="8" y="18" width="44" height="24" rx="4" fill="#94A3B8" stroke="#64748B" stroke-width="2"/><rect x="12" y="22" width="6" height="5" rx="1" fill="white"/><rect x="20" y="22" width="6" height="5" rx="1" fill="white"/><rect x="28" y="22" width="6" height="5" rx="1" fill="white"/><rect x="36" y="22" width="6" height="5" rx="1" fill="white"/><rect x="12" y="30" width="36" height="5" rx="1" fill="white"/></svg>` },
+          { label: "Monitor", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="8" y="10" width="44" height="30" rx="4" fill="#94A3B8" stroke="#64748B" stroke-width="2"/><rect x="12" y="14" width="36" height="22" rx="2" fill="#6366F1"/><rect x="25" y="40" width="10" height="6" fill="#94A3B8"/><rect x="18" y="46" width="24" height="3" rx="1" fill="#64748B"/></svg>` },
+        ]},
+        { tipo: "drag", q: "Ligue cada componente à sua função:", pairs: [
+          { left: "🖥️ Monitor", right: "Exibe a imagem" },
+          { left: "⌨️ Teclado", right: "Digita letras" },
+          { left: "🖱️ Mouse", right: "Move o cursor" },
+          { left: "🔊 Caixa de som", right: "Reproduz áudio" },
+        ]}
       ],
       2: [
         { tipo: "mc", q: "O que define hardware?", options: ["É a parte física do computador, que pode ser tocada", "São os programas e arquivos do computador", "É a conexão com a internet"], correct: 0 },
@@ -1933,7 +1974,18 @@ const MODULOS = {
         { tipo: "mc", q: "Qual destes é um componente INTERNO do PC?", options: ["Impressora", "Memória RAM", "Mouse"], correct: 1 },
         { tipo: "mc", q: "O que faz o processador (CPU)?", options: ["Mostra imagens", "Faz os cálculos e processa instruções", "Imprime documentos"], correct: 1 },
         { tipo: "mc", q: "A placa-mãe serve pra…", options: ["Conectar todas as peças do PC entre si", "Apenas imprimir documentos", "Limpar vírus"], correct: 0 },
-        { tipo: "vf", q: "A webcam é hardware de saída.", correct: false }
+        { tipo: "vf", q: "A webcam é hardware de saída.", correct: false },
+        { tipo: "drag", q: "Classifique: entrada ou saída?", pairs: [
+          { left: "🎤 Microfone", right: "Entrada" },
+          { left: "🖨️ Impressora", right: "Saída" },
+          { left: "📷 Webcam", right: "Entrada" },
+          { left: "🖥️ Monitor", right: "Saída" },
+        ]},
+        { tipo: "img", q: "Qual representa a MEMÓRIA RAM?", correct: 1, options: [
+          { label: "CPU", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="15" y="15" width="30" height="30" rx="2" fill="#1E293B" stroke="#6366F1" stroke-width="2"/><rect x="20" y="20" width="20" height="20" rx="1" fill="#6366F1"/><line x1="10" y1="25" x2="15" y2="25" stroke="#94A3B8" stroke-width="2"/><line x1="10" y1="35" x2="15" y2="35" stroke="#94A3B8" stroke-width="2"/><line x1="45" y1="25" x2="50" y2="25" stroke="#94A3B8" stroke-width="2"/><line x1="45" y1="35" x2="50" y2="35" stroke="#94A3B8" stroke-width="2"/></svg>` },
+          { label: "RAM", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="8" y="22" width="44" height="16" rx="3" fill="#1E293B" stroke="#10B981" stroke-width="2"/><rect x="12" y="26" width="5" height="8" rx="1" fill="#10B981"/><rect x="19" y="26" width="5" height="8" rx="1" fill="#10B981"/><rect x="26" y="26" width="5" height="8" rx="1" fill="#10B981"/><rect x="33" y="26" width="5" height="8" rx="1" fill="#10B981"/><rect x="40" y="26" width="5" height="8" rx="1" fill="#10B981"/><rect x="10" y="38" width="4" height="6" rx="0" fill="#64748B"/><rect x="46" y="38" width="4" height="6" rx="0" fill="#64748B"/></svg>` },
+          { label: "HD", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="10" y="16" width="40" height="28" rx="4" fill="#1E293B" stroke="#F97316" stroke-width="2"/><circle cx="30" cy="30" r="10" fill="none" stroke="#F97316" stroke-width="2"/><circle cx="30" cy="30" r="3" fill="#F97316"/><circle cx="42" cy="18" r="3" fill="#F59E0B"/></svg>` },
+        ]}
       ],
       3: [
         { tipo: "mc", q: "Um computador com 8GB de RAM está muito lento ao abrir 20 abas. Qual upgrade teria MAIOR impacto?", options: ["Trocar o mouse por um mais caro", "Adicionar mais RAM (16GB ou mais)", "Mudar o monitor para 4K"], correct: 1 },
@@ -2022,7 +2074,18 @@ const MODULOS = {
         { tipo: "vf", q: "O Word é software.", correct: true },
         { tipo: "mc", q: "Sem software, o computador…", options: ["Funciona normalmente", "Não faz nada útil", "Vira mais rápido"], correct: 1 },
         { tipo: "mc", q: "Software é tipo o ___ do computador.", options: ["Esqueleto", "Cérebro", "Coração"], correct: 1 },
-        { tipo: "vf", q: "Música no Spotify é software.", correct: true }
+        { tipo: "vf", q: "Música no Spotify é software.", correct: true },
+        { tipo: "img", q: "Qual destes é um SOFTWARE?", correct: 2, options: [
+          { label: "Mouse", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="15" y="10" width="30" height="40" rx="15" fill="#94A3B8" stroke="#64748B" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="30" stroke="#64748B" stroke-width="2"/></svg>` },
+          { label: "Teclado", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="8" y="18" width="44" height="24" rx="4" fill="#94A3B8" stroke="#64748B" stroke-width="2"/><rect x="12" y="22" width="6" height="5" rx="1" fill="white"/><rect x="20" y="22" width="6" height="5" rx="1" fill="white"/><rect x="28" y="22" width="6" height="5" rx="1" fill="white"/></svg>` },
+          { label: "Chrome", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="white" stroke="#E2E8F0" stroke-width="1"/><circle cx="30" cy="30" r="10" fill="#4285F4"/><path d="M30 8 A22 22 0 0 1 49 19 L38 19 A10 10 0 0 0 30 20 Z" fill="#EA4335"/><path d="M49 19 A22 22 0 0 1 49 41 L41 27 A10 10 0 0 0 38 19 Z" fill="#FBBC05"/><path d="M49 41 A22 22 0 0 1 11 41 L22 27 A10 10 0 0 0 30 40 Z" fill="#34A853"/><path d="M11 41 A22 22 0 0 1 11 19 L22 19 A10 10 0 0 0 30 20 Z" fill="#4285F4"/><circle cx="30" cy="30" r="8" fill="#4285F4"/></svg>` },
+        ]},
+        { tipo: "drag", q: "Ligue o software ao que ele faz:", pairs: [
+          { left: "🪟 Windows", right: "Sistema operacional" },
+          { left: "🌐 Chrome", right: "Navegar na internet" },
+          { left: "📝 Word", right: "Editar textos" },
+          { left: "🛡️ Antivírus", right: "Proteger o PC" },
+        ]}
       ],
       2: [
         { tipo: "mc", q: "Software é…", options: ["A parte física do computador", "Os programas e arquivos do computador", "Os fios do computador"], correct: 1 },
@@ -2034,7 +2097,18 @@ const MODULOS = {
         { tipo: "mc", q: "iOS é o sistema operacional do…", options: ["Android", "iPhone", "Windows"], correct: 1 },
         { tipo: "mc", q: "Antivírus é um tipo de…", options: ["Sistema operacional", "Software utilitário", "Hardware"], correct: 1 },
         { tipo: "vf", q: "Software de PC funciona normalmente no celular.", correct: false },
-        { tipo: "mc", q: "Qual é o sistema operacional MAIS usado em PCs?", options: ["Linux", "Windows", "iOS"], correct: 1 }
+        { tipo: "mc", q: "Qual é o sistema operacional MAIS usado em PCs?", options: ["Linux", "Windows", "iOS"], correct: 1 },
+        { tipo: "drag", q: "Classifique cada software pelo tipo:", pairs: [
+          { left: "🪟 Windows", right: "Sistema operacional" },
+          { left: "🎮 Roblox", right: "Aplicativo de jogo" },
+          { left: "🛡️ Antivírus", right: "Software utilitário" },
+          { left: "📊 Excel", right: "Aplicativo de escritório" },
+        ]},
+        { tipo: "img", q: "Qual ícone representa um SISTEMA OPERACIONAL?", correct: 1, options: [
+          { label: "Chrome", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="white" stroke="#E2E8F0" stroke-width="1"/><circle cx="30" cy="30" r="10" fill="#4285F4"/><path d="M30 8 A22 22 0 0 1 49 19 L38 19 A10 10 0 0 0 30 20 Z" fill="#EA4335"/><path d="M49 19 A22 22 0 0 1 49 41 L41 27 A10 10 0 0 0 38 19 Z" fill="#FBBC05"/><path d="M49 41 A22 22 0 0 1 11 41 L22 27 A10 10 0 0 0 30 40 Z" fill="#34A853"/><circle cx="30" cy="30" r="8" fill="#4285F4"/></svg>` },
+          { label: "Windows", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="10" y="10" width="18" height="18" rx="2" fill="#0078D4"/><rect x="32" y="10" width="18" height="18" rx="2" fill="#0078D4"/><rect x="10" y="32" width="18" height="18" rx="2" fill="#0078D4"/><rect x="32" y="32" width="18" height="18" rx="2" fill="#0078D4"/></svg>` },
+          { label: "Word", svg: `<svg width="60" height="60" viewBox="0 0 60 60"><rect x="8" y="8" width="44" height="44" rx="6" fill="#2B579A"/><text x="30" y="38" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="white">W</text></svg>` },
+        ]}
       ],
       3: [
         { tipo: "mc", q: "O que é uma API (Application Programming Interface)?", options: ["Uma interface que permite comunicação e troca de dados entre softwares diferentes", "Um tipo de vírus que ataca aplicativos", "Um sistema operacional baseado em Linux"], correct: 0 },
@@ -2784,6 +2858,15 @@ function renderQuizQuestion() {
         <div class="quiz-option-letter" style="background:#EF4444;color:white;">✗</div>
         <div style="font-size: 20px;">FALSO</div>
       </button>`;
+  } else if (q.tipo === "img") {
+    const imgOpts = q.options.map((op, i) => `
+      <div class="img-choice" onclick="responderImg(this, ${i}, ${q.correct})">
+        ${op.svg}
+        <div class="img-choice-label">${escapeHtml(op.label)}</div>
+      </div>`).join('');
+    opts = `<div class="img-choices">${imgOpts}</div>`;
+  } else if (q.tipo === "drag") {
+    opts = '<div id="dragContainer"></div>';
   } else {
     const letters = ["A", "B", "C", "D"];
     opts = q.options.map((opt, i) =>
@@ -2796,15 +2879,38 @@ function renderQuizQuestion() {
 
   document.getElementById("quizContent").innerHTML = `
     <div class="quiz-question">
-      <div class="quiz-q-num">PERGUNTA ${estadoQuiz.idx + 1} ${q.tipo === "vf" ? "— V ou F" : ""}</div>
+      <div class="quiz-q-num">PERGUNTA ${estadoQuiz.idx + 1} ${q.tipo === "vf" ? "— V ou F" : q.tipo === "drag" ? "— LIGUE OS PARES" : q.tipo === "img" ? "— ESCOLHA A IMAGEM" : ""}</div>
       <div class="quiz-q-text">${q.q}</div>
     </div>
-    <div class="quiz-options">${opts}</div>
+    <div class="quiz-options" style="${(q.tipo === 'img' || q.tipo === 'drag') ? 'display:block;' : ''}">${opts}</div>
     <div class="quiz-feedback" id="quizFb"></div>
     <div style="margin-top: 20px; text-align: right;">
       <button class="btn" id="nextQBtn" style="display:none;" onclick="proximaPerguntaQuiz()">Próxima →</button>
     </div>`;
   estadoQuiz.answered = false;
+
+  // Initialize drag question after DOM is set
+  if (q.tipo === "drag") {
+    const dragContainer = document.getElementById("dragContainer");
+    if (dragContainer) {
+      renderDragQuestion(q, dragContainer, function(errors) {
+        estadoQuiz.answered = true;
+        estadoQuiz.score++;
+        document.getElementById("quizScoreLabel").textContent = `Pontos: ${estadoQuiz.score}`;
+        const fb = document.getElementById("quizFb");
+        if (fb) {
+          fb.textContent = errors === 0 ? "✓ Perfeito! Todos os pares corretos! +1 ponto" : `✓ Concluído! ${errors} erro(s). +1 ponto`;
+          fb.className = "quiz-feedback show correct";
+        }
+        const next = document.getElementById("nextQBtn");
+        if (next) {
+          next.style.display = "inline-flex";
+          const quizList = MODULOS[estadoQuiz.modulo].quiz[alunoAtivo.nivel];
+          next.textContent = (estadoQuiz.idx + 1 >= quizList.length) ? "Ver resultado →" : "Próxima →";
+        }
+      });
+    }
+  }
 }
 
 function responderQuiz(idx) {
@@ -2848,6 +2954,113 @@ function responderQuiz(idx) {
   const next = document.getElementById("nextQBtn");
   next.style.display = "inline-flex";
   next.textContent = (estadoQuiz.idx + 1 >= quiz.length) ? "Ver resultado →" : "Próxima →";
+}
+
+function responderImg(el, escolhido, correto) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  if (estadoQuiz.answered) return;
+  estadoQuiz.answered = true;
+  const correct = escolhido === correto;
+  el.classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) {
+    const all = document.querySelectorAll('.img-choice');
+    if (all[correto]) all[correto].classList.add('correct');
+  }
+  // lock all
+  document.querySelectorAll('.img-choice').forEach(c => c.style.pointerEvents = 'none');
+  const fb = document.getElementById("quizFb");
+  const n = alunoAtivo.nivel;
+  const quiz = MODULOS[estadoQuiz.modulo].quiz[n];
+  if (correct) {
+    estadoQuiz.score++;
+    document.getElementById("quizScoreLabel").textContent = `Pontos: ${estadoQuiz.score}`;
+    if (fb) { fb.textContent = "✓ Correto! +1 ponto"; fb.className = "quiz-feedback show correct"; }
+  } else {
+    const q = quiz[estadoQuiz.idx];
+    if (fb) { fb.innerHTML = `✗ A resposta certa era: <strong>${escapeHtml(q.options[correto].label)}</strong>`; fb.className = "quiz-feedback show wrong"; }
+  }
+  const next = document.getElementById("nextQBtn");
+  if (next) {
+    next.style.display = "inline-flex";
+    next.textContent = (estadoQuiz.idx + 1 >= quiz.length) ? "Ver resultado →" : "Próxima →";
+  }
+}
+
+// ---- DRAG-TO-MATCH quiz type ----
+let dragState = { selected: null, matches: {}, errors: 0 };
+
+function renderDragQuestion(q, container, onComplete) {
+  dragState = { selected: null, matches: {}, errors: 0, pairs: q.pairs, onComplete };
+
+  let itemsHtml = q.pairs.map((p, i) =>
+    `<div class="drag-item" data-idx="${i}" onclick="selectDragItem(${i})">${p.left}</div>`
+  ).join('');
+
+  // Shuffle zones
+  const order = [...q.pairs.keys()].sort(() => Math.random() - 0.5);
+  let zonesHtml = order.map(i =>
+    `<div class="drop-zone" data-target="${i}" onclick="dropOnZone(${i})">
+      <span style="opacity:0.5;font-size:18px;">→</span>
+      <span>${q.pairs[i].right}</span>
+    </div>`
+  ).join('');
+
+  container.innerHTML = `
+    <div class="drag-area">
+      <div>
+        <div class="drag-col-title">TERMOS</div>
+        <div class="drag-items" id="dragItems">${itemsHtml}</div>
+      </div>
+      <div>
+        <div class="drag-col-title">DEFINIÇÕES</div>
+        <div class="drag-items" id="dragZones">${zonesHtml}</div>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="dragFeedback" style="margin-top:12px;"></div>
+  `;
+}
+
+function selectDragItem(idx) {
+  if (dragState.matches[idx] !== undefined) return; // already matched
+  document.querySelectorAll('.drag-item').forEach(el => el.classList.remove('selected'));
+  if (dragState.selected === idx) { dragState.selected = null; return; }
+  dragState.selected = idx;
+  document.querySelector(`.drag-item[data-idx="${idx}"]`)?.classList.add('selected');
+}
+
+function dropOnZone(targetIdx) {
+  if (dragState.selected === null) return;
+  const srcIdx = dragState.selected;
+
+  // Check if zone already filled
+  if (document.querySelector(`.drop-zone[data-target="${targetIdx}"]`)?.classList.contains('filled')) return;
+
+  const correct = srcIdx === targetIdx;
+  const srcEl = document.querySelector(`.drag-item[data-idx="${srcIdx}"]`);
+  const zoneEl = document.querySelector(`.drop-zone[data-target="${targetIdx}"]`);
+
+  if (correct) {
+    dragState.matches[srcIdx] = targetIdx;
+    srcEl?.classList.add('matched');
+    srcEl?.classList.remove('selected');
+    if (zoneEl) {
+      zoneEl.classList.add('filled');
+      zoneEl.innerHTML = `<span style="color:var(--green)">✓</span><span>${dragState.pairs[srcIdx].right}</span>`;
+    }
+    dragState.selected = null;
+    // Check all done
+    if (Object.keys(dragState.matches).length === dragState.pairs.length) {
+      setTimeout(() => dragState.onComplete(dragState.errors), 500);
+    }
+  } else {
+    dragState.errors++;
+    srcEl?.classList.add('wrong-flash');
+    zoneEl?.classList.add('wrong-flash');
+    setTimeout(() => { srcEl?.classList.remove('wrong-flash'); zoneEl?.classList.remove('wrong-flash'); }, 500);
+    const fb = document.getElementById('dragFeedback');
+    if (fb) { fb.className = 'quiz-feedback show wrong'; fb.textContent = '❌ Par incorreto — tente novamente!'; }
+    setTimeout(() => fb?.classList.remove('show'), 1500);
+  }
 }
 
 function proximaPerguntaQuiz() {
@@ -5014,9 +5227,9 @@ function sairAtirador() {
 }
 
 // =============================================================
-// MONTA O PC
+// (MONTA O PC REMOVIDO)
 // =============================================================
-const PECAS_PC = [
+const PECAS_PC_PLACEHOLDER = [
   { id: 'placa-mae', nome: 'Placa-mãe', icone: '🔲', slot: 'slot-placa-mae', info: '✅ Placa-mãe vai no painel central do gabinete! É o esqueleto do PC — conecta TODAS as outras peças.' },
   { id: 'cpu', nome: 'CPU / Processador', icone: '🧠', slot: 'slot-cpu', info: '✅ CPU vai no soquete da placa-mãe! É o cérebro do computador — executa todos os cálculos.' },
   { id: 'cooler', nome: 'Cooler', icone: '🌀', slot: 'slot-cooler', info: '✅ Cooler vai em cima da CPU! Mantém o processador frio para não superaquecer.' },
@@ -5027,143 +5240,313 @@ const PECAS_PC = [
   { id: 'cabos', nome: 'Cabos', icone: '🔗', slot: 'slot-cabos', info: '✅ Cabos se conectam nos conectores da placa-mãe! Ligam a fonte e os periféricos ao sistema.' }
 ];
 
-let montaState = { selectedPeca: null, placedPecas: new Set(), pontos: 0, erros: 0 };
+// (montaState and Monta PC functions removed)
 
-function goMontaPC() {
-  montaState = { selectedPeca: null, placedPecas: new Set(), pontos: 0, erros: 0 };
-  renderMontaPC();
-  showScreen('monta-pc');
+// =============================================================
+// RANKEADA DE TEXTOS — Corrida contra o relógio
+// =============================================================
+
+const TEXTOS_RANKEADA = [
+  { id: 'txt01', titulo: 'A História do Computador', nivel: 'facil', texto: `O computador e uma das invencoes mais importantes da historia da humanidade. Tudo comecou na decada de 1940, quando os primeiros computadores eram enormes maquinas que ocupavam salas inteiras. O ENIAC, construido em 1945 nos Estados Unidos, pesava 30 toneladas e usava valvulas eletronicas para fazer calculos.
+
+Com o tempo, os computadores foram ficando menores e mais poderosos. Na decada de 1970, surgiram os primeiros microcomputadores, que ja podiam ser usados em casa. Depois vieram os notebooks, os tablets e os smartphones, que hoje cabem na palma da mao.
+
+Hoje em dia, o computador esta em todos os lugares. Ele controla avioes, carros, hospitais e ate a geladeira de casa. Aprender a usar o computador e uma habilidade essencial para qualquer pessoa que queira ter boas oportunidades no futuro.` },
+
+  { id: 'txt02', titulo: 'Hardware: As Peças do PC', nivel: 'facil', texto: `O hardware e a parte fisica do computador, ou seja, tudo que voce pode tocar. As pecas mais importantes sao o processador, a memoria RAM, o HD ou SSD, a placa-mae e a fonte de energia.
+
+O processador, tambem chamado de CPU, e o cerebro do computador. Ele faz todos os calculos e processa as informacoes. A memoria RAM e onde o computador guarda os dados que esta usando no momento. Quando voce desliga o PC, tudo que estava na RAM e apagado.
+
+O HD e o SSD sao os discos de armazenamento. Eles guardam seus arquivos, fotos, musicas e programas de forma permanente. A diferenca e que o SSD e muito mais rapido que o HD tradicional, porque nao tem partes mecanicas girando.
+
+A placa-mae conecta todas as pecas e permite que elas se comuniquem entre si. A fonte de energia transforma a energia eletrica da tomada em energia que o computador consegue usar.` },
+
+  { id: 'txt03', titulo: 'Software e Sistemas Operacionais', nivel: 'facil', texto: `Software e o nome dado a todos os programas e aplicativos que existem dentro do computador. Diferente do hardware, o software nao pode ser tocado. Ele e formado por codigo, que sao instrucoes escritas por programadores para dizer ao computador o que fazer.
+
+O software mais importante de qualquer dispositivo e o sistema operacional. Ele e responsavel por fazer o computador funcionar e abrir todos os outros programas. Os sistemas operacionais mais famosos sao o Windows, o macOS e o Linux.
+
+No celular, os sistemas mais usados sao o Android e o iOS. Sem o sistema operacional, o computador seria apenas um monte de pecas sem utilidade. E ele que organiza tudo e permite que voce use programas como o Word, o Chrome e os jogos.
+
+Os aplicativos sao softwares feitos para funcoes especificas. O WhatsApp e um aplicativo de mensagens. O Spotify e um aplicativo de musica. Cada um tem um objetivo claro e foi programado para cumprir aquela funcao da melhor forma possivel.` },
+
+  { id: 'txt04', titulo: 'Como a Internet Funciona', nivel: 'medio', texto: `A internet e uma rede global que conecta bilhoes de computadores, celulares e outros dispositivos ao redor do mundo. Para que ela funcione, existem milhares de cabos submarinos que atravessam os oceanos, alem de torres de transmissao e satelites no espaco.
+
+Quando voce acessa um site, seu computador envia uma solicitacao para um servidor, que e um computador potente guardado em algum lugar do mundo. Esse servidor processa o pedido e manda de volta as informacoes do site. Tudo isso acontece em fracoes de segundo.
+
+Os dados trafegam pela internet no formato de pacotes. Cada pacote percorre um caminho diferente e todos se juntam quando chegam ao destino. Esse sistema e chamado de comutacao de pacotes e foi inventado para que a rede nunca ficasse totalmente fora do ar.
+
+Para identificar os servidores na rede, cada um tem um endereco IP, que funciona como o CEP de uma casa. O sistema de nomes de dominio, chamado de DNS, traduz os enderecos de sites como google.com em numeros que os computadores entendem.
+
+A velocidade da internet e medida em megabits por segundo. Quanto maior o numero, mais rapida e a conexao e mais rapido voce consegue baixar arquivos, assistir videos e jogar online.` },
+
+  { id: 'txt05', titulo: 'Segurança Digital', nivel: 'medio', texto: `Seguranca digital e o conjunto de praticas e ferramentas usadas para proteger computadores, dados e usuarios de ameacas na internet. Com o aumento do uso da tecnologia, os riscos tambem cresceram. Virus, golpes online e roubo de senhas sao problemas que afetam milhoes de pessoas todos os anos.
+
+Um virus de computador e um programa malicioso que se espalha de arquivo em arquivo e pode causar danos como apagar dados, roubar senhas e ate bloquear o computador. O antivirus e o software responsavel por detectar e eliminar essas ameacas.
+
+O phishing e um dos golpes mais comuns na internet. Os criminosos enviam mensagens falsas fingindo ser bancos ou lojas conhecidas para roubar senhas e dados pessoais. Para se proteger, nunca clique em links suspeitos e sempre confirme se o site e verdadeiro antes de digitar qualquer informacao.
+
+Uma senha forte e a primeira linha de defesa contra invasores. Use combinacoes de letras maiusculas, minusculas, numeros e simbolos. Nunca use datas de aniversario ou nomes faceis de adivinhar. Se possivel, ative a verificacao em duas etapas nas suas contas.
+
+Fazer backup e outra pratica essencial. Manter copias dos seus arquivos em um HD externo ou na nuvem garante que voce nao perca tudo em caso de virus, roubo ou defeito no computador.` },
+
+  { id: 'txt06', titulo: 'O Que É Programação', nivel: 'medio', texto: `Programacao e a arte de escrever instrucoes para que o computador execute tarefas. Essas instrucoes sao escritas em linguagens de programacao, que sao idiomas especiais com regras proprias que tanto humanos quanto maquinas conseguem entender.
+
+Existem dezenas de linguagens de programacao, cada uma com suas caracteristicas. O Python e famoso por ser simples e legivel, sendo muito usado em ciencia de dados e inteligencia artificial. O JavaScript roda nos navegadores e e essencial para criar paginas web interativas.
+
+Um programador analisa um problema, pensa em uma solucao logica e traduz essa solucao em codigo. O codigo e entao testado varias vezes para garantir que funciona corretamente e nao tem erros, chamados de bugs.
+
+A logica de programacao e a base de tudo. Antes de aprender qualquer linguagem, e importante entender conceitos como variaveis, condicoes, repeticoes e funcoes. Uma variavel e como uma caixa que guarda um valor. Uma condicao e uma escolha que o programa faz.
+
+Hoje, a programacao esta presente em praticamente tudo. Aplicativos de celular, jogos, sistemas bancarios, sites e carros autonomos foram criados por programadores. Saber programar e uma das habilidades mais valorizadas no mercado de trabalho atual.` },
+
+  { id: 'txt07', titulo: 'Inteligência Artificial', nivel: 'dificil', texto: `Inteligencia artificial, ou IA, e a area da computacao dedicada a criar sistemas capazes de realizar tarefas que normalmente exigiriam inteligencia humana. Reconhecer rostos em fotos, traduzir idiomas, jogar xadrez e dirigir carros sao exemplos do que a IA ja consegue fazer.
+
+O aprendizado de maquina, conhecido como machine learning, e a principal tecnica usada na IA moderna. Em vez de ser programado com regras fixas, o sistema aprende sozinho analisando grandes volumes de dados. Quanto mais dados ele processa, mais preciso se torna.
+
+As redes neurais artificiais sao inspiradas no funcionamento do cerebro humano. Elas sao compostas por camadas de neuronios digitais que processam informacoes em conjunto. O deep learning usa redes neurais com muitas camadas para resolver problemas complexos como reconhecimento de voz e imagem.
+
+Hoje, a IA esta presente no cotidiano de formas que muitas vezes passam despercebidas. Os algoritmos de recomendacao do YouTube e do Netflix sao IA. O assistente de voz do celular e IA. Os filtros de spam do email sao IA. Os carros que freiam automaticamente ao detectar obstaculos usam IA.
+
+A inteligencia artificial tambem traz desafios importantes. Questoes eticas sobre privacidade, vies algoritmico e impacto no emprego sao debatidas por pesquisadores, governos e empresas. O futuro da IA depende nao apenas da tecnologia, mas tambem das escolhas que a sociedade fara sobre como utiliza-la.` },
+
+  { id: 'txt08', titulo: 'Redes de Computadores', nivel: 'dificil', texto: `Uma rede de computadores e um conjunto de dispositivos conectados entre si para compartilhar dados e recursos. A internet e a maior rede de computadores do mundo, mas redes menores existem em casas, empresas e escolas.
+
+A rede local, chamada de LAN, conecta computadores em um mesmo ambiente, como uma escola ou escritorio. A conexao pode ser feita por cabos de rede ou por Wi-Fi. O roteador e o dispositivo responsavel por distribuir a conexao a internet para todos os dispositivos da rede.
+
+Cada dispositivo em uma rede e identificado por um endereco IP. Existem dois tipos: o endereco IP privado, usado dentro da rede local, e o endereco IP publico, visivel para a internet. O protocolo TCP/IP define como os dados sao enviados e recebidos entre os dispositivos.
+
+A seguranca em redes e fundamental. Um firewall monitora o trafego e bloqueia acessos nao autorizados. A criptografia protege os dados durante a transmissao, tornando-os ilegiveis para quem nao tem a chave correta. O protocolo HTTPS garante que a comunicacao entre seu navegador e os sites seja criptografada.
+
+O modelo cliente-servidor e a base de funcionamento da maioria dos servicos online. O cliente e o dispositivo que faz uma requisicao, como seu celular acessando o Instagram. O servidor recebe esse pedido e envia a resposta. Os servidores ficam em datacenters, que sao galpoes gigantes com milhares de computadores funcionando ininterruptamente.` },
+
+  { id: 'txt09', titulo: 'Computação em Nuvem', nivel: 'dificil', texto: `A computacao em nuvem, ou cloud computing, e a entrega de servicos de computacao pela internet. Em vez de ter programas instalados no computador e arquivos guardados no HD, tudo fica em servidores remotos acessiveis de qualquer dispositivo com internet.
+
+Os tres modelos principais de nuvem sao o IaaS, o PaaS e o SaaS. O IaaS, Infrastructure as a Service, oferece infraestrutura virtual como servidores e armazenamento. O PaaS, Platform as a Service, fornece um ambiente para desenvolver e publicar aplicacoes. O SaaS, Software as a Service, entrega software pronto pelo navegador, como o Google Docs.
+
+As tres maiores empresas de computacao em nuvem sao Amazon Web Services, Microsoft Azure e Google Cloud. Juntas, elas sustentam grande parte da infraestrutura digital global, desde startups ate grandes corporacoes e governos.
+
+As vantagens da nuvem sao muitas. Nao e preciso comprar servidores caros. A capacidade pode ser aumentada ou reduzida conforme a necessidade. As atualizacoes acontecem automaticamente. E os dados ficam acessiveis de qualquer lugar do mundo.
+
+Por outro lado, a dependencia da internet e um ponto critico. Se a conexao cair, o acesso aos servicos pode ser interrompido. A privacidade dos dados tambem e uma preocupacao, ja que as informacoes ficam armazenadas em servidores de terceiros. Por isso, a escolha de um provedor confiavel e o uso de criptografia sao fundamentais.` },
+
+  { id: 'txt10', titulo: 'O Futuro da Tecnologia', nivel: 'dificil', texto: `A tecnologia avanca em um ritmo cada vez mais acelerado. O que era ficcao cientifica ha vinte anos hoje e realidade, e o que parece impossivel hoje pode ser comum daqui a uma decada. Entender as tendencias tecnologicas e essencial para se preparar para o mundo do futuro.
+
+A internet das coisas, conhecida como IoT, conecta objetos do cotidiano a internet. Geladeiras que fazem lista de compras, relogios que monitoram a saude, casas que ajustam a temperatura automaticamente. Estima-se que mais de 75 bilhoes de dispositivos estarao conectados a internet nos proximos anos.
+
+A computacao quantica promete resolver problemas que os computadores atuais levariam seculos para calcular. Em vez de bits, que representam zero ou um, os computadores quanticos usam qubits, que podem representar zero, um ou ambos ao mesmo tempo.
+
+O metaverso e um conceito de internet imersiva, onde as pessoas interagem em ambientes virtuais tridimensionais usando oculos de realidade virtual ou aumentada. Empresas como Meta e Microsoft ja investem bilhoes nessa direcao.
+
+A tecnologia 5G, com velocidades ate cem vezes maiores que o 4G, vai viabilizar carros autonomos, cirurgias remotas e cidades inteligentes. A ciberseguranca se tornara ainda mais critica, pois quanto mais conectado e o mundo, maiores sao as superficies de ataque para criminosos digitais. Construir uma base solida em informatica hoje e investir diretamente no seu futuro.` }
+];
+
+const RANKEADA_CONFIG = {
+  facil:   { tempoBase: 300, penalidade: 2,  mult: {1:1.5, 2:1.0, 3:0.8} },
+  medio:   { tempoBase: 240, penalidade: 4,  mult: {1:1.3, 2:1.0, 3:0.75} },
+  dificil: { tempoBase: 180, penalidade: 6,  mult: {1:1.2, 2:1.0, 3:0.7} },
+  elite:   { tempoBase: 120, penalidade: 10, mult: {1:1.1, 2:1.0, 3:0.65} }
+};
+
+let rankeadaState = { texto:null, pos:0, erros:0, tempoRestante:0, tempoTotal:0, timerId:null, finalizado:false, inicio:0, dif:'facil', cfg:null };
+
+function abrirMenuRankeada() {
+  rankeadaState.dif = rankeadaState.dif || 'facil';
+  renderMenuRankeada();
+  showScreen('digitacao-rankeada-menu');
 }
 
-function renderMontaPC() {
-  const pecasRestantes = PECAS_PC.filter(p => !montaState.placedPecas.has(p.id));
-  const pecasHTML = pecasRestantes.map(p =>
-    `<div class="peca-item ${montaState.selectedPeca === p.id ? 'selected' : ''}" onclick="selecionarPeca('${p.id}')">
-      <span style="font-size:22px;">${p.icone}</span>
-      <span>${p.nome}</span>
-    </div>`
-  ).join('');
-
-  const slots = PECAS_PC.map(p => {
-    const placed = montaState.placedPecas.has(p.id);
-    return { id: p.slot, label: p.nome, placed, icone: p.icone };
-  });
-
-  const svgSlots = slots.map((sl, i) => {
-    const cols = 2;
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    const x = 30 + col * 210;
-    const y = 30 + row * 95;
-    const w = 185;
-    const h = 75;
-    const placed = sl.placed;
-    const fill = placed ? '#D1FAE5' : '#F8FAFC';
-    const stroke = placed ? '#10B981' : '#94A3B8';
-    const strokeDash = placed ? 'none' : '6,3';
-    return `
-      <g class="pc-slot-group" onclick="clicarSlot('${sl.id}')" style="cursor:pointer;">
-        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-dasharray="${strokeDash}"/>
-        <text x="${x + w/2}" y="${y + 22}" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" fill="${placed ? '#065F46' : '#64748B'}">${placed ? sl.icone : '❓'}</text>
-        <text x="${x + w/2}" y="${y + 44}" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="${placed ? '#065F46' : '#64748B'}">${sl.label}</text>
-        ${placed ? `<text x="${x + w/2}" y="${y + 62}" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#10B981">✓ Colocado</text>` : `<text x="${x + w/2}" y="${y + 62}" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#94A3B8">Clique para encaixar</text>`}
-      </g>`;
-  }).join('');
-
-  document.getElementById('montaPCContent').innerHTML = `
-    <div style="margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
-      <span style="font-weight:700;">⭐ Pontos: <span id="montaPontos">${montaState.pontos}</span></span>
-      <span style="color:var(--red-soft);font-weight:700;">❌ Erros: <span id="montaErros" style="color:var(--red);">${montaState.erros}</span></span>
-      <span style="color:var(--green);font-weight:700;">${montaState.placedPecas.size}/8 peças colocadas</span>
+function renderMenuRankeada() {
+  const nivel = alunoAtivo?.nivel || 1;
+  const dif = rankeadaState.dif;
+  const cfg = RANKEADA_CONFIG[dif];
+  const tempo = Math.round(cfg.tempoBase * (cfg.mult[nivel] || 1));
+  const nivelStr = ['','Iniciante','Intermediário','Avançado'][nivel] || 'Aluno';
+  document.getElementById('rankeadaMenuContent').innerHTML = `
+    <div style="background:linear-gradient(135deg,#0F172A,#1E293B);border-radius:var(--radius);padding:28px;color:white;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;opacity:0.6;margin-bottom:6px;">RANKEADA DE TEXTOS</div>
+      <div style="font-size:26px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:8px;">Corrida contra o relógio ⏱️</div>
+      <div style="font-size:14px;opacity:0.75;line-height:1.6;">Complete o texto antes do tempo acabar. Cada erro de digitação <strong style="color:#EF4444;">reduz o tempo</strong>. Quanto mais preciso, mais rápido você termina!</div>
     </div>
-    <div class="monta-layout">
-      <div>
-        <div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--ink-soft);">GABINETE DO PC — CLIQUE NO SLOT APÓS SELECIONAR A PEÇA</div>
-        <svg viewBox="0 0 460 430" style="width:100%;border:2px solid var(--line);border-radius:16px;background:#F1F5F9;">
-          <!-- Gabinete outline -->
-          <rect x="10" y="10" width="440" height="410" rx="18" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2"/>
-          <text x="230" y="32" text-anchor="middle" font-family="Plus Jakarta Sans,Inter,sans-serif" font-size="13" font-weight="800" fill="#475569">GABINETE DO PC</text>
-          ${svgSlots}
-        </svg>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:var(--bg-2);border:2px solid var(--line);border-radius:var(--radius-sm);padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);margin-bottom:4px;">SEU NÍVEL</div>
+        <div style="font-size:20px;font-weight:900;">${nivelStr}</div>
       </div>
-      <div>
-        <div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--ink-soft);">PEÇAS DISPONÍVEIS</div>
-        <div style="display:flex;flex-direction:column;gap:8px;" id="listaPecas">
-          ${pecasHTML || '<div style="color:var(--green);font-weight:700;text-align:center;padding:20px;">🎉 Todas as peças colocadas!</div>'}
-        </div>
-        ${montaState.selectedPeca ? `<div style="margin-top:12px;padding:10px;background:var(--blue-soft);border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--blue);">👆 Agora clique no slot correto no gabinete!</div>` : ''}
+      <div style="background:var(--yellow-soft);border:2px solid var(--yellow);border-radius:var(--radius-sm);padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#92400E;margin-bottom:4px;">TEMPO INICIAL</div>
+        <div style="font-size:20px;font-weight:900;color:#78350F;">${Math.floor(tempo/60)}m ${String(tempo%60).padStart(2,'0')}s</div>
       </div>
-    </div>`;
+    </div>
+    <div class="section-titulo">DIFICULDADE</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">
+      ${['facil','medio','dificil','elite'].map((d,i)=>{
+        const lb=['🟢 Fácil','🟡 Médio','🔴 Difícil','⚡ Elite'][i];
+        const pn=['-2s','-4s','-6s','-10s'][i];
+        const sel=dif===d;
+        return `<div onclick="setDifRankeada('${d}')" style="padding:12px 6px;border:2px solid ${sel?'var(--ink)':'var(--line)'};background:${sel?'var(--ink)':'var(--bg-soft)'};color:${sel?'white':'var(--ink)'};border-radius:10px;cursor:pointer;text-align:center;transition:all 0.15s;">
+          <div style="font-size:13px;font-weight:700;">${lb}</div>
+          <div style="font-size:11px;opacity:0.7;margin-top:3px;">Erro: ${pn}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="section-titulo">ESCOLHA UM TEXTO</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      ${TEXTOS_RANKEADA.map((t,i)=>{
+        const hist=(alunoAtivo?.progresso?.rankeada||[]).find(r=>r.id===t.id);
+        const badge=hist?`<span style="background:var(--green-soft);color:#065F46;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:800;white-space:nowrap;">✓ ${hist.wpm} WPM</span>`:'';
+        const difBadge={facil:'🟢',medio:'🟡',dificil:'🔴'}[t.nivel]||'⚡';
+        return `<div onclick="iniciarRankeada('${t.id}')" style="background:var(--bg-2);border:2px solid var(--line);border-radius:var(--radius-sm);padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.transform='translateX(4px)'" onmouseout="this.style.borderColor='var(--line)';this.style.transform=''">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:900;color:var(--ink-soft);width:24px;flex-shrink:0;text-align:center;">${i+1}</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:15px;">${t.titulo}</div>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${difBadge} ${t.nivel} · ${t.texto.length} caracteres</div>
+          </div>
+          ${badge}
+        </div>`;
+      }).join('')}
+    </div>
+    <button class="btn ghost full" onclick="abrirMenuDigitacao()">← Voltar para Digitação</button>`;
 }
 
-function selecionarPeca(id) {
-  montaState.selectedPeca = montaState.selectedPeca === id ? null : id;
-  renderMontaPC();
+function setDifRankeada(d) {
+  rankeadaState.dif = d;
+  renderMenuRankeada();
 }
 
-function clicarSlot(slotId) {
-  if (!montaState.selectedPeca) {
-    alert('Selecione uma peça primeiro!');
-    return;
+function iniciarRankeada(textoId) {
+  const texto = TEXTOS_RANKEADA.find(t=>t.id===textoId);
+  if (!texto) return;
+  const nivel = alunoAtivo?.nivel || 1;
+  const dif = rankeadaState.dif || 'facil';
+  const cfg = RANKEADA_CONFIG[dif];
+  const tempo = Math.round(cfg.tempoBase * (cfg.mult[nivel] || 1));
+  rankeadaState = { texto, pos:0, erros:0, tempoRestante:tempo, tempoTotal:tempo, timerId:null, finalizado:false, inicio:0, dif, cfg };
+  document.getElementById('rankeadaTopTitle').textContent = `⏱️ ${texto.titulo}`;
+  document.getElementById('rankeadaResultado').innerHTML = '';
+  renderTextoRankeada();
+  atualizarTimerDisplay();
+  showScreen('digitacao-rankeada');
+  document.addEventListener('keydown', listenerRankeada);
+}
+
+function renderTextoRankeada() {
+  const html = rankeadaState.texto.texto.split('').map((c,i)=>{
+    let cls='dig-char';
+    if (c===' ') cls+=' space';
+    if (i < rankeadaState.pos) cls+=' done';
+    else if (i===rankeadaState.pos) cls+=' current';
+    const disp = c==='\n' ? '↵<br>' : (c===' ' ? '·' : escapeHtml(c));
+    return `<span class="${cls}" data-i="${i}">${disp}</span>`;
+  }).join('');
+  document.getElementById('rankeadaTextoBox').innerHTML = html;
+}
+
+function atualizarTimerDisplay() {
+  const t = rankeadaState.tempoRestante;
+  const el = document.getElementById('rankeadaTimer');
+  if (!el) return;
+  el.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+  const pct = t / rankeadaState.tempoTotal;
+  el.style.color = pct < 0.2 ? '#EF4444' : pct < 0.4 ? '#F59E0B' : 'var(--ink)';
+  const barra = document.getElementById('rankeadaTimerBar');
+  if (barra) barra.style.width = (pct*100)+'%';
+  const prog = document.getElementById('rankeadaProgresso');
+  if (prog) prog.textContent = Math.round(rankeadaState.pos/rankeadaState.texto.texto.length*100)+'%';
+  const wpmEl = document.getElementById('rankeadaWpm');
+  if (wpmEl && rankeadaState.inicio) {
+    const seg = (Date.now()-rankeadaState.inicio)/1000;
+    wpmEl.textContent = seg>0 ? Math.round((rankeadaState.pos/5)/seg*60) : 0;
   }
-  const peca = PECAS_PC.find(p => p.id === montaState.selectedPeca);
-  if (!peca) return;
+}
 
-  if (peca.slot === slotId) {
-    // correct
-    montaState.placedPecas.add(peca.id);
-    montaState.pontos += 10;
-    montaState.selectedPeca = null;
-    renderMontaPC();
-    // popup
-    mostrarPopupMonta(peca.info);
-    if (montaState.placedPecas.size === PECAS_PC.length) {
-      setTimeout(vitoriaMontaPC, 1200);
-    }
+function listenerRankeada(e) {
+  if (rankeadaState.finalizado) return;
+  if (e.key==='Escape') { sairRankeada(); return; }
+  const isEnter = e.key==='Enter';
+  if (e.key.length!==1 && !isEnter) return;
+  e.preventDefault();
+  if (!rankeadaState.inicio) {
+    rankeadaState.inicio = Date.now();
+    rankeadaState.timerId = setInterval(()=>{
+      rankeadaState.tempoRestante--;
+      atualizarTimerDisplay();
+      if (rankeadaState.tempoRestante<=0) finalizarRankeada(false);
+    }, 1000);
+  }
+  const texto = rankeadaState.texto.texto;
+  const esperado = texto[rankeadaState.pos];
+  const digitado = isEnter ? '\n' : e.key;
+  const certo = normalizarChar(esperado)===normalizarChar(digitado) || (esperado==='\n' && isEnter);
+  const spans = document.querySelectorAll('#rankeadaTextoBox .dig-char');
+  if (certo) {
+    spans[rankeadaState.pos]?.classList.remove('current','wrong');
+    spans[rankeadaState.pos]?.classList.add('done');
+    rankeadaState.pos++;
+    if (rankeadaState.pos>=texto.length) { finalizarRankeada(true); return; }
+    spans[rankeadaState.pos]?.classList.add('current');
+    spans[rankeadaState.pos]?.scrollIntoView({block:'nearest',behavior:'smooth'});
   } else {
-    // wrong
-    montaState.erros++;
-    montaState.pontos = Math.max(0, montaState.pontos - 2);
-    renderMontaPC();
-    const hint = PECAS_PC.find(p => p.id === montaState.selectedPeca);
-    mostrarPopupMonta(`❌ Slot errado para ${hint?.nome || 'essa peça'}! Tente outro slot. Dica: ${hint?.info.split('!')[1]?.trim() || 'Leia o slot com atenção.'}`);
+    rankeadaState.erros++;
+    const pen = rankeadaState.cfg?.penalidade||3;
+    rankeadaState.tempoRestante = Math.max(1, rankeadaState.tempoRestante-pen);
+    atualizarTimerDisplay();
+    spans[rankeadaState.pos]?.classList.add('wrong');
+    setTimeout(()=>spans[rankeadaState.pos]?.classList.remove('wrong'), 300);
+    const timerEl = document.getElementById('rankeadaTimer');
+    if (timerEl) { timerEl.style.transform='scale(1.3)'; setTimeout(()=>timerEl.style.transform='', 250); }
   }
 }
 
-function mostrarPopupMonta(texto) {
-  // remove existing
-  document.querySelectorAll('.monta-overlay,.monta-info-popup').forEach(e => e.remove());
-  const overlay = document.createElement('div');
-  overlay.className = 'monta-overlay';
-  overlay.onclick = () => { overlay.remove(); popup.remove(); };
-  const popup = document.createElement('div');
-  popup.className = 'monta-info-popup';
-  popup.innerHTML = `<div style="font-size:32px;margin-bottom:10px;">${texto.startsWith('✅') ? '🎉' : '⚠️'}</div>
-    <p style="font-size:15px;line-height:1.5;margin-bottom:16px;">${texto}</p>
-    <button class="btn" onclick="this.closest('.monta-info-popup').remove();document.querySelector('.monta-overlay').remove();">OK</button>`;
-  document.body.appendChild(overlay);
-  document.body.appendChild(popup);
+function finalizarRankeada(sucesso) {
+  rankeadaState.finalizado = true;
+  if (rankeadaState.timerId) clearInterval(rankeadaState.timerId);
+  document.removeEventListener('keydown', listenerRankeada);
+  const tempoGasto = rankeadaState.inicio ? (Date.now()-rankeadaState.inicio)/1000 : 1;
+  const textoLen = rankeadaState.texto.texto.length;
+  const wpm = Math.round((textoLen/5)/tempoGasto*60);
+  const precisao = Math.round((textoLen/(textoLen+rankeadaState.erros))*100);
+  const tempoSobrou = rankeadaState.tempoRestante;
+  const difMult={facil:1,medio:1.5,dificil:2,elite:3}[rankeadaState.dif]||1;
+  let pontos=0;
+  if (sucesso && alunoAtivo) {
+    pontos = Math.max(10, Math.round((wpm*precisao/100+tempoSobrou*0.5)*difMult));
+    adicionarPontosJogo(pontos);
+    if (!alunoAtivo.progresso.rankeada) alunoAtivo.progresso.rankeada=[];
+    const idx = alunoAtivo.progresso.rankeada.findIndex(r=>r.id===rankeadaState.texto.id);
+    const rec={id:rankeadaState.texto.id,titulo:rankeadaState.texto.titulo,wpm,precisao,pontos,dif:rankeadaState.dif,data:new Date().toISOString()};
+    if (idx>=0) { if (wpm>alunoAtivo.progresso.rankeada[idx].wpm) alunoAtivo.progresso.rankeada[idx]=rec; }
+    else alunoAtivo.progresso.rankeada.push(rec);
+    salvarAluno(alunoAtivo);
+  }
+  const emoji=sucesso?(wpm>=50?'🚀':wpm>=30?'⚡':'🎉'):'⏰';
+  const titulo=sucesso?(wpm>=50?'Incrível!':wpm>=30?'Muito bom!':'Concluído!'):'Tempo esgotado!';
+  const txBox = document.getElementById('rankeadaTextoBox');
+  if (txBox) txBox.style.opacity='0.35';
+  document.getElementById('rankeadaResultado').innerHTML=`
+    <div class="dig-completo" style="margin-top:16px;${!sucesso?'background:linear-gradient(135deg,#7F1D1D,#991B1B);':''}">
+      <div style="font-size:52px;margin-bottom:8px;">${emoji}</div>
+      <div style="font-size:26px;font-weight:800;margin-bottom:8px;">${titulo}</div>
+      ${sucesso?`
+        <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:10px 0;font-weight:700;font-size:18px;opacity:0.9;">
+          <div>${wpm}<span style="font-size:11px;font-weight:600;display:block;">WPM</span></div>
+          <div>${precisao}%<span style="font-size:11px;font-weight:600;display:block;">PRECISÃO</span></div>
+          <div>${rankeadaState.erros}<span style="font-size:11px;font-weight:600;display:block;">ERROS</span></div>
+          <div>${tempoSobrou}s<span style="font-size:11px;font-weight:600;display:block;">SOBRANDO</span></div>
+        </div>
+        <div style="font-size:30px;font-weight:900;margin-bottom:16px;">+${pontos} ⭐</div>`
+      :`<div style="font-size:14px;opacity:0.85;margin-bottom:16px;">Você digitou ${rankeadaState.pos} de ${textoLen} caracteres (${Math.round(rankeadaState.pos/textoLen*100)}%)</div>`}
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn ghost" style="background:rgba(255,255,255,0.2);color:white;" onclick="iniciarRankeada('${rankeadaState.texto.id}')">↻ Tentar novamente</button>
+        <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuRankeada()">← Escolher texto</button>
+        <button class="btn" style="background:rgba(0,0,0,0.2);color:white;" onclick="abrirMenuDigitacao()">Menu digitação</button>
+      </div>
+    </div>`;
 }
 
-function vitoriaMontaPC() {
-  document.querySelectorAll('.monta-overlay,.monta-info-popup').forEach(e => e.remove());
-  const pts = montaState.pontos;
-  if (pts > 0 && alunoAtivo) adicionarPontosJogo(pts);
-  const overlay = document.createElement('div');
-  overlay.className = 'monta-overlay';
-  const popup = document.createElement('div');
-  popup.className = 'monta-info-popup';
-  popup.innerHTML = `<div style="font-size:52px;margin-bottom:10px;">🖥️🎉</div>
-    <h2 style="margin-bottom:8px;">PC Montado!</h2>
-    <p style="color:var(--ink-soft);margin-bottom:8px;">Você colocou todas as ${PECAS_PC.length} peças corretamente!</p>
-    <p style="font-size:18px;font-weight:800;color:var(--green);margin-bottom:8px;">+${pts} pontos ⭐</p>
-    <p style="font-size:13px;color:var(--ink-soft);margin-bottom:16px;">Erros: ${montaState.erros}</p>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn" onclick="goMontaPC();this.closest('.monta-info-popup').remove();document.querySelector('.monta-overlay').remove();">🔄 Jogar Novamente</button>
-      <button class="btn ghost" onclick="goDashboard();document.querySelector('.monta-overlay')?.remove();document.querySelector('.monta-info-popup')?.remove();">Voltar</button>
-    </div>`;
-  document.body.appendChild(overlay);
-  document.body.appendChild(popup);
+function sairRankeada() {
+  if (rankeadaState.timerId) clearInterval(rankeadaState.timerId);
+  document.removeEventListener('keydown', listenerRankeada);
+  abrirMenuRankeada();
 }
 
 // =============================================================
