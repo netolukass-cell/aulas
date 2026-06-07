@@ -2055,10 +2055,10 @@
         <div class="pratique-desc">Encontre os pares de informática. Menos jogadas = mais pontos.</div>
         <div class="pratique-arrow">→</div>
       </div>
-      <div class="pratique-card" onclick="iniciarCacaHardware()">
-        <div class="pratique-icon-wrap"><iconify-icon icon="ph:target-bold"></iconify-icon></div>
-        <div class="pratique-title">Caça-Hardware</div>
-        <div class="pratique-desc">Nome apareceu? Acha o ícone certo antes do tempo acabar.</div>
+      <div class="pratique-card" onclick="iniciarHackerRunner()">
+        <div class="pratique-icon-wrap"><iconify-icon icon="ph:game-controller-bold"></iconify-icon></div>
+        <div class="pratique-title">Hacker Runner</div>
+        <div class="pratique-desc">Fase de plataforma pixel art. Colete dados, derrote virus, chegue ao PC Central.</div>
         <div class="pratique-arrow">→</div>
       </div>
       <div class="pratique-card" onclick="iniciarRelampago()">
@@ -2252,20 +2252,18 @@
   </div>
 </div>
 
-<!-- ====================== CAÇA-HARDWARE ====================== -->
-<div class="screen" id="screen-caca">
-  <div class="container">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Voltar</button>
-      <div class="top-bar-title">🎯 Caça-Hardware</div>
+<!-- ====================== HACKER RUNNER ====================== -->
+<div class="screen" id="screen-caca" style="padding:0;background:#000;display:flex;align-items:center;justify-content:center;">
+  <div style="position:relative;width:100%;max-width:960px;">
+    <canvas id="hrCanvas" style="display:block;width:100%;image-rendering:pixelated;cursor:none;"></canvas>
+    <div id="hrOverlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,8,0.92);font-family:'JetBrains Mono','Courier New',monospace;color:#E6EDF3;">
+      <div style="font-size:clamp(18px,4vw,32px);font-weight:900;color:#00FFCC;letter-spacing:3px;margin-bottom:8px;">HACKER RUNNER</div>
+      <div style="font-size:clamp(10px,2vw,13px);color:#8B949E;margin-bottom:24px;letter-spacing:1px;">INFILTRE A REDE. COLETE OS DADOS. CHEGUE AO PC CENTRAL.</div>
+      <div style="font-size:clamp(9px,1.5vw,11px);color:#3FB950;margin-bottom:6px;letter-spacing:1px;">[ SETAS / WASD ] MOVER &nbsp;&nbsp; [ SPACE / W ] PULAR</div>
+      <div style="font-size:clamp(9px,1.5vw,11px);color:#3FB950;margin-bottom:28px;letter-spacing:1px;">PULE EM CIMA DOS VIRUS PARA DESTRUI-LOS</div>
+      <button onclick="hrStart()" style="background:#00FFCC;color:#000;border:none;font-family:inherit;font-size:clamp(12px,2vw,15px);font-weight:900;padding:12px 36px;border-radius:4px;cursor:pointer;letter-spacing:2px;">INICIAR FASE</button>
+      <button onclick="goDashboard()" style="margin-top:10px;background:transparent;color:#8B949E;border:1px solid #30363D;font-family:inherit;font-size:clamp(10px,1.5vw,12px);padding:8px 24px;border-radius:4px;cursor:pointer;letter-spacing:1px;">VOLTAR</button>
     </div>
-    <div class="jogo-header">
-      <div class="jogo-stat"><div class="jogo-stat-val" id="cacaPontos">0</div><div class="jogo-stat-label">PONTOS</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="cacaRodada">1/10</div><div class="jogo-stat-label">RODADA</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="cacaErros">0</div><div class="jogo-stat-label">ERROS</div></div>
-    </div>
-    <div class="caca-target" id="cacaTarget"></div>
-    <div class="caca-grid" id="cacaGrid"></div>
   </div>
 </div>
 
@@ -4866,98 +4864,397 @@ function finalizarMemoria() {
 }
 
 // =============================================================
-// CAÇA-HARDWARE
+// HACKER RUNNER — pixel-art platformer (replaces Caca-Hardware)
 // =============================================================
-const CACA_ITENS = [
-  {icon:"ph:desktop-bold", nome:"Monitor"},
-  {icon:"ph:keyboard-bold", nome:"Teclado"},
-  {icon:"ph:mouse-bold", nome:"Mouse"},
-  {icon:"ph:printer-bold", nome:"Impressora"},
-  {icon:"ph:hard-drives-bold", nome:"HD"},
-  {icon:"ph:cpu-bold", nome:"CPU"},
-  {icon:"ph:webcam-bold", nome:"Webcam"},
-  {icon:"ph:microphone-bold", nome:"Microfone"},
-  {icon:"ph:speaker-high-bold", nome:"Alto-falante"},
-  {icon:"ph:headphones-bold", nome:"Fone"},
-  {icon:"ph:device-mobile-bold", nome:"Celular"},
-  {icon:"ph:disc-bold", nome:"CD"},
-  {icon:"ph:windows-logo-bold", nome:"Windows"},
-  {icon:"ph:globe-bold", nome:"Chrome"},
-  {icon:"ph:file-text-bold", nome:"Word"},
-  {icon:"ph:shield-check-bold", nome:"Antivírus"},
-  {icon:"ph:game-controller-bold", nome:"Joystick"},
-  {icon:"ph:lightning-bold", nome:"Memória RAM"},
-  {icon:"ph:camera-bold", nome:"Câmera"},
-  {icon:"ph:wifi-high-bold", nome:"Wi-Fi"}
-];
-let cacaState = { rodada: 0, pontos: 0, erros: 0, target: null };
+(function() {
+  const GW = 480, GH = 270, TS = 16;
+  const GRAV = 0.28, MAX_FALL = 8;
 
-function iniciarCacaHardware() {
-  cacaState = { rodada: 0, pontos: 0, erros: 0, target: null };
-  document.getElementById("cacaPontos").textContent = "0";
-  document.getElementById("cacaErros").textContent = "0";
-  showScreen("caca");
-  proximaRodadaCaca();
-}
+  // Tilemap legend:
+  // # = ground  p = platform  . = empty
+  // P = player start  D = data packet  V = virus
+  // F = firewall  C = checkpoint  X = PC Central
+  const RAW_MAP = [
+    "................................................................................",
+    "................................................................................",
+    ".......D...........D.....p..........D.................D.........................",
+    ".....pppppp.......pppp..............pppp....................ppp...................",
+    "..P...........................................V........D......................D.X.",
+    "....................D.....V.....ppp.....ppp...............pppp....ppp..pppp..ppp",
+    ".....pppppp........ppp.......F........F..........C..........................F...",
+    "################....##############.....##############....#####################..",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+  ];
 
-function proximaRodadaCaca() {
-  cacaState.rodada++;
-  if (cacaState.rodada > 10) { finalizarCaca(); return; }
-  document.getElementById("cacaRodada").textContent = `${cacaState.rodada}/10`;
-
-  // sorteia 1 target + 5 distratores
-  const pool = [...CACA_ITENS].sort(() => Math.random() - 0.5);
-  const target = pool[0];
-  const opcoes = pool.slice(0, 6).sort(() => Math.random() - 0.5);
-  cacaState.target = target;
-
-  document.getElementById("cacaTarget").innerHTML = `
-    <div class="caca-target-label">ACHE O ÍCONE DE:</div>
-    <div class="caca-target-word">${target.nome}</div>`;
-
-  // sem nome embaixo — só ícone grande
-  document.getElementById("cacaGrid").innerHTML = opcoes.map(op =>
-    `<div class="caca-option" onclick="responderCaca('${op.nome}', this)">
-      <iconify-icon icon="${op.icon}"></iconify-icon>
-    </div>`).join("");
-}
-
-function responderCaca(nome, el) {
-  if (el.classList.contains("correct") || el.classList.contains("wrong")) return;
-  if (nome === cacaState.target.nome) {
-    el.classList.add("correct");
-    cacaState.pontos += 10;
-    document.getElementById("cacaPontos").textContent = cacaState.pontos;
-    setTimeout(proximaRodadaCaca, 600);
-  } else {
-    el.classList.add("wrong");
-    cacaState.erros++;
-    document.getElementById("cacaErros").textContent = cacaState.erros;
+  function parseMap(raw) {
+    const tiles=[], collectibles=[], enemies=[], firewalls=[], checkpoints=[];
+    let playerStart={x:2*TS,y:4*TS}, goalPos=null;
+    raw.forEach((row,ry)=>{
+      row.split('').forEach((ch,cx)=>{
+        const px=cx*TS, py=ry*TS;
+        if(ch==='#'||ch==='p') tiles.push({x:px,y:py,w:TS,h:TS,type:ch});
+        if(ch==='D') collectibles.push({x:px+4,y:py+4,w:8,h:8,alive:true,glow:0});
+        if(ch==='V') enemies.push({x:px,y:py,w:14,h:14,vx:-0.7,alive:true,anim:0,startX:px,rangeX:48});
+        if(ch==='F') firewalls.push({x:px,y:py,w:TS,h:TS*2,pulse:0});
+        if(ch==='C') checkpoints.push({x:px,y:py,w:TS,h:TS*2,activated:false});
+        if(ch==='P') playerStart={x:px,y:py-TS};
+        if(ch==='X') goalPos={x:px,y:py-TS*2,w:TS*2,h:TS*3};
+      });
+    });
+    return {tiles,collectibles,enemies,firewalls,checkpoints,playerStart,goalPos};
   }
-}
 
-function finalizarCaca() {
-  const pontosFinais = cacaState.pontos - (cacaState.erros * 2);
-  adicionarPontosJogo(Math.max(0, pontosFinais));
-  if (!alunoAtivo.progresso.jogos) alunoAtivo.progresso.jogos = {};
-  alunoAtivo.progresso.jogos.caca = true;
-  salvarAluno(alunoAtivo);
+  let canvas, ctx, animId=null;
+  let map, player, particles=[], gameState='idle';
+  let keys={}, time=0, score=0, lastCheckpoint=null, flashMsg={txt:'',t:0};
 
-  document.getElementById("cacaTarget").innerHTML = "";
-  document.getElementById("cacaGrid").innerHTML = `
-    <div class="result-screen" style="grid-column: 1 / -1;">
-      <div class="result-emoji">🎯</div>
-      <div class="result-title">Acabou o jogo!</div>
-      <div style="font-size:18px;color:var(--ink-soft);margin-bottom:12px;">
-        ${cacaState.pontos} pontos brutos · ${cacaState.erros} erros
-      </div>
-      <div class="result-score" data-n="${alunoAtivo.nivel}">+${Math.max(0, pontosFinais)} ⭐</div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn ghost" onclick="iniciarCacaHardware()">↻ Jogar de novo</button>
-        <button class="btn" onclick="goDashboard()">Ir pro menu</button>
-      </div>
-    </div>`;
-}
+  function mkPlayer(x,y){
+    return{x,y,w:12,h:20,vx:0,vy:0,grounded:false,facing:1,anim:0,animT:0,energy:5,invincible:0,coyote:0};
+  }
+
+  function hrInit(){
+    canvas=document.getElementById('hrCanvas');
+    canvas.width=GW; canvas.height=GH;
+    canvas.style.width='100%'; canvas.style.imageRendering='pixelated';
+    ctx=canvas.getContext('2d');
+    ctx.imageSmoothingEnabled=false;
+    function onKey(e,down){
+      keys[e.code]=down;
+      if(['Space','ArrowUp','ArrowLeft','ArrowRight','KeyW','KeyA','KeyD'].includes(e.code)) e.preventDefault();
+    }
+    document.addEventListener('keydown',e=>onKey(e,true));
+    document.addEventListener('keyup',e=>onKey(e,false));
+    let touchStartX=0;
+    canvas.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;keys['Space']=true;setTimeout(()=>{keys['Space']=false;},120);},{passive:true});
+    canvas.addEventListener('touchmove',e=>{const dx=e.touches[0].clientX-touchStartX;keys['ArrowLeft']=dx<-15;keys['ArrowRight']=dx>15;},{passive:true});
+    canvas.addEventListener('touchend',()=>{keys['ArrowLeft']=keys['ArrowRight']=false;},{passive:true});
+  }
+
+  window.iniciarHackerRunner=function(){
+    showScreen('caca');
+    document.getElementById('hrOverlay').style.display='flex';
+  };
+
+  window.hrStart=function(){
+    document.getElementById('hrOverlay').style.display='none';
+    if(!canvas) hrInit();
+    map=parseMap(RAW_MAP);
+    player=mkPlayer(map.playerStart.x,map.playerStart.y);
+    particles=[]; keys={}; score=0; lastCheckpoint=null; flashMsg={txt:'',t:0};
+    gameState='playing';
+    if(animId) cancelAnimationFrame(animId);
+    loop();
+  };
+
+  function loop(){
+    animId=requestAnimationFrame(loop);
+    if(gameState==='playing') update();
+    render();
+  }
+
+  function rectsOverlap(a,b){
+    return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+  }
+
+  function resolveX(ent){
+    map.tiles.forEach(t=>{
+      if(!rectsOverlap(ent,t)) return;
+      if(ent.vx>0) ent.x=t.x-ent.w;
+      else if(ent.vx<0) ent.x=t.x+t.w;
+      ent.vx=0;
+    });
+  }
+
+  function resolveY(ent,wasGrounded){
+    map.tiles.forEach(t=>{
+      if(!rectsOverlap(ent,t)) return;
+      if(ent.vy>0){ent.y=t.y-ent.h;ent.vy=0;ent.grounded=true;}
+      else if(ent.vy<0){ent.y=t.y+t.h;ent.vy=0;}
+    });
+    if(ent===player&&wasGrounded&&!ent.grounded) ent.coyote=6;
+  }
+
+  function spawnParticles(x,y,col,n){
+    for(let i=0;i<n;i++){
+      const a=Math.random()*Math.PI*2, s=1+Math.random()*2.5;
+      particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1.5,col,life:20+Math.random()*20|0,size:2});
+    }
+  }
+
+  function flash(txt){flashMsg={txt,t:80};}
+
+  function update(){
+    time++;
+    const p=player;
+    const left=keys['ArrowLeft']||keys['KeyA'];
+    const right=keys['ArrowRight']||keys['KeyD'];
+    const jump=keys['Space']||keys['ArrowUp']||keys['KeyW'];
+
+    if(left){p.vx=-1.8;p.facing=-1;}
+    else if(right){p.vx=1.8;p.facing=1;}
+    else p.vx*=0.72;
+
+    if(jump&&(p.grounded||p.coyote>0)){
+      p.vy=-5.4;p.grounded=false;p.coyote=0;
+      keys['Space']=false;keys['ArrowUp']=false;keys['KeyW']=false;
+    }
+
+    p.vy=Math.min(p.vy+GRAV,MAX_FALL);
+    if(p.coyote>0) p.coyote--;
+    if(p.invincible>0) p.invincible--;
+
+    p.animT++;
+    if(Math.abs(p.vx)>0.3&&p.grounded){if(p.animT%10===0)p.anim=(p.anim+1)%4;}
+    else if(!p.grounded)p.anim=1;
+    else p.anim=0;
+
+    p.x+=p.vx; resolveX(p);
+    const wasGrounded=p.grounded; p.grounded=false;
+    p.y+=p.vy; resolveY(p,wasGrounded);
+
+    // collectibles
+    map.collectibles.forEach(d=>{
+      if(!d.alive) return;
+      d.glow=(d.glow+0.1)%(Math.PI*2);
+      if(rectsOverlap(p,d)){d.alive=false;score+=10;spawnParticles(d.x+4,d.y+4,'#00FFCC',10);flash('DADO COLETADO  +10');}
+    });
+
+    // enemies
+    map.enemies.forEach(en=>{
+      if(!en.alive) return;
+      en.anim=(en.anim+0.12)%(Math.PI*2);
+      en.x+=en.vx;
+      if(en.x<en.startX-en.rangeX||en.x>en.startX+en.rangeX) en.vx*=-1;
+      resolveX(en);
+      if(rectsOverlap(p,en)){
+        const stomp=p.vy>0&&p.y+p.h<=en.y+8;
+        if(stomp){en.alive=false;p.vy=-4;score+=25;spawnParticles(en.x+7,en.y+7,'#9B59B6',14);flash('VIRUS DESTRUIDO  +25');}
+        else if(p.invincible===0){p.energy--;p.invincible=80;spawnParticles(p.x+6,p.y+10,'#DA3633',8);if(p.energy<=0){gameState='gameover';showEndOverlay(false);}}
+      }
+    });
+
+    // firewalls
+    map.firewalls.forEach(fw=>{
+      fw.pulse=(fw.pulse+0.07)%(Math.PI*2);
+      if(p.invincible===0&&rectsOverlap(p,fw)){p.energy--;p.invincible=90;p.vx=p.vx>0?-3:3;p.vy=-3;spawnParticles(p.x+6,p.y+10,'#FF4500',8);if(p.energy<=0){gameState='gameover';showEndOverlay(false);}}
+    });
+
+    // checkpoints
+    map.checkpoints.forEach(cp=>{
+      if(!cp.activated&&rectsOverlap(p,cp)){cp.activated=true;lastCheckpoint={x:cp.x,y:cp.y-p.h};flash('CHECKPOINT!');spawnParticles(cp.x+8,cp.y+8,'#FFDD57',12);}
+    });
+
+    // goal
+    if(map.goalPos&&rectsOverlap(p,map.goalPos)){gameState='victory';score+=100;showEndOverlay(true);}
+
+    // void death
+    if(p.y>GH+40){
+      if(lastCheckpoint){p.x=lastCheckpoint.x;p.y=lastCheckpoint.y;p.vx=0;p.vy=0;p.energy=Math.max(1,p.energy-1);flash('RESPAWN');}
+      else{p.energy--;p.x=map.playerStart.x;p.y=map.playerStart.y;p.vx=0;p.vy=0;if(p.energy<=0){gameState='gameover';showEndOverlay(false);}}
+    }
+
+    particles=particles.filter(pt=>pt.life>0);
+    particles.forEach(pt=>{pt.x+=pt.vx;pt.y+=pt.vy;pt.vy+=0.15;pt.life--;});
+    if(flashMsg.t>0) flashMsg.t--;
+  }
+
+  function render(){
+    const levelW=RAW_MAP[0].length*TS;
+    const camX=player?Math.max(0,Math.min(player.x-GW/2+player.w/2,levelW-GW)):0;
+
+    // bg
+    const bg=ctx.createLinearGradient(0,0,0,GH);
+    bg.addColorStop(0,'#050A18');bg.addColorStop(1,'#0A1428');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,GW,GH);
+
+    drawParallax(camX);
+
+    ctx.save();ctx.translate(-camX,0);
+    map&&map.tiles.forEach(t=>drawTile(t));
+    map&&map.firewalls.forEach(fw=>drawFirewall(fw));
+    map&&map.checkpoints.forEach(cp=>drawCheckpoint(cp));
+    map&&map.goalPos&&drawGoal(map.goalPos);
+    map&&map.collectibles.forEach(d=>{if(d.alive)drawData(d);});
+    map&&map.enemies.forEach(en=>{if(en.alive)drawVirus(en);});
+    particles.forEach(pt=>{ctx.globalAlpha=pt.life/40;ctx.fillStyle=pt.col;ctx.fillRect(pt.x|0,pt.y|0,pt.size,pt.size);});
+    ctx.globalAlpha=1;
+    player&&drawPlayer(player);
+    ctx.restore();
+
+    drawHUD();
+
+    if(flashMsg.t>0){
+      ctx.globalAlpha=Math.min(1,flashMsg.t/20);
+      ctx.fillStyle='#00FFCC';ctx.font='bold 7px monospace';ctx.textAlign='center';
+      ctx.fillText(flashMsg.txt,GW/2,20);ctx.globalAlpha=1;ctx.textAlign='left';
+    }
+  }
+
+  function drawParallax(camX){
+    ctx.strokeStyle='rgba(0,255,180,0.04)';ctx.lineWidth=0.5;
+    const off1=(camX*0.15)%32;
+    for(let x=-off1;x<GW+32;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GH);ctx.stroke();}
+    for(let y=0;y<GH;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GW,y);ctx.stroke();}
+
+    const off2=(camX*0.25)%GW;
+    ctx.fillStyle='rgba(0,30,60,0.5)';
+    [20,40,24,56,32,28,48,20,60,36,44,52,28,16,40].forEach((bh,i)=>{
+      const bx=i*20-off2;
+      ctx.fillRect(bx|0,GH-bh-60,18,bh);
+      if(Math.sin(time*0.03+bx)>0.3){
+        ctx.fillStyle='rgba(0,180,255,0.3)';
+        for(let by=GH-bh-58;by<GH-62;by+=6) ctx.fillRect(bx+3|0,by,4,3);
+        ctx.fillStyle='rgba(0,30,60,0.5)';
+      }
+    });
+
+    ctx.fillStyle='rgba(100,200,255,0.4)';
+    const off3=(camX*0.05)%480;
+    [[10,20],[60,8],[120,35],[200,12],[300,28],[400,5],[450,22],[80,40],[250,18]].forEach(([sx,sy])=>{
+      const rx=(sx-off3+GW*2)%GW;
+      const s=Math.sin(time*0.04+sx)>0.5?2:1;
+      ctx.fillRect(rx|0,sy,s,s);
+    });
+  }
+
+  function drawTile(t){
+    if(t.type==='#'){
+      ctx.fillStyle='#0D2240';ctx.fillRect(t.x,t.y,TS,TS);
+      ctx.fillStyle='#0A3060';ctx.fillRect(t.x+1,t.y+1,TS-2,2);
+      ctx.fillStyle='rgba(0,255,204,0.25)';
+      ctx.fillRect(t.x+2,t.y+TS-3,TS-4,1);ctx.fillRect(t.x+TS-3,t.y+2,1,TS-4);
+      ctx.fillStyle='rgba(0,255,204,0.5)';
+      ctx.fillRect(t.x+3,t.y+3,2,2);ctx.fillRect(t.x+TS-5,t.y+TS-5,2,2);
+      ctx.fillStyle='#1A4080';ctx.fillRect(t.x,t.y,TS,1);
+    } else {
+      ctx.fillStyle='#1C2333';ctx.fillRect(t.x,t.y,TS,TS);
+      ctx.fillStyle='#2A3F5A';ctx.fillRect(t.x,t.y,TS,3);
+      const bl=Math.sin(time*0.08+t.x*0.3)>0;
+      ctx.fillStyle=bl?'#3FB950':'#1A2530';ctx.fillRect(t.x+3,t.y+1,2,1);
+      ctx.fillStyle=Math.sin(time*0.05+t.x*0.5)>0.3?'#388BFD':'#1A2530';ctx.fillRect(t.x+8,t.y+1,2,1);
+    }
+  }
+
+  function drawFirewall(fw){
+    const a=0.6+Math.sin(fw.pulse)*0.3;
+    ctx.fillStyle=`rgba(218,54,51,${a})`;ctx.fillRect(fw.x+4,fw.y,fw.w-8,fw.h);
+    ctx.fillStyle=`rgba(255,90,40,${a*0.5})`;
+    ctx.fillRect(fw.x+2,fw.y,2,fw.h);ctx.fillRect(fw.x+fw.w-4,fw.y,2,fw.h);
+    ctx.fillStyle='rgba(0,0,0,0.3)';
+    for(let sy=fw.y;sy<fw.y+fw.h;sy+=4) ctx.fillRect(fw.x+4,sy,fw.w-8,1);
+    ctx.fillStyle='#FFAA00';ctx.font='5px monospace';ctx.fillText('FW',fw.x+3,fw.y+10);
+  }
+
+  function drawCheckpoint(cp){
+    const col=cp.activated?'#3FB950':'#8B949E';
+    ctx.fillStyle=col;ctx.fillRect(cp.x+6,cp.y,2,cp.h);
+    ctx.fillRect(cp.x+8,cp.y,8,6);
+    ctx.fillStyle=cp.activated?'#D3F9D8':'#444';ctx.fillRect(cp.x+9,cp.y+1,6,4);
+  }
+
+  function drawGoal(g){
+    const gl=0.5+Math.sin(time*0.06)*0.3;
+    ctx.fillStyle='#1A2A40';ctx.fillRect(g.x,g.y+4,g.w,g.h-4);
+    ctx.fillStyle=`rgba(0,255,180,${gl})`;ctx.fillRect(g.x+3,g.y+8,g.w-6,g.h-20);
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    for(let sy=g.y+8;sy<g.y+g.h-12;sy+=3) ctx.fillRect(g.x+3,sy,g.w-6,1);
+    ctx.fillStyle='#FFFFFF';ctx.font='5px monospace';ctx.fillText('PC',g.x+6,g.y+18);
+    ctx.strokeStyle=`rgba(0,255,180,${gl*0.5})`;ctx.lineWidth=2;
+    ctx.strokeRect(g.x-2,g.y+2,g.w+4,g.h);ctx.lineWidth=1;
+  }
+
+  function drawData(d){
+    const g=0.5+Math.sin(d.glow)*0.4;
+    ctx.fillStyle=`rgba(0,255,204,${g*0.3})`;ctx.fillRect(d.x-1,d.y-1,10,10);
+    ctx.fillStyle=`rgba(0,255,204,${g})`;ctx.fillRect(d.x+1,d.y+1,6,6);
+    ctx.fillStyle='#FFFFFF';ctx.fillRect(d.x+2,d.y+2,4,4);
+  }
+
+  function drawVirus(en){
+    const w=Math.sin(en.anim)*1.5;
+    const ex=en.x|0,ey=(en.y+w)|0;
+    ctx.fillStyle='#7B2FBE';
+    ctx.fillRect(ex+2,ey+4,10,8);ctx.fillRect(ex+4,ey+2,6,10);
+    ctx.fillStyle='#FF4444';ctx.fillRect(ex+3,ey+4,3,3);ctx.fillRect(ex+8,ey+4,3,3);
+    ctx.fillStyle='#FFAAAA';ctx.fillRect(ex+4,ey+5,1,1);ctx.fillRect(ex+9,ey+5,1,1);
+    const leg=Math.sin(en.anim*4)>0;
+    ctx.fillStyle='#9B59B6';
+    ctx.fillRect(ex+3,ey+12,3,leg?3:2);ctx.fillRect(ex+8,ey+12,3,leg?2:3);
+    if(Math.sin(time*0.3+en.x)>0.85){ctx.fillStyle='rgba(255,0,0,0.3)';ctx.fillRect(ex,ey,14,14);}
+  }
+
+  function drawPlayer(p){
+    if(p.invincible>0&&Math.floor(p.invincible/6)%2===0) return;
+    const px=p.x|0,py=p.y|0,f=p.facing;
+    ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(px+1,py+p.h,p.w-2,2);
+    ctx.fillStyle='#1C2333';ctx.fillRect(px+2,py+8,p.w-4,10);
+    ctx.fillStyle='#232D3F';ctx.fillRect(px+2,py+2,p.w-4,8);
+    ctx.fillStyle='#00FFCC';ctx.fillRect(px+2,py+10,1,4);ctx.fillRect(px+p.w-3,py+10,1,4);
+    ctx.fillStyle='#141C28';ctx.fillRect(px+3,py+2,6,7);
+    ctx.fillStyle='#00DDFF';ctx.fillRect(px+3,py+5,6,2);
+    ctx.fillStyle='#0D1A2A';ctx.fillRect(f>0?px+1:px+p.w-4,py+8,3,6);
+    ctx.fillStyle='#388BFD';ctx.fillRect(f>0?px+1:px+p.w-4,py+9,1,1);
+    const lp=p.anim%4;
+    ctx.fillStyle='#0F1923';
+    if(!p.grounded){
+      ctx.fillRect(px+3,py+18,3,3);ctx.fillRect(px+7,py+17,3,4);
+    } else {
+      const ly=(lp===1||lp===3)?py+18:py+17;
+      const ry=(lp===0||lp===2)?py+18:py+17;
+      ctx.fillRect(px+3,ly,3,p.h-(ly-py));ctx.fillRect(px+7,ry,3,p.h-(ry-py));
+      ctx.fillStyle='#3FB950';ctx.fillRect(px+(f>0?7:3),py+p.h-1,4,1);
+    }
+  }
+
+  function drawHUD(){
+    ctx.fillStyle='rgba(0,0,8,0.6)';ctx.fillRect(0,0,GW,14);
+    ctx.fillStyle='#21262D';ctx.fillRect(4,3,62,8);
+    const ep=player?player.energy/5:0;
+    ctx.fillStyle=ep>0.5?'#3FB950':ep>0.25?'#D29922':'#DA3633';
+    ctx.fillRect(4,3,(62*ep)|0,8);
+    ctx.fillStyle='rgba(255,255,255,0.7)';ctx.font='5px monospace';ctx.fillText('ENERGIA',6,9);
+    ctx.fillStyle='#8B949E';ctx.font='5px monospace';ctx.fillText('PTS',GW-36,9);
+    ctx.fillStyle='#00FFCC';ctx.font='bold 7px monospace';ctx.fillText(String(score).padStart(4,'0'),GW-36,17);
+  }
+
+  function showEndOverlay(win){
+    const ov=document.getElementById('hrOverlay');
+    ov.style.display='flex';
+    if(win){
+      if(typeof adicionarPontosJogo==='function') adicionarPontosJogo(score);
+      if(typeof alunoAtivo!=='undefined'&&alunoAtivo){
+        if(!alunoAtivo.progresso.jogos) alunoAtivo.progresso.jogos={};
+        alunoAtivo.progresso.jogos.caca=true;
+        if(typeof salvarAluno==='function') salvarAluno(alunoAtivo);
+      }
+      ov.innerHTML=`
+        <div style="font-size:clamp(16px,3.5vw,28px);font-weight:900;color:#00FFCC;letter-spacing:3px;margin-bottom:6px;">MISSAO CONCLUIDA</div>
+        <div style="font-size:clamp(9px,1.5vw,11px);color:#3FB950;margin-bottom:4px;letter-spacing:1px;">PC CENTRAL CONECTADO</div>
+        <div style="font-size:clamp(24px,6vw,48px);font-weight:900;color:#FFF;margin:12px 0;">${score}<span style="font-size:0.4em;color:#8B949E;"> PTS</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button onclick="hrStart()" style="background:#3FB950;color:#000;border:none;font-family:inherit;font-size:clamp(11px,2vw,14px);font-weight:900;padding:10px 28px;border-radius:4px;cursor:pointer;letter-spacing:1px;">JOGAR NOVAMENTE</button>
+          <button onclick="goDashboard()" style="background:transparent;color:#8B949E;border:1px solid #30363D;font-family:inherit;font-size:clamp(10px,1.5vw,12px);padding:10px 24px;border-radius:4px;cursor:pointer;letter-spacing:1px;">MENU</button>
+        </div>`;
+    } else {
+      ov.innerHTML=`
+        <div style="font-size:clamp(16px,3.5vw,28px);font-weight:900;color:#DA3633;letter-spacing:3px;margin-bottom:6px;">SISTEMA COMPROMETIDO</div>
+        <div style="font-size:clamp(9px,1.5vw,11px);color:#8B949E;margin-bottom:4px;letter-spacing:1px;">ENERGIA ESGOTADA</div>
+        <div style="font-size:clamp(24px,6vw,48px);font-weight:900;color:#FFF;margin:12px 0;">${score}<span style="font-size:0.4em;color:#8B949E;"> PTS</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button onclick="hrStart()" style="background:#DA3633;color:#FFF;border:none;font-family:inherit;font-size:clamp(11px,2vw,14px);font-weight:900;padding:10px 28px;border-radius:4px;cursor:pointer;letter-spacing:1px;">TENTAR NOVAMENTE</button>
+          <button onclick="goDashboard()" style="background:transparent;color:#8B949E;border:1px solid #30363D;font-family:inherit;font-size:clamp(10px,1.5vw,12px);padding:10px 24px;border-radius:4px;cursor:pointer;letter-spacing:1px;">MENU</button>
+        </div>`;
+    }
+  }
+})();
 
 // =============================================================
 // DESAFIO RELÂMPAGO
