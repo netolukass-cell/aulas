@@ -420,6 +420,7 @@
   .modulo-card[data-m="software"] .modulo-card-banner { background: linear-gradient(135deg,#6366F1,#4338CA); }
   .modulo-card[data-m="navegadores"] .modulo-card-banner { background: linear-gradient(135deg,#06B6D4,#0284C7); }
   .modulo-card[data-m="antivirus"] .modulo-card-banner { background: linear-gradient(135deg,#10B981,#047857); }
+  .modulo-card[data-m="memoria"] .modulo-card-banner { background: linear-gradient(135deg,#8B5CF6,#6D28D9); }
   .modulo-card-banner-num {
     font-size: 72px; font-weight: 900; color: rgba(255,255,255,0.12);
     font-family: 'Plus Jakarta Sans',sans-serif; line-height: 1; letter-spacing: -4px;
@@ -447,6 +448,7 @@
   .modulo-card[data-m="software"] .modulo-card-score-fill { background: linear-gradient(90deg,#6366F1,#818CF8); }
   .modulo-card[data-m="navegadores"] .modulo-card-score-fill { background: linear-gradient(90deg,#06B6D4,#38BDF8); }
   .modulo-card[data-m="antivirus"] .modulo-card-score-fill { background: linear-gradient(90deg,#10B981,#34D399); }
+  .modulo-card[data-m="memoria"] .modulo-card-score-fill { background: linear-gradient(90deg,#8B5CF6,#A78BFA); }
   .modulo-card.locked { opacity: 0.6; cursor: not-allowed; }
   .modulo-card.locked:hover { transform: none; box-shadow: var(--shadow-sm); border-color: var(--line); }
   .modulo-card.done { border-left: 4px solid var(--green); }
@@ -991,6 +993,41 @@
     font-size: 16px; line-height: 1.6; outline: none;
     font-family: Georgia, "Times New Roman", serif; border: 1px solid var(--line);
   }
+
+  /* ===== RAM Game ===== */
+  .ram-bar-wrap { background: var(--bg-2); border-radius: 16px; padding: 20px 24px; border: 1px solid var(--line); margin-bottom: 18px; }
+  .ram-bar-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+  .ram-bar-track { height: 20px; background: var(--bg-soft); border-radius: 10px; overflow: hidden; }
+  .ram-bar-fill { height: 100%; border-radius: 10px; transition: width 0.4s ease, background 0.4s; background: linear-gradient(90deg,#6366F1,#8B5CF6); }
+  .ram-bar-fill.warning { background: linear-gradient(90deg,#F59E0B,#EF4444); }
+  .ram-bar-fill.full { background: linear-gradient(90deg,#EF4444,#DC2626); animation: ramPulse 0.5s ease infinite alternate; }
+  @keyframes ramPulse { from { opacity:1; } to { opacity:0.6; } }
+  .ram-stats { display: flex; gap: 16px; margin-bottom: 18px; }
+  .ram-stat { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; flex: 1; text-align: center; }
+  .ram-stat-val { font-size: 22px; font-weight: 900; font-family: 'Plus Jakarta Sans',sans-serif; }
+  .ram-stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--ink-soft); text-transform: uppercase; }
+  .ram-programs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .ram-program {
+    background: var(--bg-2); border: 2px solid var(--line); border-radius: 14px;
+    padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative;
+    user-select: none;
+  }
+  .ram-program:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .ram-program.ativo { border-color: #6366F1; background: rgba(99,102,241,0.08); }
+  .ram-program.ativo .ram-prog-status { color: #6366F1; }
+  .ram-program.blocked { opacity: 0.5; cursor: not-allowed; }
+  .ram-prog-icon { font-size: 32px; margin-bottom: 6px; }
+  .ram-prog-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .ram-prog-size { font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+  .ram-prog-status { font-size: 10px; font-weight: 800; letter-spacing: 1px; margin-top: 6px; color: var(--ink-light); text-transform: uppercase; }
+  .ram-msg { text-align: center; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; margin-bottom: 14px; display: none; }
+  .ram-msg.show { display: block; }
+  .ram-msg.ok { background: #D1FAE5; color: #065F46; }
+  .ram-msg.erro { background: var(--red-soft); color: #7F1D1D; }
+  .ram-task-bar { background: var(--bg-2); border-top: 1px solid var(--line); padding: 10px 16px; border-radius: 0 0 16px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .ram-task-chip { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; color: #4338CA; display: flex; align-items: center; gap: 6px; }
+  .ram-task-chip .chip-x { cursor: pointer; opacity: 0.6; }
+  .ram-task-chip .chip-x:hover { opacity: 1; }
 
   /* ===== Pratique menu ===== */
   .pratique-grid {
@@ -2067,6 +2104,12 @@
           <line x1="60" y1="53" x2="46" y2="44" stroke="white" stroke-width="1.5"/>
         </svg>
       </div>
+      <div class="pratique-card" onclick="iniciarRamGame()">
+        <div class="pratique-icon-wrap"><iconify-icon icon="ph:memory-bold"></iconify-icon></div>
+        <div class="pratique-title">Gerenciador de RAM</div>
+        <div class="pratique-desc">Abra e feche programas sem travar o PC. Aprenda quanto cada coisa usa de memória!</div>
+        <div class="pratique-arrow">→</div>
+      </div>
     </div>
 
     <div class="section-titulo">
@@ -2457,6 +2500,17 @@
     </div>
 
     <div id="digResultado"></div>
+  </div>
+</div>
+
+<!-- ====================== GERENCIADOR DE RAM ====================== -->
+<div class="screen" id="screen-ram-game">
+  <div class="container-narrow">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="goDashboard()">← Sair</button>
+      <div class="top-bar-title">🧠 Gerenciador de RAM</div>
+    </div>
+    <div id="ramGameContent"></div>
   </div>
 </div>
 
@@ -3054,10 +3108,79 @@ const MODULOS = {
         { tipo: "vf", q: "Passkeys (chaves de acesso) são consideradas mais seguras que senhas tradicionais por usarem criptografia de chave pública, eliminando o risco de phishing de senha.", correct: true }
       ]
     }
+  },
+  memoria: {
+    titulo: "Bits, Bytes e Memória",
+    icone: "💾",
+    desc: "Entenda como o computador mede e guarda informação — de bits a terabytes.",
+    paginas: {
+      1: [
+        { tipo:"hero", emoji:"💾", titulo:"O que é um Bit?",
+          texto:"O computador só entende <strong data-n='1'>dois valores: 0 e 1</strong>. Cada um desses valores chama-se <strong data-n='1'>bit</strong>. É a menor unidade de informação que existe num computador. Pensa assim: uma lâmpada pode estar acesa (1) ou apagada (0). Um bit é exatamente isso — liga ou desliga!",
+          callout:"💡 BIT vem de Binary digIT — dígito binário." },
+        { tipo:"items", emoji:"📦", titulo:"De Bit a Byte",
+          items:[{icone:"🔵",label:"8 bits = 1 Byte"},{icone:"📄",label:"1 Byte = 1 letra"},{icone:"📦",label:"1024 Bytes = 1 KB"}],
+          texto:"8 bits juntos formam um <strong data-n='1'>Byte</strong>. Um Byte guarda uma letra do alfabeto. A letra 'A' por exemplo é guardada como 01000001 — oito zeros e uns. Juntando 1024 Bytes temos 1 Kilobyte (KB).",
+          callout:"1 mensagem de texto simples tem cerca de 1 KB." },
+        { tipo:"hero", emoji:"📱", titulo:"KB, MB, GB, TB",
+          texto:"Juntando mais e mais: <strong data-n='1'>1024 KB = 1 MB</strong> (Megabyte). Uma música MP3 tem cerca de 4 MB. <strong data-n='1'>1024 MB = 1 GB</strong> (Gigabyte) — onde cabe um filme. <strong data-n='1'>1024 GB = 1 TB</strong> (Terabyte) — onde cabem centenas de filmes!",
+          callout:"Foto tirada pelo celular ≈ 3 MB. Vídeo de 1 minuto ≈ 100 MB. Jogo moderno ≈ 50 GB." },
+        { tipo:"callout", emoji:"🧠", titulo:"RAM × HD — Qual a diferença?",
+          texto:"O <strong data-n='1'>HD/SSD</strong> guarda tudo para sempre — seus arquivos, fotos, programas. A <strong data-n='1'>memória RAM</strong> é temporária: só funciona com o PC ligado. A RAM é muito mais rápida que o HD, por isso o computador usa ela pra rodar programas. Quando você desliga, a RAM apaga tudo." }
+      ],
+      2: [
+        { tipo:"hero", emoji:"🔢", titulo:"A base binária",
+          texto:"Computadores usam <strong data-n='2'>sistema binário</strong> (base 2) porque os transistores dos chips têm apenas dois estados: conduz corrente (1) ou não conduz (0). Com 8 bits podemos representar 256 valores diferentes (2⁸ = 256), o suficiente para todo o alfabeto, números e pontuação.",
+          callout:"💡 ASCII: a letra 'A' = decimal 65 = binário 01000001." },
+        { tipo:"items", emoji:"📊", titulo:"Escala de medidas",
+          items:[{icone:"🔵",label:"1 bit"},{icone:"📄",label:"1 Byte = 8 bits"},{icone:"📁",label:"1 KB = 1.024 B"},{icone:"🎵",label:"1 MB = 1.024 KB"},{icone:"🎬",label:"1 GB = 1.024 MB"},{icone:"💿",label:"1 TB = 1.024 GB"}],
+          texto:"Cada salto é de <strong data-n='2'>1024 vezes</strong> (2¹⁰), não 1000. Por isso um HD de '500 GB' no Windows parece ter menos — o fabricante usa 1000 e o sistema usa 1024." },
+        { tipo:"hero", emoji:"🧠", titulo:"RAM vs Armazenamento",
+          texto:"A <strong data-n='2'>RAM</strong> (memória de acesso aleatório) é volátil: rápida, cara e temporária. O <strong data-n='2'>SSD/HD</strong> é não-volátil: persistente mas mais lento. Ao abrir um programa, ele é copiado do HD para a RAM — é por isso que mais RAM = mais programas abertos ao mesmo tempo sem lentidão.",
+          callout:"RAM típica hoje: 8–16 GB. SSD comum: 256 GB–1 TB." }
+      ],
+      3: [
+        { tipo:"hero", emoji:"⚙️", titulo:"Representação binária",
+          texto:"No sistema binário, cada posição representa uma potência de 2. O número <strong data-n='3'>42</strong> em binário é <strong data-n='3'>00101010</strong> — calculado como 32+8+2=42. Com n bits representamos 2ⁿ valores (0 a 2ⁿ−1). Um inteiro de 32 bits vai de 0 a 4.294.967.295." },
+        { tipo:"items", emoji:"📐", titulo:"Hierarquia de memórias",
+          items:[{icone:"⚡",label:"Registradores"},{icone:"🔥",label:"Cache L1/L2/L3"},{icone:"🧠",label:"RAM (DDR5)"},{icone:"💾",label:"SSD NVMe"},{icone:"🖴",label:"HDD"},{icone:"☁️",label:"Nuvem"}],
+          texto:"Quanto mais próxima do processador, <strong data-n='3'>mais rápida e cara</strong> é a memória. Registradores operam em picossegundos, a nuvem em milissegundos — uma diferença de 10⁹× de velocidade." },
+        { tipo:"callout", emoji:"🔬", titulo:"Bit vs Byte na prática",
+          texto:"Conexões de rede são medidas em <strong data-n='3'>bits por segundo</strong> (Mbps), não bytes. Uma conexão de 100 Mbps transfere ~12,5 MB/s (÷8). Por isso baixar um arquivo de 1 GB nessa conexão leva ~85 segundos — não 1 segundo.",
+          callout:"ISP anuncia em bits; o Windows mostra em bytes. Divida por 8 para comparar." }
+      ]
+    },
+    quiz: {
+      1: [
+        { tipo:"mc", q:"Quantos bits formam 1 Byte?", options:["4","8","16","2"], correct:1 },
+        { tipo:"mc", q:"1024 Bytes é igual a...?", options:["1 MB","1 GB","1 KB","1 TB"], correct:2 },
+        { tipo:"mc", q:"Qual memória guarda arquivos MESMO desligado?", options:["RAM","HD/SSD","Processador"], correct:1 },
+        { tipo:"vf", q:"A RAM guarda dados permanentemente.", correct:false },
+        { tipo:"mc", q:"Uma foto de celular tem cerca de:", options:["3 KB","3 MB","3 GB"], correct:1 },
+        { tipo:"vf", q:"1 GB = 1024 MB.", correct:true },
+        { tipo:"mc", q:"Bit vem de:", options:["Binary Intelligence Terminal","Binary digIT","Big Information Transfer"], correct:1 },
+        { tipo:"mc", q:"Qual memória é mais RÁPIDA?", options:["HD","SSD","RAM"], correct:2 }
+      ],
+      2: [
+        { tipo:"mc", q:"Por que usamos base 2?", options:["Por costume","Transistores têm 2 estados","É mais fácil de calcular"], correct:1 },
+        { tipo:"mc", q:"2⁸ equivale a:", options:["16","128","256","512"], correct:2 },
+        { tipo:"mc", q:"Por que 1KB = 1024 e não 1000?", options:["Convenção antiga","Porque 2¹⁰ = 1024","Erro histórico"], correct:1 },
+        { tipo:"mc", q:"Ao abrir um programa, ele vai para:", options:["HD","RAM","CPU diretamente"], correct:1 },
+        { tipo:"vf", q:"RAM é volátil (perde dados ao desligar).", correct:true },
+        { tipo:"mc", q:"'A' em ASCII decimal é:", options:["52","65","97"], correct:1 }
+      ],
+      3: [
+        { tipo:"mc", q:"42 em binário 8 bits é:", options:["00101010","00110000","01001010"], correct:0 },
+        { tipo:"mc", q:"Com 32 bits representamos até:", options:["65.535","4.294.967.295","2.147.483.647"], correct:1 },
+        { tipo:"mc", q:"100 Mbps = quantos MB/s aprox.?", options:["100 MB/s","50 MB/s","12,5 MB/s"], correct:2 },
+        { tipo:"mc", q:"O que é mais próximo da CPU?", options:["SSD NVMe","Cache L1","RAM DDR5"], correct:1 },
+        { tipo:"vf", q:"ISPs medem velocidade em bits, não bytes.", correct:true }
+      ]
+    }
   }
 };
 
-const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus"];
+const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria"];
 
 // =============================================================
 // PROVA FINAL — 10 questões mistas por nível
@@ -3489,7 +3612,7 @@ function renderDashboard() {
     if (!prog.quizDone || (prog.quizScore / prog.quizTotal) < 0.5) podeProva = false;
 
     // Ícone Iconify por módulo
-    const iconMap = {hardware:"ph:desktop-bold", software:"ph:file-text-bold", navegadores:"ph:globe-bold", antivirus:"ph:shield-check-bold"};
+    const iconMap = {hardware:"ph:desktop-bold", software:"ph:file-text-bold", navegadores:"ph:globe-bold", antivirus:"ph:shield-check-bold", memoria:"ph:memory-bold"};
     const iconName = iconMap[m] || "ph:book-bold";
 
     // SVG decorativo temático por módulo
@@ -3532,6 +3655,21 @@ function renderDashboard() {
         <path d="M40 8 L68 20 L68 44 C68 58 54 70 40 74 C26 70 12 58 12 44 L12 20 Z" stroke="currentColor" stroke-width="2"/>
         <path d="M40 18 L60 27 L60 44 C60 54 50 63 40 66 C30 63 20 54 20 44 L20 27 Z" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 2"/>
         <polyline points="28,42 36,50 52,34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+      memoria: `<svg class="modulo-deco" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="28" width="64" height="24" rx="4" stroke="currentColor" stroke-width="2"/>
+        <rect x="14" y="34" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="26" y="34" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="38" y="34" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="50" y="34" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="28" x2="20" y2="20" stroke="currentColor" stroke-width="2"/>
+        <line x1="32" y1="28" x2="32" y2="20" stroke="currentColor" stroke-width="2"/>
+        <line x1="44" y1="28" x2="44" y2="20" stroke="currentColor" stroke-width="2"/>
+        <line x1="56" y1="28" x2="56" y2="20" stroke="currentColor" stroke-width="2"/>
+        <line x1="20" y1="52" x2="20" y2="60" stroke="currentColor" stroke-width="2"/>
+        <line x1="32" y1="52" x2="32" y2="60" stroke="currentColor" stroke-width="2"/>
+        <line x1="44" y1="52" x2="44" y2="60" stroke="currentColor" stroke-width="2"/>
+        <line x1="56" y1="52" x2="56" y2="60" stroke="currentColor" stroke-width="2"/>
       </svg>`
     };
 
@@ -5030,6 +5168,141 @@ let digState = {
   timerId: null,
   finalizado: false
 };
+
+// =============================================================
+// GERENCIADOR DE RAM — Jogo de memória educativo
+// =============================================================
+const RAM_PROGRAMAS = [
+  { id:'navegador', nome:'Navegador',   icone:'🌐', mb:512  },
+  { id:'word',      nome:'Word',        icone:'📝', mb:256  },
+  { id:'jogo',      nome:'Jogo',        icone:'🎮', mb:2048 },
+  { id:'video',     nome:'Vídeo 4K',    icone:'🎬', mb:1024 },
+  { id:'antivirus', nome:'Antivírus',   icone:'🛡️', mb:128  },
+  { id:'spotify',   nome:'Música',      icone:'🎵', mb:200  },
+  { id:'camera',    nome:'Webcam',      icone:'📷', mb:300  },
+  { id:'planilha',  nome:'Planilha',    icone:'📊', mb:180  },
+  { id:'editor',    nome:'Foto Editor', icone:'🎨', mb:800  },
+  { id:'chat',      nome:'Chat',        icone:'💬', mb:150  },
+];
+
+let ramState = { totalMb: 8192, abertos: {}, pontos: 0, missaoIdx: 0, timerId: null };
+
+const RAM_MISSOES = [
+  { desc: 'Abra o Navegador e o Word ao mesmo tempo.', check: s => s.navegador && s.word },
+  { desc: 'Feche tudo e abra só o Jogo.', check: s => Object.keys(s).length===1 && s.jogo },
+  { desc: 'Abra 4 programas sem travar o PC.', check: s => Object.keys(s).length >= 4 },
+  { desc: 'Abra programas usando menos de 1 GB no total.', check: (s, used) => Object.keys(s).length > 0 && used < 1024 },
+  { desc: 'Abra todos os 10 programas (vai precisar de mais RAM!).', check: s => Object.keys(s).length === 10 },
+];
+
+function ramUsedMb() {
+  return Object.keys(ramState.abertos).reduce((sum, id) => {
+    const p = RAM_PROGRAMAS.find(p => p.id === id);
+    return sum + (p ? p.mb : 0);
+  }, 0);
+}
+
+function ramFmt(mb) {
+  return mb >= 1024 ? (mb/1024).toFixed(1)+' GB' : mb+' MB';
+}
+
+function iniciarRamGame() {
+  ramState = { totalMb: 8192, abertos: {}, pontos: 0, missaoIdx: 0, timerId: null };
+  showScreen('ram-game');
+  renderRamGame();
+}
+
+function renderRamGame() {
+  const used = ramUsedMb();
+  const pct = Math.min(100, (used / ramState.totalMb) * 100);
+  const missao = RAM_MISSOES[ramState.missaoIdx] || null;
+  const barClass = pct >= 95 ? 'full' : pct >= 75 ? 'warning' : '';
+
+  const programasHtml = RAM_PROGRAMAS.map(p => {
+    const ativo = !!ramState.abertos[p.id];
+    const bloqueado = !ativo && used + p.mb > ramState.totalMb;
+    let cls = 'ram-program'; if (ativo) cls += ' ativo'; if (bloqueado) cls += ' blocked';
+    const statusTxt = ativo ? '● Rodando' : bloqueado ? '⛔ Sem RAM' : '○ Fechado';
+    return `<div class="${cls}" onclick="toggleRamProgram('${p.id}')">
+      <div class="ram-prog-icon">${p.icone}</div>
+      <div class="ram-prog-name">${p.nome}</div>
+      <div class="ram-prog-size">${ramFmt(p.mb)}</div>
+      <div class="ram-prog-status">${statusTxt}</div>
+    </div>`;
+  }).join('');
+
+  const abertosChips = Object.keys(ramState.abertos).map(id => {
+    const p = RAM_PROGRAMAS.find(p => p.id === id);
+    return `<div class="ram-task-chip">${p.icone} ${p.nome} <span class="chip-x" onclick="event.stopPropagation();toggleRamProgram('${id}')">✕</span></div>`;
+  }).join('');
+
+  document.getElementById('ramGameContent').innerHTML = `
+    <div class="ram-bar-wrap">
+      <div class="ram-bar-label">
+        <span>💾 RAM: <strong>${ramFmt(used)}</strong> usados de ${ramFmt(ramState.totalMb)}</span>
+        <span style="color:${pct>=95?'#EF4444':pct>=75?'#F59E0B':'var(--ink-soft)'}">${Math.round(pct)}%</span>
+      </div>
+      <div class="ram-bar-track"><div class="ram-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="ram-stats">
+      <div class="ram-stat"><div class="ram-stat-val" style="color:#6366F1">${Object.keys(ramState.abertos).length}</div><div class="ram-stat-label">Programas Abertos</div></div>
+      <div class="ram-stat"><div class="ram-stat-val" style="color:#10B981">${ramFmt(ramState.totalMb - used)}</div><div class="ram-stat-label">RAM Livre</div></div>
+      <div class="ram-stat"><div class="ram-stat-val" style="color:#F59E0B">${ramState.pontos}</div><div class="ram-stat-label">Pontos</div></div>
+    </div>
+
+    ${missao ? `<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:14px;">
+      <span style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#6366F1;display:block;margin-bottom:4px;">MISSÃO ${ramState.missaoIdx+1}/${RAM_MISSOES.length}</span>
+      🎯 ${missao.desc}
+    </div>` : `<div style="background:#D1FAE5;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-weight:700;color:#065F46;">🏆 Todas as missões concluídas! ${ramState.pontos} pontos!</div>`}
+
+    <div id="ramMsg" class="ram-msg"></div>
+    <div class="ram-programs">${programasHtml}</div>
+
+    ${abertosChips ? `<div class="ram-task-bar">${abertosChips}</div>` : ''}
+  `;
+}
+
+function toggleRamProgram(id) {
+  const used = ramUsedMb();
+  const p = RAM_PROGRAMAS.find(p => p.id === id);
+  if (!p) return;
+
+  if (ramState.abertos[id]) {
+    delete ramState.abertos[id];
+    showRamMsg(`${p.icone} ${p.nome} fechado — liberou ${ramFmt(p.mb)}.`, 'ok');
+  } else {
+    if (used + p.mb > ramState.totalMb) {
+      showRamMsg(`⛔ Sem RAM! Feche um programa antes de abrir ${p.nome}.`, 'erro');
+      return;
+    }
+    ramState.abertos[id] = true;
+    ramState.pontos += Math.round(p.mb / 100);
+    showRamMsg(`✅ ${p.nome} aberto! Usou +${ramFmt(p.mb)} de RAM.`, 'ok');
+    checkRamMissao();
+  }
+  renderRamGame();
+}
+
+function checkRamMissao() {
+  if (ramState.missaoIdx >= RAM_MISSOES.length) return;
+  const missao = RAM_MISSOES[ramState.missaoIdx];
+  const s = ramState.abertos;
+  const used = ramUsedMb();
+  if (missao.check(s, used)) {
+    ramState.pontos += 50;
+    ramState.missaoIdx++;
+    setTimeout(() => { showRamMsg(`🎉 Missão completa! +50 pontos!`, 'ok'); renderRamGame(); }, 300);
+  }
+}
+
+function showRamMsg(txt, tipo) {
+  const el = document.getElementById('ramMsg');
+  if (!el) return;
+  el.textContent = txt; el.className = `ram-msg show ${tipo}`;
+  clearTimeout(ramState._msgTimer);
+  ramState._msgTimer = setTimeout(() => { if(el) el.classList.remove('show'); }, 2500);
+}
 
 function abrirMenuDigitacao() {
   digState.dif = digState.dif || 'facil';
