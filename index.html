@@ -580,50 +580,160 @@
      ============================ */
   .quiz-header { margin-bottom: 22px; }
   .quiz-counter-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 700; font-size: 13px; }
-  .quiz-question {
-    background: var(--bg-2); padding: 36px; border-radius: var(--radius);
-    box-shadow: var(--shadow-sm); margin-bottom: 18px;
-    border: 1px solid var(--line);
+  /* ============================
+     QUIZ — Estilo Show do Milhão
+     ============================ */
+  #screen-quiz {
+    background: radial-gradient(ellipse at 50% 0%, #0D2B4E 0%, #071525 55%, #030D18 100%) !important;
+    min-height: 100vh; padding: 0 !important;
   }
-  .quiz-q-num {
-    font-size: 11px; font-weight: 800; color: var(--ink-soft);
-    letter-spacing: 1.8px; margin-bottom: 14px;
+  .milhao-wrap {
+    display: grid; grid-template-columns: 1fr 200px;
+    gap: 0; min-height: 100vh; position: relative;
   }
-  .quiz-q-text {
+  .milhao-spotlight {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 340px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,210,60,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .milhao-main { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 1; }
+  .milhao-topbar { display: flex; align-items: center; justify-content: space-between; }
+  .milhao-exit { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 18px; border-radius: 30px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .milhao-exit:hover { background: rgba(255,255,255,0.2); }
+  .milhao-lifelines { display: flex; gap: 10px; }
+  .milhao-lifeline {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #1A4A7A, #0D2B4E);
+    border: 2px solid #2D7DD2; color: white; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .milhao-lifeline:hover { transform: scale(1.1); border-color: #FFD23C; }
+  .milhao-lifeline.used { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+  .milhao-lifeline-label { font-size: 9px; font-weight: 800; position: absolute; bottom: -16px; color: rgba(255,255,255,0.6); letter-spacing: 1px; white-space: nowrap; }
+  .milhao-timer-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .milhao-timer {
+    width: 54px; height: 54px; border-radius: 50%;
+    border: 3px solid #FFD23C; background: rgba(255,210,60,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 900; color: #FFD23C;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .milhao-timer.danger { border-color: #EF4444; color: #EF4444; background: rgba(239,68,68,0.1); animation: timerShake 0.3s ease infinite; }
+  @keyframes timerShake { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-3deg)} 75%{transform:rotate(3deg)} }
+  .milhao-pergunta {
+    background: linear-gradient(180deg, rgba(13,43,78,0.9) 0%, rgba(7,21,37,0.95) 100%);
+    border: 2px solid #2D7DD2; border-radius: 16px;
+    padding: 28px 32px; text-align: center;
+    box-shadow: 0 0 40px rgba(45,125,210,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .milhao-q-num { font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #FFD23C; margin-bottom: 10px; }
+  .milhao-q-text {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 24px; font-weight: 700; line-height: 1.35;
+    font-size: 22px; font-weight: 700; color: white; line-height: 1.4;
   }
-  .quiz-options { display: grid; gap: 10px; }
+  .milhao-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .milhao-option {
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+    border: 2px solid #FFD23C; border-radius: 50px;
+    padding: 14px 20px; cursor: pointer; font-size: 15px; font-weight: 700;
+    transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex; align-items: center; gap: 12px; color: white; width: 100%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .milhao-option:hover:not(.disabled) {
+    background: linear-gradient(135deg, #2D4A8A, #1A3570);
+    border-color: #FFE770; transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(45,125,210,0.4);
+  }
+  .milhao-option.correct {
+    background: linear-gradient(135deg, #064E3B, #065F46) !important;
+    border-color: #10B981 !important;
+    box-shadow: 0 0 30px rgba(16,185,129,0.5) !important;
+    animation: correctPulse 0.5s ease;
+  }
+  .milhao-option.wrong {
+    background: linear-gradient(135deg, #7F1D1D, #991B1B) !important;
+    border-color: #EF4444 !important;
+    box-shadow: 0 0 30px rgba(239,68,68,0.4) !important;
+  }
+  .milhao-option.hidden { opacity: 0.2; pointer-events: none; }
+  .milhao-option.disabled { pointer-events: none; }
+  @keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+  .milhao-opt-letter {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: #FFD23C; color: #0D2B4E;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 13px;
+  }
+  .milhao-option.correct .milhao-opt-letter { background: #10B981; color: white; }
+  .milhao-option.wrong .milhao-opt-letter { background: #EF4444; color: white; }
+  .milhao-option.hidden .milhao-opt-letter { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); }
+  .milhao-vf-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .milhao-feedback {
+    text-align: center; padding: 14px 20px; border-radius: 12px;
+    font-size: 16px; font-weight: 700; display: none; margin-top: 4px;
+  }
+  .milhao-feedback.show { display: block; }
+  .milhao-feedback.correct { background: rgba(16,185,129,0.15); color: #34D399; border: 1px solid rgba(16,185,129,0.3); }
+  .milhao-feedback.wrong { background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.3); }
+  .milhao-next {
+    background: linear-gradient(135deg, #FFD23C, #F59E0B); color: #0D2B4E;
+    border: none; border-radius: 50px; padding: 14px 40px;
+    font-size: 16px; font-weight: 900; cursor: pointer;
+    transition: all 0.2s; display: none; margin: 0 auto;
+    box-shadow: 0 8px 24px rgba(255,210,60,0.4);
+  }
+  .milhao-next:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 32px rgba(255,210,60,0.5); }
+  /* Escada lateral */
+  .milhao-escada {
+    background: rgba(7,21,37,0.95); border-left: 1px solid rgba(45,125,210,0.3);
+    padding: 20px 0; display: flex; flex-direction: column; justify-content: center;
+    position: relative; z-index: 1;
+  }
+  .milhao-escada-item {
+    display: flex; align-items: center; gap: 8px; padding: 5px 16px;
+    font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.45);
+    transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .milhao-escada-item.ativo {
+    color: #FFD23C; border-left-color: #FFD23C;
+    background: rgba(255,210,60,0.08);
+  }
+  .milhao-escada-item.conquistado { color: #10B981; }
+  .milhao-escada-num { width: 20px; font-size: 10px; text-align: right; opacity: 0.7; }
+  /* result screen dark */
+  .milhao-result {
+    text-align: center; padding: 60px 32px; position: relative; z-index: 1;
+  }
+  .milhao-result-trophy { font-size: 80px; margin-bottom: 16px; filter: drop-shadow(0 0 24px rgba(255,210,60,0.6)); }
+  .milhao-result-title { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 36px; font-weight: 900; color: white; margin-bottom: 8px; }
+  .milhao-result-score { font-size: 64px; font-weight: 900; color: #FFD23C; font-family: 'Plus Jakarta Sans',sans-serif; line-height: 1; margin-bottom: 8px; }
+  .milhao-result-sub { color: rgba(255,255,255,0.6); font-size: 16px; margin-bottom: 32px; }
+
+  /* Legacy .quiz-option still needed for drag/img types */
   .quiz-option {
     background: var(--bg-2); padding: 16px 22px; border-radius: var(--radius-sm);
     box-shadow: var(--shadow-sm); cursor: pointer; font-size: 16px; font-weight: 600;
     border: 2px solid var(--line); transition: all 0.15s ease; text-align: left;
-    display: flex; align-items: center; gap: 14px; font-family: inherit; color: var(--ink);
-    width: 100%;
+    display: flex; align-items: center; gap: 14px; font-family: inherit; color: var(--ink); width: 100%;
   }
-  .quiz-option:hover:not(.disabled) {
-    transform: translateX(6px); border-color: var(--ink);
-    box-shadow: var(--shadow);
-  }
+  .quiz-option:hover:not(.disabled) { transform: translateX(6px); border-color: var(--ink); }
   .quiz-option.correct { background: var(--green-soft); border-color: var(--green); color: #064E3B; }
   .quiz-option.wrong { background: var(--red-soft); border-color: var(--red); color: #7F1D1D; }
   .quiz-option.disabled { pointer-events: none; opacity: 0.55; }
-  .quiz-option-letter {
-    width: 36px; height: 36px; border-radius: 50%; background: var(--bg-soft);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; flex-shrink: 0; font-size: 14px;
-  }
+  .quiz-option-letter { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-soft); display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; font-size: 14px; }
   .quiz-option.correct .quiz-option-letter { background: var(--green); color: white; }
   .quiz-option.wrong .quiz-option-letter { background: var(--red); color: white; }
-
-  .quiz-feedback {
-    padding: 16px 20px; border-radius: var(--radius-sm); margin-top: 14px;
-    font-size: 15px; font-weight: 600; display: none;
-  }
+  .quiz-feedback { padding: 16px 20px; border-radius: var(--radius-sm); margin-top: 14px; font-size: 15px; font-weight: 600; display: none; }
   .quiz-feedback.show { display: block; }
   .quiz-feedback.correct { background: var(--green-soft); color: #064E3B; }
   .quiz-feedback.wrong { background: var(--red-soft); color: #7F1D1D; }
-
   .vf-option { justify-content: center !important; font-size: 17px !important; }
   .vf-option .quiz-option-letter { font-size: 20px !important; width: 40px !important; height: 40px !important; }
 
@@ -1925,19 +2035,34 @@
 
 <!-- ====================== QUIZ ====================== -->
 <div class="screen" id="screen-quiz">
-  <div class="container-narrow">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Sair do quiz</button>
-      <div class="top-bar-title" id="quizTopTitle"></div>
-    </div>
-    <div class="quiz-header">
-      <div class="quiz-counter-row">
-        <span id="quizCounter"></span>
-        <span id="quizScoreLabel"></span>
+  <div class="milhao-spotlight"></div>
+  <div class="milhao-wrap">
+    <div class="milhao-main">
+      <!-- topbar -->
+      <div class="milhao-topbar">
+        <button class="milhao-exit" onclick="goDashboard()">✕ Sair</button>
+        <div id="quizTopTitle" style="font-size:13px;font-weight:800;letter-spacing:1.5px;color:rgba(255,255,255,0.6);text-transform:uppercase;"></div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="milhao-lifelines">
+            <div class="milhao-lifeline" id="lifeline5050" onclick="usarLifeline5050()" title="50:50">
+              <span style="font-size:11px;font-weight:900;">50:50</span>
+              <span class="milhao-lifeline-label">ELIMINAR</span>
+            </div>
+          </div>
+          <div class="milhao-timer-wrap">
+            <div class="milhao-timer" id="quizTimer">30</div>
+          </div>
+        </div>
       </div>
-      <div class="aula-progress"><div class="aula-progress-fill" id="quizProgressFill"></div></div>
+      <!-- pergunta + opções -->
+      <div id="quizContent"></div>
+      <!-- escondidos para compat -->
+      <span id="quizCounter" style="display:none"></span>
+      <span id="quizScoreLabel" style="display:none"></span>
+      <div class="aula-progress" style="display:none"><div class="aula-progress-fill" id="quizProgressFill"></div></div>
     </div>
-    <div id="quizContent"></div>
+    <!-- escada -->
+    <div class="milhao-escada" id="quizEscada"></div>
   </div>
 </div>
 
@@ -3422,11 +3547,81 @@ function finalizarAula() {
 // QUIZ POR MÓDULO
 // =============================================================
 function iniciarQuizModulo(moduloId) {
-  estadoQuiz = { modulo: moduloId, idx: 0, score: 0, answered: false };
+  const n = alunoAtivo.nivel;
+  const total = MODULOS[moduloId].quiz[n].length;
+  estadoQuiz = { modulo: moduloId, idx: 0, score: 0, answered: false, timerVal: 30, timerId: null, lifeline5050used: false };
   document.getElementById("quizTopTitle").textContent =
-    `${MODULOS[moduloId].icone} Quiz — ${MODULOS[moduloId].titulo}`;
+    `${MODULOS[moduloId].icone} ${MODULOS[moduloId].titulo}`;
+  const lif = document.getElementById('lifeline5050');
+  if (lif) { lif.classList.remove('used'); }
+  renderEscada(total);
   renderQuizQuestion();
   showScreen("quiz");
+}
+
+function renderEscada(total) {
+  const el = document.getElementById('quizEscada');
+  if (!el) return;
+  const pts = [];
+  for (let i = total; i >= 1; i--) pts.push(i);
+  el.innerHTML = pts.map(i => `
+    <div class="milhao-escada-item" id="escada-${i}">
+      <span class="milhao-escada-num">${i}</span>
+      <span>${i === total ? '🏆 MAX' : i >= Math.ceil(total*0.7) ? '⭐ ' + i + ' pts' : i + ' pts'}</span>
+    </div>`).join('');
+}
+
+function atualizarEscada() {
+  document.querySelectorAll('.milhao-escada-item').forEach(el => el.classList.remove('ativo'));
+  const cur = document.getElementById(`escada-${estadoQuiz.idx + 1}`);
+  if (cur) cur.classList.add('ativo');
+  for (let i = 1; i < estadoQuiz.idx + 1; i++) {
+    const el = document.getElementById(`escada-${i}`);
+    if (el) el.classList.add('conquistado');
+  }
+}
+
+function iniciarTimerQuiz() {
+  if (estadoQuiz.timerId) clearInterval(estadoQuiz.timerId);
+  estadoQuiz.timerVal = 30;
+  const el = document.getElementById('quizTimer');
+  if (el) { el.textContent = 30; el.classList.remove('danger'); }
+  estadoQuiz.timerId = setInterval(() => {
+    estadoQuiz.timerVal--;
+    const el = document.getElementById('quizTimer');
+    if (el) {
+      el.textContent = estadoQuiz.timerVal;
+      el.classList.toggle('danger', estadoQuiz.timerVal <= 8);
+    }
+    if (estadoQuiz.timerVal <= 0) {
+      clearInterval(estadoQuiz.timerId);
+      if (!estadoQuiz.answered) {
+        estadoQuiz.answered = true;
+        const fb = document.getElementById('quizFb');
+        if (fb) { fb.textContent = '⏱️ Tempo esgotado!'; fb.className = 'milhao-feedback show wrong'; }
+        const btn = document.getElementById('nextQBtn');
+        if (btn) btn.style.display = 'flex';
+      }
+    }
+  }, 1000);
+}
+
+function usarLifeline5050() {
+  if (estadoQuiz.lifeline5050used || estadoQuiz.answered) return;
+  estadoQuiz.lifeline5050used = true;
+  document.getElementById('lifeline5050')?.classList.add('used');
+  const n = alunoAtivo.nivel;
+  const quiz = MODULOS[estadoQuiz.modulo].quiz[n];
+  const q = quiz[estadoQuiz.idx];
+  if (q.tipo !== 'mc') return;
+  const correct = q.correct;
+  const wrongOpts = [0,1,2,3].filter(i => i !== correct);
+  // remove 2 wrong options
+  const toHide = wrongOpts.sort(() => Math.random()-0.5).slice(0,2);
+  toHide.forEach(i => {
+    const el = document.getElementById(`qopt-${i}`);
+    if (el) el.classList.add('hidden','disabled');
+  });
 }
 
 function renderQuizQuestion() {
@@ -3435,55 +3630,51 @@ function renderQuizQuestion() {
   const q = quiz[estadoQuiz.idx];
   const total = quiz.length;
 
-  const pct = (estadoQuiz.idx / total) * 100;
   const fill = document.getElementById("quizProgressFill");
-  fill.style.width = pct + "%";
-  fill.setAttribute("data-n", n);
-
-  document.getElementById("quizCounter").textContent = `Pergunta ${estadoQuiz.idx + 1} de ${total}`;
+  if (fill) { fill.style.width = (estadoQuiz.idx/total*100)+"%"; fill.setAttribute("data-n",n); }
+  document.getElementById("quizCounter").textContent = `Pergunta ${estadoQuiz.idx+1} de ${total}`;
   document.getElementById("quizScoreLabel").textContent = `Pontos: ${estadoQuiz.score}`;
+  atualizarEscada();
+
+  const tipoLabel = q.tipo==="vf" ? "VERDADEIRO OU FALSO" : q.tipo==="drag" ? "LIGUE OS PARES" : q.tipo==="img" ? "ESCOLHA A IMAGEM" : `PERGUNTA ${estadoQuiz.idx+1} DE ${total}`;
 
   let opts = "";
   if (q.tipo === "vf") {
-    opts = `
-      <button class="quiz-option vf-option" onclick="responderQuiz(0)" id="qopt-0">
-        <div class="quiz-option-letter" style="background:#10B981;color:white;">✓</div>
-        <div style="font-size: 20px;">VERDADEIRO</div>
+    opts = `<div class="milhao-vf-opts">
+      <button class="milhao-option" onclick="responderQuiz(0)" id="qopt-0">
+        <div class="milhao-opt-letter" style="background:#10B981;">✓</div><span>VERDADEIRO</span>
       </button>
-      <button class="quiz-option vf-option" onclick="responderQuiz(1)" id="qopt-1">
-        <div class="quiz-option-letter" style="background:#EF4444;color:white;">✗</div>
-        <div style="font-size: 20px;">FALSO</div>
-      </button>`;
+      <button class="milhao-option" onclick="responderQuiz(1)" id="qopt-1">
+        <div class="milhao-opt-letter" style="background:#EF4444;">✗</div><span>FALSO</span>
+      </button></div>`;
   } else if (q.tipo === "img") {
     const imgOpts = q.options.map((op, i) => `
-      <div class="img-choice" onclick="responderImg(this, ${i}, ${q.correct})">
-        ${op.svg}
-        <div class="img-choice-label">${escapeHtml(op.label)}</div>
+      <div class="img-choice" onclick="responderImg(this,${i},${q.correct})" style="border:2px solid rgba(255,210,60,0.3);background:rgba(13,43,78,0.8);color:white;">
+        ${op.svg}<div class="img-choice-label">${escapeHtml(op.label)}</div>
       </div>`).join('');
     opts = `<div class="img-choices">${imgOpts}</div>`;
   } else if (q.tipo === "drag") {
     opts = '<div id="dragContainer"></div>';
   } else {
-    const letters = ["A", "B", "C", "D"];
-    opts = q.options.map((opt, i) =>
-      `<button class="quiz-option" onclick="responderQuiz(${i})" id="qopt-${i}">
-         <div class="quiz-option-letter">${letters[i]}</div>
-         <div>${opt}</div>
-       </button>`
-    ).join("");
+    const letters = ["A","B","C","D"];
+    opts = `<div class="milhao-options">${q.options.map((opt,i)=>
+      `<button class="milhao-option" onclick="responderQuiz(${i})" id="qopt-${i}">
+        <div class="milhao-opt-letter">${letters[i]}</div><span>${opt}</span>
+      </button>`).join("")}</div>`;
   }
 
   document.getElementById("quizContent").innerHTML = `
-    <div class="quiz-question">
-      <div class="quiz-q-num">PERGUNTA ${estadoQuiz.idx + 1} ${q.tipo === "vf" ? "— V ou F" : q.tipo === "drag" ? "— LIGUE OS PARES" : q.tipo === "img" ? "— ESCOLHA A IMAGEM" : ""}</div>
-      <div class="quiz-q-text">${q.q}</div>
+    <div class="milhao-pergunta">
+      <div class="milhao-q-num">${tipoLabel}</div>
+      <div class="milhao-q-text">${q.q}</div>
     </div>
-    <div class="quiz-options" style="${(q.tipo === 'img' || q.tipo === 'drag') ? 'display:block;' : ''}">${opts}</div>
-    <div class="quiz-feedback" id="quizFb"></div>
-    <div style="margin-top: 20px; text-align: right;">
-      <button class="btn" id="nextQBtn" style="display:none;" onclick="proximaPerguntaQuiz()">Próxima →</button>
+    ${opts}
+    <div class="milhao-feedback" id="quizFb"></div>
+    <div style="text-align:center;margin-top:8px;">
+      <button class="milhao-next" id="nextQBtn" onclick="proximaPerguntaQuiz()">Próxima →</button>
     </div>`;
   estadoQuiz.answered = false;
+  iniciarTimerQuiz();
 
   // Initialize drag question after DOM is set
   if (q.tipo === "drag") {
@@ -3530,7 +3721,9 @@ function responderQuiz(idx) {
     textoCerto = q.options[correctIdx];
   }
 
-  document.querySelectorAll(".quiz-option").forEach((el, i) => {
+  if (estadoQuiz.timerId) clearInterval(estadoQuiz.timerId);
+
+  document.querySelectorAll(".milhao-option").forEach((el, i) => {
     el.classList.add("disabled");
     if (i === correctIdx) el.classList.add("correct");
     else if (i === idx) el.classList.add("wrong");
@@ -3541,17 +3734,16 @@ function responderQuiz(idx) {
     estadoQuiz.score++;
     document.getElementById("quizScoreLabel").textContent = `Pontos: ${estadoQuiz.score}`;
     fb.textContent = "✓ Correto! +1 ponto";
-    fb.className = "quiz-feedback show correct";
+    fb.className = "milhao-feedback show correct";
   } else {
-    fb.innerHTML = `✗ A resposta certa era: <strong>${textoCerto}</strong>`;
-    fb.className = "quiz-feedback show wrong";
-    // rastreia erro
+    fb.innerHTML = `✗ A resposta certa era: <strong>${escapeHtml(textoCerto)}</strong>`;
+    fb.className = "milhao-feedback show wrong";
     if (!estadoQuiz.erros) estadoQuiz.erros = [];
     estadoQuiz.erros.push({ q: q.q, errou: idx, certo: correctIdx });
   }
 
   const next = document.getElementById("nextQBtn");
-  next.style.display = "inline-flex";
+  next.style.display = "flex";
   next.textContent = (estadoQuiz.idx + 1 >= quiz.length) ? "Ver resultado →" : "Próxima →";
 }
 
@@ -3703,20 +3895,18 @@ function finalizarQuizModulo() {
     ? `<button class="btn lg" onclick="iniciarModulo('${proxModuloId}')">Próximo módulo: ${MODULOS[proxModuloId].titulo} →</button>`
     : "";
 
+  if (estadoQuiz.timerId) clearInterval(estadoQuiz.timerId);
   document.getElementById("quizContent").innerHTML = `
-    <div class="result-screen">
-      <div class="result-emoji">${emoji}</div>
-      <div class="result-title">${title}</div>
-      <div class="result-score" data-n="${n}">${score} / ${total}</div>
-      <div class="result-msg">${msg}</div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn ghost" onclick="iniciarModulo('${moduloAtual}')">↻ Refazer módulo</button>
-        <button class="btn ghost" onclick="goDashboard()">Ir pro menu</button>
-        ${proxBtnHtml}
+    <div class="milhao-result">
+      <div class="milhao-result-trophy">${emoji}</div>
+      <div class="milhao-result-title">${title}</div>
+      <div class="milhao-result-score">${score}<span style="font-size:28px;opacity:0.6"> / ${total}</span></div>
+      <div class="milhao-result-sub">${msg}</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="milhao-next" style="display:flex;" onclick="goDashboard()">← Menu</button>
+        ${proxBtnHtml ? `<button class="milhao-next" style="display:flex;background:linear-gradient(135deg,#10B981,#059669);box-shadow:0 8px 24px rgba(16,185,129,0.4);" onclick="${proxBtnHtml.match(/onclick="([^"]+)"/)?.[1]||'goDashboard()'}">Próximo módulo →</button>` : ''}
       </div>
     </div>`;
-  document.getElementById("quizCounter").textContent = "Resultado";
-  document.getElementById("quizProgressFill").style.width = "100%";
 }
 
 // =============================================================
