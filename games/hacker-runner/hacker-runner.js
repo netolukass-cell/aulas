@@ -444,11 +444,11 @@ class GameScene extends Phaser.Scene {
     this.dataTotal = LVL.dataItems.length;
 
     // Física
-    this.physics.world.setBounds(0, 0, WW, GH + 400);
+    this.physics.world.setBounds(0, 0, WW, GH + 300);
     this.physics.world.gravity.y = 900;
 
     // Câmera
-    this.cameras.main.setBounds(0, 0, WW, GH + 400);
+    this.cameras.main.setBounds(0, 0, WW, GH);
 
     // ── Background parallax ──
     this._createBackground();
@@ -531,8 +531,8 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemyGroup, this.platforms, null, this._platformProcess, this);
 
     // ── Câmera segue o jogador ──
-    this.cameras.main.startFollow(this.player, true, 0.10, 0.10);
-    this.cameras.main.setDeadzone(100, 80);
+    this.cameras.main.startFollow(this.player, true, 0.10, 0);
+    this.cameras.main.setDeadzone(100, 0);
 
     // ── Meta (PC Central) ──
     this._drawGoal();
