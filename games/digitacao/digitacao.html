@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digitação — Professor Lusca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="digitacao.css">
+</head>
+<body>
+
+<!-- ====================== MENU DIGITAÇÃO ====================== -->
+<div class="dig-screen" id="screen-digitacao-menu">
+  <div class="container-narrow">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="voltarPlataforma()">← Voltar</button>
+      <div class="top-bar-title">⌨️ Digitação</div>
+    </div>
+
+    <p style="text-align:center; color:var(--ink-soft); margin-bottom:24px; font-size:16px;">
+      Escolha um modo. <strong>Treino</strong> é tranquilo, sem pressão. <strong>Ranqueado</strong> tem cronômetro e entra no ranking da turma!
+    </p>
+
+    <div class="dig-modos">
+      <div class="dig-modo-card" style="border-color: #6366F1;" onclick="abrirFileiras()">
+        <div class="dig-modo-icon" style="background: linear-gradient(135deg, #6366F1, #4338CA);">🏫</div>
+        <div class="dig-modo-titulo">Aprender por Fileira</div>
+        <div class="dig-modo-desc">Aprenda do zero! Lições progressivas por fileira do teclado — home row, superior e inferior.</div>
+      </div>
+      <div class="dig-modo-card treino" onclick="iniciarDigitacao('treino')">
+        <div class="dig-modo-icon">🧘</div>
+        <div class="dig-modo-titulo">Treino Casual</div>
+        <div class="dig-modo-desc">Sem cronômetro. Treine no seu ritmo com textos completos.</div>
+      </div>
+      <div class="dig-modo-card ranqueado" onclick="iniciarDigitacao('ranqueado')">
+        <div class="dig-modo-icon">🏆</div>
+        <div class="dig-modo-titulo">Ranqueado</div>
+        <div class="dig-modo-desc">Cronômetro ativo! WPM (palavras/min), precisão e pontos no ranking.</div>
+      </div>
+      <div class="dig-modo-card" style="border-color:#EF4444;" onclick="abrirMenuRankeada()">
+        <div class="dig-modo-icon" style="background:linear-gradient(135deg,#EF4444,#B91C1C);">⏱️</div>
+        <div class="dig-modo-titulo">Rankeada de Textos</div>
+        <div class="dig-modo-desc">Textos longos de informática com cronômetro regressivo. Cada erro reduz seu tempo!</div>
+      </div>
+    </div>
+
+    <div class="section-titulo" style="margin-top:20px;">DIFICULDADE</div>
+    <div class="dig-nivel-selector" id="digNivelSelector">
+      <button class="dig-nivel-btn active" onclick="setDifDig('facil', this)">🟢 Fácil</button>
+      <button class="dig-nivel-btn" onclick="setDifDig('medio', this)">🟡 Médio</button>
+      <button class="dig-nivel-btn" onclick="setDifDig('dificil', this)">🔴 Difícil</button>
+    </div>
+
+    <div id="digHistorico" style="margin-top:32px;"></div>
+  </div>
+</div>
+
+<!-- ====================== RANKEADA DE TEXTOS — MENU ====================== -->
+<div class="dig-screen" id="screen-digitacao-rankeada-menu">
+  <div class="container-narrow">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="abrirMenuDigitacao()">← Voltar</button>
+      <div class="top-bar-title">⏱️ Rankeada de Textos</div>
+    </div>
+    <div id="rankeadaMenuContent"></div>
+  </div>
+</div>
+
+<!-- ====================== RANKEADA DE TEXTOS — JOGO ====================== -->
+<div class="dig-screen" id="screen-digitacao-rankeada">
+  <div class="container">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="sairRankeada()">← Sair</button>
+      <div class="top-bar-title" id="rankeadaTopTitle"></div>
+    </div>
+
+    <div style="background:var(--bg-2);border-radius:16px;padding:16px 22px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:16px;align-items:center;margin-bottom:12px;">
+        <div style="text-align:center;">
+          <div id="rankeadaTimer" style="font-size:36px;font-weight:900;line-height:1;transition:color 0.3s,transform 0.2s;">3:00</div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);">TEMPO</div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-soft);text-align:center;">⚠️ Cada erro de digitação reduz o tempo!</div>
+        <div class="dig-stat"><div class="dig-stat-val" id="rankeadaWpm">0</div><div class="dig-stat-label">WPM</div></div>
+        <div class="dig-stat"><div class="dig-stat-val" id="rankeadaProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:9px;font-weight:800;letter-spacing:1px;color:var(--ink-soft);white-space:nowrap;">TEMPO RESTANTE</span>
+        <div style="flex:1;height:10px;background:var(--bg-soft);border-radius:5px;overflow:hidden;">
+          <div id="rankeadaTimerBar" style="height:100%;background:linear-gradient(90deg,#EF4444,#FBBF24,#10B981);background-size:300% 100%;background-position:right center;border-radius:5px;transition:width 1s linear;width:100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dig-texto-box" id="rankeadaTextoBox" style="border-radius:16px;border:2px solid var(--line);background:var(--bg-2);"></div>
+    <div class="teclado-virtual" id="rankeadaTeclado" style="margin-top:14px;"></div>
+    <div class="teclado-legenda" id="rankeadaTecladoLegenda" style="display:none;">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
+    <div id="rankeadaResultado"></div>
+  </div>
+</div>
+
+<!-- ====================== FILEIRAS — Trilha de Lições ====================== -->
+<div class="dig-screen" id="screen-digitacao-fileiras">
+  <div class="container-narrow">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="abrirMenuDigitacao()">← Voltar</button>
+      <div class="top-bar-title">⌨️ Aprenda por Fileira</div>
+    </div>
+
+    <div class="fileiras-intro">
+      <div class="fileiras-intro-icon">🏫</div>
+      <div class="fileiras-intro-text">
+        <strong>Aprenda digitação do zero!</strong> Cada fileira do teclado tem lições progressivas.
+        Comece pela <strong>Fileira do Meio</strong> (a mais importante!), depois a Superior e a Inferior.
+        Complete cada lição para desbloquear a próxima. 🎯
+      </div>
+    </div>
+
+    <div class="fileiras-trilha" id="fileirasTrilha"></div>
+  </div>
+</div>
+
+<!-- ====================== LIÇÃO DE DIGITAÇÃO ====================== -->
+<div class="dig-screen" id="screen-digitacao-licao">
+  <div class="container">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="voltarParaFileiras()">← Sair da lição</button>
+      <div class="top-bar-title" id="licaoTopTitle"></div>
+    </div>
+
+    <div id="licaoHeader"></div>
+    <div id="licaoInstrucao"></div>
+
+    <div class="dig-stats">
+      <div class="dig-stat"><div class="dig-stat-val" id="licaoTempo">0s</div><div class="dig-stat-label">TEMPO</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="licaoAcertos">0</div><div class="dig-stat-label">ACERTOS</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="licaoPrecisao">100%</div><div class="dig-stat-label">PRECISÃO</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="licaoProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
+    </div>
+
+    <div class="dig-texto-box" id="licaoTextoBox"></div>
+    <div class="teclado-virtual" id="licaoTeclado"></div>
+    <div class="teclado-legenda">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
+    <div id="licaoResultado"></div>
+  </div>
+</div>
+
+<!-- ====================== JOGO DIGITAÇÃO ====================== -->
+<div class="dig-screen" id="screen-digitacao">
+  <div class="container">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="sairDigitacao()">← Sair</button>
+      <div class="top-bar-title" id="digTopTitle"></div>
+    </div>
+
+    <div class="dig-stats">
+      <div class="dig-stat"><div class="dig-stat-val" id="digTempo">0s</div><div class="dig-stat-label">TEMPO</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="digWpm">0</div><div class="dig-stat-label">PALAVRAS/MIN</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="digPrecisao">100%</div><div class="dig-stat-label">PRECISÃO</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="digErros">0</div><div class="dig-stat-label">ERROS</div></div>
+      <div class="dig-stat"><div class="dig-stat-val" id="digProgresso">0%</div><div class="dig-stat-label">PROGRESSO</div></div>
+    </div>
+
+    <div style="background:var(--bg-2);border-radius:10px;padding:10px 16px;margin-bottom:14px;border:1px solid var(--line);box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--ink-soft);">PROGRESSO DO TEXTO</span>
+        <span id="digProgressoPct" style="font-size:10px;font-weight:800;color:var(--green);">0%</span>
+      </div>
+      <div style="height:8px;background:var(--bg-soft);border-radius:4px;overflow:hidden;">
+        <div id="digProgressoBar" style="height:100%;width:0%;background:linear-gradient(90deg,#10B981,#3B82F6);border-radius:4px;transition:width 0.3s ease;"></div>
+      </div>
+    </div>
+
+    <div class="dig-texto-box" id="digTextoBox" style="height:220px;overflow-y:auto;scroll-behavior:smooth;border-radius:16px;border:2px solid var(--line);"></div>
+    <div class="teclado-virtual" id="tecladoVirtual" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);"></div>
+    <div class="teclado-legenda">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
+
+    <div id="digResultado"></div>
+  </div>
+</div>
+
+<script src="digitacao.js"></script>
+</body>
+</html>

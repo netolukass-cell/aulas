@@ -1,0 +1,58 @@
+/* ── Hacker Runner — standalone game styles ─────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #000;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#gameWrap {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+}
+
+#hrCanvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  image-rendering: pixelated;
+  cursor: none;
+}
+
+#hrOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 8, 0.92);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  color: #E6EDF3;
+}
+
+#hrQuestion {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(5, 12, 28, 0.98);
+  border: 2px solid #00FFCC;
+  border-radius: 6px;
+  padding: 18px 22px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  color: #E6EDF3;
+  min-width: clamp(220px, 55%, 380px);
+  max-width: 90%;
+  z-index: 30;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+}
+
+button:hover { opacity: 0.9; }
