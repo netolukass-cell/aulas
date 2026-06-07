@@ -67,6 +67,7 @@
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='none'/%3E%3Ccircle cx='40' cy='40' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='0' cy='0' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='80' cy='0' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='0' cy='80' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='80' cy='80' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Cline x1='0' y1='0' x2='40' y2='40' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Cline x1='80' y1='0' x2='40' y2='40' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Cline x1='40' y1='40' x2='80' y2='80' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Cline x1='40' y1='40' x2='0' y2='80' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Crect x='16' y='36' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3Crect x='56' y='36' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3Crect x='36' y='16' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3Crect x='36' y='56' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3C/svg%3E");
     color: var(--ink);
     min-height: 100vh;
     overflow-x: hidden;
@@ -133,7 +134,7 @@
   }
   .home-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 52px; font-weight: 800; line-height: 1.05;
+    font-size: 56px; font-weight: 800; line-height: 1.05;
     letter-spacing: -1.8px; margin-bottom: 14px;
     background: linear-gradient(135deg, #0F172A 0%, #6366F1 100%);
     -webkit-background-clip: text; background-clip: text;
@@ -294,11 +295,25 @@
      ============================ */
   .dash-header {
     background: var(--bg-2); border-radius: var(--radius); padding: 28px;
-    box-shadow: var(--shadow-sm); margin-bottom: 24px;
+    box-shadow: var(--shadow-lg); margin-bottom: 24px;
     border: 1px solid var(--line);
     display: grid; grid-template-columns: auto 1fr auto auto; gap: 24px;
-    align-items: center;
+    align-items: center; position: relative; overflow: hidden;
   }
+  .dash-header::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit;
+    opacity: 0.07; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='2' fill='%230F172A'/%3E%3Ccircle cx='0' cy='0' r='2' fill='%230F172A'/%3E%3Ccircle cx='40' cy='0' r='2' fill='%230F172A'/%3E%3Ccircle cx='0' cy='40' r='2' fill='%230F172A'/%3E%3Ccircle cx='40' cy='40' r='2' fill='%230F172A'/%3E%3C/svg%3E");
+  }
+  .dash-header::after {
+    content: ""; position: absolute; top: -80px; right: -80px;
+    width: 280px; height: 280px; border-radius: 50%;
+    background: radial-gradient(circle, var(--dash-accent, rgba(99,102,241,0.12)), transparent 70%);
+    pointer-events: none;
+  }
+  .dash-header[data-n="1"] { --dash-accent: rgba(249,115,22,0.15); border-top: 3px solid var(--n1-main); }
+  .dash-header[data-n="2"] { --dash-accent: rgba(20,184,166,0.15); border-top: 3px solid var(--n2-main); }
+  .dash-header[data-n="3"] { --dash-accent: rgba(139,92,246,0.15); border-top: 3px solid var(--n3-main); }
   .dash-avatar-wrap {
     width: 80px; height: 80px; border-radius: 50%; padding: 4px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08); flex-shrink: 0;
@@ -1286,6 +1301,78 @@
   /* N7 pratique-card extra colors */
   .pratique-card:nth-child(8) .pratique-icon-wrap { background: linear-gradient(135deg, #0EA5E9, #0369A1); box-shadow: 0 6px 14px -4px rgba(14,165,233,0.4); }
   .pratique-card:nth-child(9) .pratique-icon-wrap { background: linear-gradient(135deg, #84CC16, #4D7C0F); box-shadow: 0 6px 14px -4px rgba(132,204,22,0.4); }
+
+  /* ============================
+     VISUAL POLISH — v2
+     ============================ */
+
+  /* Backdrop blur nos modais */
+  #modalProfSenha > div,
+  #modalPainelPro > div,
+  [id^="modal"] > div { backdrop-filter: blur(8px); }
+
+  /* Bevel sutil em todos os cards */
+  .aluno-card, .modulo-card, .pratique-card, .ranking-card, .quiz-question,
+  .aula-pagina, .paint-toolbar, .canvas-wrap, .word-toolbar, .jogo-header {
+    box-shadow: var(--shadow-sm), 0 1px 0 rgba(255,255,255,0.8) inset;
+  }
+  .aluno-card:hover { box-shadow: var(--shadow-lg), 0 1px 0 rgba(255,255,255,0.8) inset; }
+  .modulo-card:hover { box-shadow: var(--shadow-lg), 0 1px 0 rgba(255,255,255,0.8) inset; }
+  .pratique-card:hover { box-shadow: var(--shadow-lg), 0 1px 0 rgba(255,255,255,0.8) inset; }
+
+  /* Transições suaves em todos os cards */
+  .aluno-card, .modulo-card, .pratique-card, .quiz-option, .caca-option, .memoria-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  /* Pratique-card — altura mínima + área de preview */
+  .pratique-card { min-height: 160px; }
+  .pratique-preview {
+    position: absolute; bottom: 0; right: 0;
+    width: 80px; height: 80px; opacity: 0.12;
+    pointer-events: none;
+  }
+
+  /* Módulo card — SVG decorativo no canto */
+  .modulo-deco {
+    position: absolute; bottom: 12px; right: 12px;
+    width: 80px; height: 80px; opacity: 0.12;
+    pointer-events: none;
+  }
+
+  /* Dash-header — gradiente baseado no nível */
+  .dash-header[data-n="1"] {
+    background: linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(251,191,36,0.05) 100%), var(--bg-2);
+    border-top: 3px solid var(--n1-main);
+  }
+  .dash-header[data-n="2"] {
+    background: linear-gradient(135deg, rgba(20,184,166,0.08) 0%, rgba(59,130,246,0.05) 100%), var(--bg-2);
+    border-top: 3px solid var(--n2-main);
+  }
+  .dash-header[data-n="3"] {
+    background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(67,56,202,0.05) 100%), var(--bg-2);
+    border-top: 3px solid var(--n3-main);
+  }
+
+  /* Barra de progresso animada */
+  @keyframes progressGrow {
+    from { width: 0; }
+  }
+  .aluno-progress-fill { animation: progressGrow 0.8s cubic-bezier(0.4,0,0.2,1) both; }
+  .aula-progress-fill { animation: progressGrow 0.6s cubic-bezier(0.4,0,0.2,1) both; }
+
+  /* Progresso geral com barra visual */
+  .progresso-bar-wrap {
+    width: 80px; height: 6px; background: var(--bg-soft);
+    border-radius: 3px; overflow: hidden; margin-top: 4px; margin-left: auto;
+  }
+  .progresso-bar-fill {
+    height: 100%; border-radius: 3px;
+    animation: progressGrow 0.8s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  .dash-header[data-n="1"] .progresso-bar-fill { background: var(--n1-grad); }
+  .dash-header[data-n="2"] .progresso-bar-fill { background: var(--n2-grad); }
+  .dash-header[data-n="3"] .progresso-bar-fill { background: var(--n3-grad); }
 </style>
 </head>
 <body>
@@ -1303,29 +1390,108 @@
         <p class="home-sub">Aprenda no seu ritmo com módulos, quizzes, jogos e desafios. Suba no ranking e ganhe medalhas.</p>
       </div>
       <div class="home-illustration">
-        <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="160" cy="140" r="120" fill="#EEF2FF"/>
-          <rect x="60" y="60" width="200" height="130" rx="12" fill="#0F172A"/>
-          <rect x="72" y="72" width="176" height="100" rx="6" fill="url(#screen-grad)"/>
-          <rect x="84" y="88" width="60" height="6" rx="3" fill="white" opacity="0.9"/>
-          <rect x="84" y="102" width="100" height="4" rx="2" fill="white" opacity="0.4"/>
-          <rect x="84" y="112" width="80" height="4" rx="2" fill="white" opacity="0.4"/>
-          <circle cx="200" cy="135" r="20" fill="#FBBF24"/>
-          <text x="200" y="142" text-anchor="middle" fill="#0F172A" font-size="24" font-weight="bold">★</text>
-          <rect x="140" y="190" width="40" height="14" fill="#0F172A"/>
-          <rect x="110" y="200" width="100" height="10" rx="5" fill="#0F172A"/>
-          <circle cx="40" cy="80" r="18" fill="#FB923C"/>
-          <text x="40" y="87" text-anchor="middle" fill="white" font-size="16">🖱</text>
-          <circle cx="280" cy="220" r="22" fill="#14B8A6"/>
-          <text x="280" y="228" text-anchor="middle" fill="white" font-size="18">⌨</text>
-          <circle cx="60" cy="220" r="16" fill="#8B5CF6"/>
-          <text x="60" y="227" text-anchor="middle" fill="white" font-size="14">💾</text>
+        <svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="screen-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#6366F1"/>
-              <stop offset="1" stop-color="#4338CA"/>
+            <linearGradient id="bgCircle" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#EEF2FF"/>
+              <stop offset="100%" stop-color="#E0E7FF"/>
             </linearGradient>
+            <linearGradient id="heroScreenGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#6366F1"/>
+              <stop offset="100%" stop-color="#4338CA"/>
+            </linearGradient>
+            <linearGradient id="heroScreenGrad2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#14B8A6"/>
+              <stop offset="100%" stop-color="#0891B2"/>
+            </linearGradient>
+            <linearGradient id="deskGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#334155"/>
+              <stop offset="100%" stop-color="#1E293B"/>
+            </linearGradient>
+            <filter id="softShadow">
+              <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1E40AF" flood-opacity="0.18"/>
+            </filter>
+            <filter id="cardShadow">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.12"/>
+            </filter>
           </defs>
+
+          <!-- Background circle -->
+          <circle cx="200" cy="160" r="148" fill="url(#bgCircle)" opacity="0.8"/>
+          <circle cx="200" cy="160" r="148" fill="none" stroke="#C7D2FE" stroke-width="1" opacity="0.6"/>
+
+          <!-- Desk -->
+          <rect x="60" y="240" width="280" height="12" rx="4" fill="url(#deskGrad)" opacity="0.4"/>
+
+          <!-- Monitor left (teacher) -->
+          <rect x="62" y="130" width="120" height="88" rx="8" fill="#0F172A" filter="url(#softShadow)"/>
+          <rect x="68" y="136" width="108" height="72" rx="4" fill="url(#heroScreenGrad)"/>
+          <!-- Code lines on screen -->
+          <rect x="76" y="148" width="36" height="4" rx="2" fill="white" opacity="0.9"/>
+          <rect x="76" y="158" width="60" height="3" rx="1.5" fill="white" opacity="0.4"/>
+          <rect x="76" y="165" width="48" height="3" rx="1.5" fill="white" opacity="0.4"/>
+          <rect x="76" y="172" width="54" height="3" rx="1.5" fill="white" opacity="0.4"/>
+          <rect x="76" y="179" width="40" height="3" rx="1.5" fill="#FBBF24" opacity="0.8"/>
+          <rect x="76" y="186" width="30" height="3" rx="1.5" fill="white" opacity="0.3"/>
+          <!-- monitor stand -->
+          <rect x="116" y="218" width="8" height="18" rx="2" fill="#334155" opacity="0.6"/>
+          <rect x="104" y="233" width="32" height="5" rx="2" fill="#334155" opacity="0.5"/>
+
+          <!-- Monitor right (student) -->
+          <rect x="218" y="138" width="112" height="84" rx="8" fill="#0F172A" filter="url(#softShadow)"/>
+          <rect x="224" y="144" width="100" height="66" rx="4" fill="url(#heroScreenGrad2)"/>
+          <!-- Graph bars on screen -->
+          <rect x="232" y="185" width="12" height="16" rx="3" fill="white" opacity="0.7"/>
+          <rect x="248" y="174" width="12" height="27" rx="3" fill="white" opacity="0.9"/>
+          <rect x="264" y="180" width="12" height="21" rx="3" fill="white" opacity="0.7"/>
+          <rect x="280" y="168" width="12" height="33" rx="3" fill="#FBBF24" opacity="0.9"/>
+          <rect x="296" y="176" width="12" height="25" rx="3" fill="white" opacity="0.6"/>
+          <rect x="232" y="152" width="44" height="4" rx="2" fill="white" opacity="0.8"/>
+          <!-- monitor stand -->
+          <rect x="270" y="222" width="8" height="16" rx="2" fill="#334155" opacity="0.6"/>
+          <rect x="258" y="235" width="32" height="5" rx="2" fill="#334155" opacity="0.5"/>
+
+          <!-- Person left (teacher) silhouette -->
+          <circle cx="122" cy="110" r="16" fill="#F97316"/>
+          <rect x="108" y="126" width="28" height="20" rx="6" fill="#6366F1" opacity="0.9"/>
+
+          <!-- Person right (student) silhouette -->
+          <circle cx="274" cy="118" r="14" fill="#14B8A6"/>
+          <rect x="261" y="132" width="26" height="18" rx="6" fill="#8B5CF6" opacity="0.9"/>
+
+          <!-- Floating UI card 1 (top left) -->
+          <rect x="28" y="56" width="88" height="50" rx="10" fill="white" filter="url(#cardShadow)"/>
+          <rect x="36" y="66" width="20" height="20" rx="6" fill="#EEF2FF"/>
+          <rect x="62" y="68" width="44" height="4" rx="2" fill="#0F172A" opacity="0.7"/>
+          <rect x="62" y="76" width="32" height="3" rx="1.5" fill="#94A3B8"/>
+          <rect x="62" y="83" width="38" height="3" rx="1.5" fill="#C7D2FE"/>
+
+          <!-- Floating UI card 2 (top right) -->
+          <rect x="284" y="44" width="80" height="58" rx="10" fill="white" filter="url(#cardShadow)"/>
+          <rect x="292" y="54" width="64" height="4" rx="2" fill="#0F172A" opacity="0.7"/>
+          <rect x="292" y="63" width="12" height="12" rx="3" fill="#6366F1" opacity="0.9"/>
+          <rect x="308" y="65" width="40" height="3" rx="1.5" fill="#94A3B8"/>
+          <rect x="292" y="79" width="12" height="12" rx="3" fill="#10B981" opacity="0.9"/>
+          <rect x="308" y="81" width="30" height="3" rx="1.5" fill="#94A3B8"/>
+          <rect x="292" y="95" width="52" height="3" rx="1.5" fill="#E2E8F0"/>
+
+          <!-- Floating badge: score -->
+          <rect x="165" y="60" width="72" height="32" rx="10" fill="#FBBF24" filter="url(#cardShadow)"/>
+          <text x="201" y="81" text-anchor="middle" fill="#78350F" font-size="12" font-weight="800" font-family="Plus Jakarta Sans, sans-serif">★ 1.240 pts</text>
+
+          <!-- Floating progress pill (bottom) -->
+          <rect x="148" y="258" width="106" height="22" rx="11" fill="white" filter="url(#cardShadow)"/>
+          <rect x="152" y="262" width="64" height="14" rx="7" fill="#6366F1" opacity="0.2"/>
+          <rect x="152" y="262" width="38" height="14" rx="7" fill="url(#heroScreenGrad)"/>
+          <text x="224" y="274" text-anchor="middle" fill="#6366F1" font-size="9" font-weight="800" font-family="Plus Jakarta Sans, sans-serif">60%</text>
+
+          <!-- Decorative dots -->
+          <circle cx="52" cy="176" r="4" fill="#6366F1" opacity="0.3"/>
+          <circle cx="64" cy="176" r="4" fill="#F97316" opacity="0.3"/>
+          <circle cx="76" cy="176" r="4" fill="#10B981" opacity="0.3"/>
+          <circle cx="348" cy="140" r="5" fill="#14B8A6" opacity="0.35"/>
+          <circle cx="360" cy="156" r="3" fill="#8B5CF6" opacity="0.3"/>
+          <circle cx="344" cy="158" r="3" fill="#FBBF24" opacity="0.35"/>
         </svg>
       </div>
     </div>
@@ -1400,6 +1566,7 @@
       <div class="progresso-geral">
         <div class="progresso-label">PROGRESSO</div>
         <div class="progresso-valor" id="progressoValor"></div>
+        <div class="progresso-bar-wrap"><div class="progresso-bar-fill" id="progressoBarFill" style="width:0%"></div></div>
       </div>
     </div>
 
@@ -1464,31 +1631,90 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:paint-brush-broad-bold"></iconify-icon></div>
         <div class="pratique-title">Desenho</div>
         <div class="pratique-desc">Estilo Paint. Pincéis, formas, baldinho de tinta, desfazer e mais.</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="28" stroke="currentColor" stroke-width="2"/>
+          <path d="M28 52 Q36 28 52 30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="52" cy="28" r="4" fill="currentColor" opacity="0.5"/>
+        </svg>
       </div>
       <div class="pratique-card" onclick="goWord()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:text-aa-bold"></iconify-icon></div>
         <div class="pratique-title">Texto</div>
         <div class="pratique-desc">Editor estilo Word. Escreva textos com formatação e baixe o arquivo.</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="6" width="52" height="68" rx="4" stroke="currentColor" stroke-width="2"/>
+          <line x1="18" y1="22" x2="54" y2="22" stroke="currentColor" stroke-width="2"/>
+          <line x1="18" y1="32" x2="50" y2="32" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="18" y1="40" x2="46" y2="40" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="18" y1="48" x2="52" y2="48" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="18" y1="56" x2="38" y2="56" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarJogoMemoria()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:cards-three-bold"></iconify-icon></div>
         <div class="pratique-title">Jogo da Memória</div>
         <div class="pratique-desc">Encontre os pares de informática. Quanto menos jogadas, mais pontos!</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
+          <rect x="10" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
+          <rect x="42" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
+          <rect x="48" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
+          <line x1="4" y1="58" x2="38" y2="58" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="42" y1="58" x2="76" y2="58" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarCacaHardware()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:target-bold"></iconify-icon></div>
         <div class="pratique-title">Caça-Hardware</div>
         <div class="pratique-desc">Apareceu o nome? Acha o ícone certo antes do tempo acabar!</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
+          <circle cx="40" cy="40" r="20" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="40" cy="40" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="40" cy="40" r="3" fill="currentColor" opacity="0.5"/>
+          <line x1="40" y1="6" x2="40" y2="14" stroke="currentColor" stroke-width="2"/>
+          <line x1="40" y1="66" x2="40" y2="74" stroke="currentColor" stroke-width="2"/>
+          <line x1="6" y1="40" x2="14" y2="40" stroke="currentColor" stroke-width="2"/>
+          <line x1="66" y1="40" x2="74" y2="40" stroke="currentColor" stroke-width="2"/>
+        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarRelampago()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:lightning-bold"></iconify-icon></div>
         <div class="pratique-title">Desafio Relâmpago</div>
         <div class="pratique-desc">60 segundos pra acertar o máximo que conseguir. Vale pontos extras!</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
+          <polyline points="40,14 40,42 52,42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="40" cy="40" r="3" fill="currentColor" opacity="0.5"/>
+        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarAtiradorPalavras()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
         <div class="pratique-desc">Palavras voam pela tela! Digite rápido pra destruir os balões antes que cheguem ao fim!</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="40" cy="28" rx="18" ry="16" stroke="currentColor" stroke-width="2"/>
+          <line x1="40" y1="44" x2="40" y2="60" stroke="currentColor" stroke-width="2"/>
+          <path d="M26 60 Q40 54 54 60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="14" y1="18" x2="6" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="66" y1="18" x2="74" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="pratique-card" onclick="iniciarRedePuzzle()" style="background:linear-gradient(135deg,#0F172A,#1E293B);color:white;border:none;">
+        <div class="pratique-icon-wrap" style="background:rgba(99,102,241,0.2);"><iconify-icon icon="ph:graph-bold" style="color:#818CF8;"></iconify-icon></div>
+        <div class="pratique-title" style="color:white;">Reparar a Rede</div>
+        <div class="pratique-desc" style="color:#94A3B8;">Vírus infectou a rede! Responda perguntas para consertar os nós e salvar o sistema.</div>
+        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.2;">
+          <circle cx="40" cy="40" r="8" stroke="white" stroke-width="2"/>
+          <circle cx="14" cy="24" r="6" stroke="white" stroke-width="1.5"/>
+          <circle cx="66" cy="24" r="6" stroke="white" stroke-width="1.5"/>
+          <circle cx="14" cy="56" r="6" stroke="white" stroke-width="1.5"/>
+          <circle cx="66" cy="56" r="6" stroke="white" stroke-width="1.5"/>
+          <line x1="20" y1="27" x2="34" y2="36" stroke="white" stroke-width="1.5"/>
+          <line x1="60" y1="27" x2="46" y2="36" stroke="white" stroke-width="1.5"/>
+          <line x1="20" y1="53" x2="34" y2="44" stroke="white" stroke-width="1.5"/>
+          <line x1="60" y1="53" x2="46" y2="44" stroke="white" stroke-width="1.5"/>
+        </svg>
       </div>
     </div>
 
@@ -1504,7 +1730,7 @@
 </div>
 
 <!-- ====================== MODAL PAINEL PROFESSOR ====================== -->
-<div id="modalProfSenha" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;align-items:center;justify-content:center;">
+<div id="modalProfSenha" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:20px;padding:32px;max-width:380px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.3);">
     <h2 style="font-size:20px;font-weight:800;margin-bottom:6px;">🔒 Painel do Professor</h2>
     <p style="color:#64748B;font-size:14px;margin-bottom:20px;">Digite a senha para acessar.</p>
@@ -1517,7 +1743,7 @@
   </div>
 </div>
 
-<div id="modalPainelPro" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+<div id="modalPainelPro" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#F8FAFC;border-radius:24px;width:100%;max-width:900px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.25);">
     <div style="background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:24px 28px;border-radius:24px 24px 0 0;display:flex;align-items:center;gap:12px;">
       <div style="flex:1;">
@@ -1538,7 +1764,7 @@
 </div>
 
 <!-- ====================== MODAL SYNC ====================== -->
-<div id="modalSync" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+<div id="modalSync" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:20px;padding:32px;max-width:520px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.2);">
     <h2 style="font-size:20px;font-weight:800;margin-bottom:8px;">☁️ Ranking Compartilhado</h2>
     <p style="color:#475569;font-size:14px;margin-bottom:20px;">Cole aqui a URL do seu Google Apps Script para sincronizar o ranking entre os 3 PCs da sala.</p>
@@ -1928,6 +2154,39 @@
       <button class="btn success" onclick="saveWord()" style="height: 38px; padding: 0 14px;">💾 Salvar</button>
     </div>
     <div id="wordEditor" contenteditable="true"></div>
+  </div>
+</div>
+
+<!-- ====================== REPARAR A REDE ====================== -->
+<div class="screen" id="screen-rede-puzzle">
+  <div style="max-width:900px;margin:0 auto;">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="sairRedePuzzle()">← Voltar</button>
+      <div class="top-bar-title">🌐 Reparar a Rede</div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:#6366F1;" id="rpPontos">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">PONTOS</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:#EF4444;" id="rpInfectados">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">INFECTADOS</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:#10B981;" id="rpReparados">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">REPARADOS</div></div>
+      </div>
+    </div>
+    <canvas id="redeCanvas" style="border-radius:16px;background:#0F172A;display:block;width:100%;border:2px solid #1E293B;cursor:pointer;"></canvas>
+    <div id="rpMensagem" style="text-align:center;margin-top:12px;font-size:14px;color:#64748B;min-height:20px;"></div>
+    <div id="rpGameOver" style="display:none;text-align:center;padding:40px;background:#0F172A;border-radius:16px;margin-top:16px;">
+      <div id="rpGameOverEmoji" style="font-size:64px;margin-bottom:12px;"></div>
+      <div id="rpGameOverTitulo" style="font-size:24px;font-weight:900;color:white;margin-bottom:8px;"></div>
+      <div id="rpGameOverMsg" style="color:#94A3B8;margin-bottom:20px;"></div>
+      <button class="btn" onclick="iniciarRedePuzzle()" style="margin-right:8px;">🔄 Nova Partida</button>
+      <button class="btn ghost" onclick="sairRedePuzzle()">Voltar</button>
+    </div>
+  </div>
+  <!-- Modal de pergunta -->
+  <div id="rpModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9000;align-items:center;justify-content:center;">
+    <div style="background:#1E293B;border-radius:20px;padding:28px;max-width:480px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid #334155;">
+      <div id="rpModalNode" style="font-size:12px;font-weight:700;color:#6366F1;letter-spacing:1px;margin-bottom:8px;"></div>
+      <div id="rpModalQ" style="font-size:17px;font-weight:700;color:white;margin-bottom:20px;line-height:1.5;"></div>
+      <div id="rpModalOpts" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="rpModalFb" style="margin-top:14px;font-size:14px;min-height:20px;text-align:center;"></div>
+    </div>
   </div>
 </div>
 
@@ -2767,6 +3026,7 @@ function renderDashboard() {
 
   document.getElementById("dashAvatarImg").src = dicebearUrl(a.nome + a.id, n);
   document.getElementById("dashAvatarWrap").setAttribute("data-n", n);
+  document.querySelector(".dash-header").setAttribute("data-n", n);
   document.getElementById("dashName").textContent = a.nome.toUpperCase();
   const tag = document.getElementById("dashNivelTag");
   tag.textContent = nivelNome(n);
@@ -2795,6 +3055,8 @@ function renderDashboard() {
   if (a.progresso.prova?.done) concluidas++;
   const pct = Math.round((concluidas / totalAtividades) * 100);
   document.getElementById("progressoValor").textContent = pct + "%";
+  const barFill = document.getElementById("progressoBarFill");
+  if (barFill) { barFill.style.width = "0%"; setTimeout(() => barFill.style.width = pct + "%", 50); }
 
   // módulos
   const grid = document.getElementById("modulosGrid");
@@ -2827,6 +3089,49 @@ function renderDashboard() {
     const iconMap = {hardware:"ph:desktop-bold", software:"ph:file-text-bold", navegadores:"ph:globe-bold", antivirus:"ph:shield-check-bold"};
     const iconName = iconMap[m] || "ph:book-bold";
 
+    // SVG decorativo temático por módulo
+    const decoSVG = {
+      hardware: `<svg class="modulo-deco" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="20" width="64" height="44" rx="4" stroke="currentColor" stroke-width="2"/>
+        <rect x="14" y="26" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="30" y="26" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="46" y="26" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="14" y="42" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="30" y="42" width="28" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="20" x2="20" y2="8" stroke="currentColor" stroke-width="2"/>
+        <line x1="36" y1="20" x2="36" y2="8" stroke="currentColor" stroke-width="2"/>
+        <line x1="52" y1="20" x2="52" y2="8" stroke="currentColor" stroke-width="2"/>
+        <circle cx="20" cy="8" r="2" fill="currentColor"/>
+        <circle cx="36" cy="8" r="2" fill="currentColor"/>
+        <circle cx="52" cy="8" r="2" fill="currentColor"/>
+      </svg>`,
+      software: `<svg class="modulo-deco" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="12" y="8" width="48" height="62" rx="4" stroke="currentColor" stroke-width="2"/>
+        <line x1="20" y1="24" x2="52" y2="24" stroke="currentColor" stroke-width="2"/>
+        <line x1="20" y1="32" x2="48" y2="32" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="48" x2="50" y2="48" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="56" x2="38" y2="56" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="20" y="14" width="8" height="6" rx="1.5" fill="currentColor" opacity="0.4"/>
+      </svg>`,
+      navegadores: `<svg class="modulo-deco" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="12" width="68" height="56" rx="6" stroke="currentColor" stroke-width="2"/>
+        <rect x="6" y="12" width="68" height="18" rx="6" fill="currentColor" opacity="0.15"/>
+        <circle cx="18" cy="21" r="3" fill="currentColor" opacity="0.5"/>
+        <circle cx="28" cy="21" r="3" fill="currentColor" opacity="0.5"/>
+        <circle cx="38" cy="21" r="3" fill="currentColor" opacity="0.5"/>
+        <rect x="44" y="16" width="24" height="10" rx="4" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="44" x2="60" y2="44" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="52" x2="52" y2="52" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="20" y1="60" x2="44" y2="60" stroke="currentColor" stroke-width="1.5"/>
+      </svg>`,
+      antivirus: `<svg class="modulo-deco" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M40 8 L68 20 L68 44 C68 58 54 70 40 74 C26 70 12 58 12 44 L12 20 Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M40 18 L60 27 L60 44 C60 54 50 63 40 66 C30 63 20 54 20 44 L20 27 Z" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <polyline points="28,42 36,50 52,34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`
+    };
+
     const onClick = liberado ? `onclick="iniciarModulo('${m}')"` : "";
     html += `
       <div class="${classes}" ${onClick}>
@@ -2837,6 +3142,7 @@ function renderDashboard() {
         <div class="modulo-title">${mod.titulo}</div>
         <div class="modulo-desc">${mod.desc}</div>
         ${statusHtml}
+        ${decoSVG[m] || ""}
       </div>`;
   });
   grid.innerHTML = html;
@@ -5165,6 +5471,295 @@ const PALAVRAS_ATIRADOR = [
 
 let atiradorState = null;
 let atiradorRAF = null;
+
+// =============================================================
+// REPARAR A REDE — PUZZLE EDUCACIONAL
+// =============================================================
+const RP_PERGUNTAS = [
+  { q:"O que é um roteador?", opts:["Dispositivo que direciona dados entre redes","Tipo de vírus","Memória RAM da rede"], c:0 },
+  { q:"O que faz um Firewall?", opts:["Acelera a internet","Bloqueia acessos não autorizados","Armazena arquivos"], c:1 },
+  { q:"IP significa…", opts:["Internet Protocol","Internal Program","Input Processing"], c:0 },
+  { q:"O que é um servidor?", opts:["Computador que serve arquivos/serviços para outros","Tipo de cabo de rede","Programa de edição de texto"], c:0 },
+  { q:"HTTP serve para…", opts:["Proteger senhas","Transferir páginas web","Conectar ao Wi-Fi"], c:1 },
+  { q:"O que é malware?", opts:["Software educacional","Software malicioso que causa danos","Atualização do sistema"], c:1 },
+  { q:"DNS converte…", opts:["Imagens em texto","Nomes de domínio em endereços IP","Senhas em códigos"], c:1 },
+  { q:"O que é phishing?", opts:["Técnica de pesca esportiva","Golpe para roubar dados pessoais","Tipo de cabo de rede"], c:1 },
+  { q:"RAM é…", opts:["Memória temporária usada pelo processador","Disco rígido permanente","Placa de vídeo"], c:0 },
+  { q:"O que é backup?", opts:["Tipo de vírus","Cópia de segurança dos dados","Nome do processador"], c:1 },
+  { q:"Wi-Fi funciona por…", opts:["Cabos de fibra óptica","Ondas de rádio sem fio","Satélites"], c:1 },
+  { q:"CPU é chamada de…", opts:["Memória do PC","Cérebro do computador","Placa-mãe"], c:1 },
+  { q:"HTTPS é mais seguro pois…", opts:["É mais rápido","Usa criptografia SSL/TLS","Usa menos dados"], c:1 },
+  { q:"O que é um vírus de computador?", opts:["Erro de hardware","Programa que se replica e causa danos","Atualização de segurança"], c:1 },
+  { q:"Nuvem (cloud) significa…", opts:["Armazenamento online em servidores remotos","Memória interna do PC","Tipo de processador"], c:0 },
+];
+
+const RP_NOS = [
+  { id:0, label:"PC\nEscritório",  icon:"💻", x:0.15, y:0.25, tipo:"pc" },
+  { id:1, label:"PC\nAluno",       icon:"🖥️", x:0.15, y:0.70, tipo:"pc" },
+  { id:2, label:"Roteador",        icon:"📡", x:0.38, y:0.48, tipo:"router" },
+  { id:3, label:"Firewall",        icon:"🛡️", x:0.62, y:0.48, tipo:"firewall" },
+  { id:4, label:"Servidor",        icon:"🖧",  x:0.82, y:0.25, tipo:"server" },
+  { id:5, label:"Nuvem",           icon:"☁️", x:0.82, y:0.70, tipo:"cloud" },
+  { id:6, label:"PC\nProf",        icon:"👨‍🏫", x:0.50, y:0.15, tipo:"pc" },
+  { id:7, label:"Banco\nDados",    icon:"🗄️", x:0.50, y:0.82, tipo:"server" },
+];
+const RP_ARESTAS = [[0,2],[1,2],[2,3],[3,4],[3,5],[6,3],[7,2],[4,5]];
+
+let rpState = null;
+let rpRAF = null;
+let rpPergsUsadas = [];
+
+function iniciarRedePuzzle() {
+  showScreen('rede-puzzle');
+  document.getElementById('rpGameOver').style.display = 'none';
+  document.getElementById('rpModal').style.display = 'none';
+  document.getElementById('rpMensagem').textContent = 'Clique nos nós infectados (🔴) para repará-los!';
+
+  // estado inicial: infecta 3 nós aleatórios
+  const infectados = new Set();
+  while (infectados.size < 3) infectados.add(Math.floor(Math.random() * RP_NOS.length));
+
+  rpState = {
+    nos: RP_NOS.map(n => ({ ...n, status: infectados.has(n.id) ? 'infectado' : 'ok', glitch: Math.random() * Math.PI * 2 })),
+    pontos: 0, reparados: 0, infectadosTotal: infectados.size,
+    ativo: true, pergAtual: null, noAtual: null,
+  };
+  rpPergsUsadas = [];
+  atualizarStatsRede();
+  cancelAnimationFrame(rpRAF);
+  rpLoop();
+
+  const canvas = document.getElementById('redeCanvas');
+  canvas.onclick = rpHandleClick;
+}
+
+function sairRedePuzzle() {
+  cancelAnimationFrame(rpRAF);
+  rpState = null;
+  goDashboard();
+}
+
+function rpHandleClick(e) {
+  if (!rpState?.ativo) return;
+  const canvas = document.getElementById('redeCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  for (const no of rpState.nos) {
+    if (no.status !== 'infectado') continue;
+    const nx = no.x * canvas.width;
+    const ny = no.y * canvas.height;
+    const dist = Math.hypot(mx - nx, my - ny);
+    if (dist < 44) { abrirPerguntaRede(no); return; }
+  }
+}
+
+function abrirPerguntaRede(no) {
+  rpState.noAtual = no;
+  const disponiveis = RP_PERGUNTAS.filter((_,i) => !rpPergsUsadas.includes(i));
+  const pool = disponiveis.length ? disponiveis : RP_PERGUNTAS;
+  const idx = Math.floor(Math.random() * pool.length);
+  const perg = pool[idx];
+  rpState.pergAtual = perg;
+  if (!rpPergsUsadas.includes(RP_PERGUNTAS.indexOf(perg))) rpPergsUsadas.push(RP_PERGUNTAS.indexOf(perg));
+
+  const tipos = { pc:"💻 PC", router:"📡 Roteador", firewall:"🛡️ Firewall", server:"🖧 Servidor", cloud:"☁️ Nuvem" };
+  document.getElementById('rpModalNode').textContent = `REPARAR: ${tipos[no.tipo]||no.label}`;
+  document.getElementById('rpModalQ').textContent = perg.q;
+  document.getElementById('rpModalFb').textContent = '';
+
+  const letras = ['A','B','C'];
+  document.getElementById('rpModalOpts').innerHTML = perg.opts.map((op,i) =>
+    `<button onclick="responderRedePuzzle(${i})" style="background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:14px 16px;color:white;font-size:14px;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center;transition:border-color .2s;" onmouseover="this.style.borderColor='#6366F1'" onmouseout="this.style.borderColor='#334155'">
+      <span style="background:#1E293B;border-radius:8px;padding:4px 10px;font-weight:800;color:#6366F1;font-size:13px;">${letras[i]}</span>
+      <span>${op}</span>
+    </button>`
+  ).join('');
+  document.getElementById('rpModal').style.display = 'flex';
+}
+
+function responderRedePuzzle(idx) {
+  const perg = rpState.pergAtual;
+  const no = rpState.noAtual;
+  const fb = document.getElementById('rpModalFb');
+  const btns = document.querySelectorAll('#rpModalOpts button');
+  btns.forEach(b => b.style.pointerEvents = 'none');
+
+  if (idx === perg.c) {
+    btns[idx].style.background = '#064E3B';
+    btns[idx].style.borderColor = '#10B981';
+    fb.innerHTML = '<span style="color:#10B981;font-weight:700;">✅ Correto! Nó reparado!</span>';
+    no.status = 'reparando';
+    rpState.reparados++;
+    rpState.pontos += 20;
+    atualizarStatsRede();
+    setTimeout(() => {
+      no.status = 'ok';
+      document.getElementById('rpModal').style.display = 'none';
+      verificarFimRede();
+    }, 1000);
+  } else {
+    btns[idx].style.background = '#450A0A';
+    btns[idx].style.borderColor = '#EF4444';
+    btns[perg.c].style.background = '#064E3B';
+    btns[perg.c].style.borderColor = '#10B981';
+    fb.innerHTML = '<span style="color:#EF4444;font-weight:700;">❌ Errou! O vírus se espalha...</span>';
+    rpState.pontos = Math.max(0, rpState.pontos - 5);
+    atualizarStatsRede();
+    // espalha vírus para nó vizinho saudável
+    setTimeout(() => {
+      espalharVirusRede(no);
+      document.getElementById('rpModal').style.display = 'none';
+      verificarFimRede();
+    }, 1500);
+  }
+}
+
+function espalharVirusRede(noOrigem) {
+  const vizinhos = RP_ARESTAS
+    .filter(([a,b]) => a === noOrigem.id || b === noOrigem.id)
+    .map(([a,b]) => a === noOrigem.id ? b : a);
+  const saudaveis = rpState.nos.filter(n => vizinhos.includes(n.id) && n.status === 'ok');
+  if (saudaveis.length) {
+    const alvo = saudaveis[Math.floor(Math.random() * saudaveis.length)];
+    alvo.status = 'infectado';
+    rpState.infectadosTotal++;
+    atualizarStatsRede();
+    document.getElementById('rpMensagem').textContent = `⚠️ Vírus se espalhou para ${alvo.label.replace('\n',' ')}!`;
+  }
+}
+
+function verificarFimRede() {
+  const infectados = rpState.nos.filter(n => n.status === 'infectado').length;
+  const todos_ok = rpState.nos.every(n => n.status === 'ok');
+  if (todos_ok) {
+    rpState.ativo = false;
+    adicionarPontosJogo(rpState.pontos);
+    document.getElementById('rpGameOverEmoji').textContent = '🏆';
+    document.getElementById('rpGameOverTitulo').textContent = 'Rede Salva!';
+    document.getElementById('rpGameOverMsg').innerHTML = `Você reparou todos os nós e ganhou <strong style="color:#10B981;">${rpState.pontos} pontos</strong>!`;
+    document.getElementById('rpGameOver').style.display = 'block';
+  } else if (infectados >= rpState.nos.length - 1) {
+    rpState.ativo = false;
+    document.getElementById('rpGameOverEmoji').textContent = '💀';
+    document.getElementById('rpGameOverTitulo').textContent = 'Rede Comprometida!';
+    document.getElementById('rpGameOverMsg').innerHTML = `O vírus dominou a rede. Você fez <strong style="color:#6366F1;">${rpState.pontos} pontos</strong>. Tente novamente!`;
+    document.getElementById('rpGameOver').style.display = 'block';
+  }
+}
+
+function atualizarStatsRede() {
+  if (!rpState) return;
+  document.getElementById('rpPontos').textContent = rpState.pontos;
+  document.getElementById('rpInfectados').textContent = rpState.nos.filter(n=>n.status==='infectado').length;
+  document.getElementById('rpReparados').textContent = rpState.reparados;
+}
+
+function rpLoop() {
+  const canvas = document.getElementById('redeCanvas');
+  if (!canvas || !rpState) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth * devicePixelRatio || 800;
+  const H = canvas.height = Math.min(W * 0.6, 520 * devicePixelRatio);
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0F172A';
+  ctx.fillRect(0, 0, W, H);
+
+  const t = Date.now() / 1000;
+
+  // desenha arestas
+  RP_ARESTAS.forEach(([a,b]) => {
+    const na = rpState.nos[a], nb = rpState.nos[b];
+    const ax = na.x*W, ay = na.y*H, bx = nb.x*W, by = nb.y*H;
+    const infectada = na.status==='infectado' || nb.status==='infectado';
+    ctx.save();
+    if (infectada) {
+      ctx.strokeStyle = `rgba(239,68,68,${0.4 + 0.3*Math.sin(t*4)})`;
+      ctx.setLineDash([8,8]);
+      ctx.lineDashOffset = -t*20;
+    } else {
+      ctx.strokeStyle = '#1E3A5F';
+      ctx.setLineDash([]);
+    }
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+
+    // pacotes de dados viajando na linha
+    if (!infectada) {
+      const prog = ((t * 0.4 + a*0.3 + b*0.7) % 1);
+      const px = ax + (bx-ax)*prog, py = ay + (by-ay)*prog;
+      ctx.fillStyle = '#3B82F6';
+      ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  });
+
+  // desenha nós
+  rpState.nos.forEach(no => {
+    const x = no.x*W, y = no.y*H;
+    const r = 36;
+    no.glitch += 0.05;
+
+    ctx.save();
+    if (no.status === 'infectado') {
+      // glow vermelho pulsante
+      const pulse = 0.5 + 0.5*Math.sin(t*5 + no.glitch);
+      const grd = ctx.createRadialGradient(x,y,r*0.5,x,y,r*1.8);
+      grd.addColorStop(0, `rgba(239,68,68,${0.3*pulse})`);
+      grd.addColorStop(1, 'rgba(239,68,68,0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(x,y,r*1.8,0,Math.PI*2); ctx.fill();
+      // borda pulsante
+      ctx.strokeStyle = `rgba(239,68,68,${0.6+0.4*pulse})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+      // fundo
+      ctx.fillStyle = '#1A0A0A';
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    } else if (no.status === 'reparando') {
+      // glow amarelo
+      ctx.strokeStyle = '#FBBF24';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#1A1500';
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    } else {
+      // ok: verde suave
+      const grd2 = ctx.createRadialGradient(x,y,0,x,y,r);
+      grd2.addColorStop(0, '#0D2B1F'); grd2.addColorStop(1, '#0F172A');
+      ctx.fillStyle = grd2;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#1E3A2F';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    }
+
+    // ícone
+    ctx.font = `${r*0.7}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (no.status === 'infectado') {
+      // glitch: desenha ícone levemente deslocado
+      const gx = (Math.random()-0.5)*4;
+      ctx.fillText('⚠️', x+gx, y-4);
+    } else {
+      ctx.fillText(no.icon, x, y-4);
+    }
+
+    // label
+    const label = no.label.replace('\n',' ');
+    ctx.font = `bold ${Math.max(10, r*0.28)}px sans-serif`;
+    ctx.fillStyle = no.status==='infectado' ? '#EF4444' : '#94A3B8';
+    ctx.fillText(label, x, y+r+12);
+    ctx.restore();
+  });
+
+  rpRAF = requestAnimationFrame(rpLoop);
+}
 
 function iniciarAtiradorPalavras() {
   showScreen('atirador');
