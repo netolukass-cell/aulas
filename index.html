@@ -176,8 +176,12 @@
 
   .section-titulo {
     font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
-    color: var(--ink-soft); margin: 36px 0 16px; text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
+    color: var(--ink-soft); margin: 36px 0 14px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-titulo::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--line), transparent);
   }
 
   .alunos-grid {
@@ -763,33 +767,48 @@
 
   /* ===== Pratique menu ===== */
   .pratique-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
   }
   .pratique-card {
-    background: var(--bg-2); border-radius: var(--radius); padding: 28px 22px;
-    cursor: pointer; transition: all 0.25s ease;
+    background: var(--bg-2); border-radius: var(--radius); padding: 24px 20px;
+    cursor: pointer; transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
     box-shadow: var(--shadow-sm); text-align: left;
     border: 1px solid var(--line); position: relative; overflow: hidden;
   }
-  .pratique-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: transparent; }
-  .pratique-icon-wrap {
-    width: 48px; height: 48px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 14px; color: white; font-size: 24px;
+  .pratique-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, #6366F1, #EC4899);
+    opacity: 0; transition: opacity 0.2s;
   }
-  .pratique-card:nth-child(1) .pratique-icon-wrap { background: linear-gradient(135deg, #EC4899, #BE185D); box-shadow: 0 6px 14px -4px rgba(236,72,153,0.4); }
-  .pratique-card:nth-child(2) .pratique-icon-wrap { background: linear-gradient(135deg, #6366F1, #4338CA); box-shadow: 0 6px 14px -4px rgba(99,102,241,0.4); }
-  .pratique-card:nth-child(3) .pratique-icon-wrap { background: linear-gradient(135deg, #F59E0B, #D97706); box-shadow: 0 6px 14px -4px rgba(245,158,11,0.4); }
-  .pratique-card:nth-child(4) .pratique-icon-wrap { background: linear-gradient(135deg, #14B8A6, #0F766E); box-shadow: 0 6px 14px -4px rgba(20,184,166,0.4); }
-  .pratique-card:nth-child(5) .pratique-icon-wrap { background: linear-gradient(135deg, #EF4444, #B91C1C); box-shadow: 0 6px 14px -4px rgba(239,68,68,0.4); }
-  .pratique-card:nth-child(6) .pratique-icon-wrap { background: linear-gradient(135deg, #8B5CF6, #6D28D9); box-shadow: 0 6px 14px -4px rgba(139,92,246,0.4); }
-  .pratique-card:nth-child(7) .pratique-icon-wrap { background: linear-gradient(135deg, #06B6D4, #0891B2); box-shadow: 0 6px 14px -4px rgba(6,182,212,0.4); }
+  .pratique-card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-lg); border-color: rgba(99,102,241,0.2); }
+  .pratique-card:hover::before { opacity: 1; }
+  .pratique-card:active { transform: translateY(-2px) scale(0.99); }
+  .pratique-icon-wrap {
+    width: 52px; height: 52px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px; color: white; font-size: 26px;
+  }
+  .pratique-card:nth-child(1) .pratique-icon-wrap { background: linear-gradient(135deg, #EC4899, #BE185D); box-shadow: 0 8px 16px -4px rgba(236,72,153,0.45); }
+  .pratique-card:nth-child(2) .pratique-icon-wrap { background: linear-gradient(135deg, #6366F1, #4338CA); box-shadow: 0 8px 16px -4px rgba(99,102,241,0.45); }
+  .pratique-card:nth-child(3) .pratique-icon-wrap { background: linear-gradient(135deg, #F59E0B, #D97706); box-shadow: 0 8px 16px -4px rgba(245,158,11,0.45); }
+  .pratique-card:nth-child(4) .pratique-icon-wrap { background: linear-gradient(135deg, #14B8A6, #0F766E); box-shadow: 0 8px 16px -4px rgba(20,184,166,0.45); }
+  .pratique-card:nth-child(5) .pratique-icon-wrap { background: linear-gradient(135deg, #EF4444, #B91C1C); box-shadow: 0 8px 16px -4px rgba(239,68,68,0.45); }
+  .pratique-card:nth-child(6) .pratique-icon-wrap { background: linear-gradient(135deg, #8B5CF6, #6D28D9); box-shadow: 0 8px 16px -4px rgba(139,92,246,0.45); }
+  .pratique-card:nth-child(7) .pratique-icon-wrap { background: linear-gradient(135deg, #06B6D4, #0891B2); box-shadow: 0 8px 16px -4px rgba(6,182,212,0.45); }
   .pratique-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 18px; font-weight: 800; margin-bottom: 4px;
+    font-size: 17px; font-weight: 800; margin-bottom: 5px; color: var(--ink);
   }
   .pratique-desc { color: var(--ink-soft); font-size: 13px; line-height: 1.5; }
+  .pratique-arrow {
+    position: absolute; bottom: 18px; right: 18px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg-soft); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--ink-soft); opacity: 0;
+    transition: opacity 0.2s, background 0.2s;
+  }
+  .pratique-card:hover .pratique-arrow { opacity: 1; background: var(--ink); color: white; }
 
   /* ============================
      RANKING / JOGOS
@@ -991,22 +1010,21 @@
     height: 300px; overflow-y: auto; overflow-x: hidden;
     font-size: 17px; line-height: 2.1; scroll-behavior: smooth;
   }
-  .dig-char { color: var(--ink-light); transition: color 0.1s; }
-  .dig-char.done { color: var(--ink); }
-  .dig-char.wrong { color: white; background: var(--red); border-radius: 3px; padding: 0 2px; }
+  .dig-char { color: var(--ink-light); transition: background 0.08s, color 0.08s; border-radius: 3px; }
+  .dig-char.done { color: #065F46; background: #D1FAE5; }
+  .dig-char.wrong { color: white; background: var(--red); }
   .dig-char.current {
-    background: var(--ink); color: white; border-radius: 3px; padding: 0 2px;
-    animation: piscar 1s infinite;
+    background: var(--ink); color: white;
+    animation: piscar 0.9s infinite;
   }
   @keyframes piscar {
-    0%, 50% { background: var(--ink); }
-    51%, 100% { background: var(--ink-soft); }
+    0%, 49% { background: var(--ink); color: white; }
+    50%, 100% { background: rgba(99,102,241,0.18); color: var(--ink); }
   }
   @keyframes guia-pulse {
     0%, 100% { r: 12; opacity: 0.4; }
     50% { r: 16; opacity: 0.15; }
   }
-  .dig-char.space.done { background: var(--green-soft); color: var(--green); }
 
   /* Teclado virtual */
   .teclado-virtual {
@@ -1692,7 +1710,7 @@
       ⌨️ DIGITAÇÃO — FOCO PRINCIPAL
     </div>
     <div class="pratique-grid">
-      <div class="pratique-card" onclick="abrirMenuDigitacao()" style="grid-column: 1/-1; background: linear-gradient(135deg,#0F172A 0%,#1E293B 100%); color:white; border:none; display:flex; align-items:center; gap:28px; padding:32px;">
+      <div class="pratique-card" onclick="abrirMenuDigitacao()" style="grid-column: 1/-1; background: linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%); color:white; border:none; display:flex; align-items:center; gap:28px; padding:32px; box-shadow: 0 20px 60px -12px rgba(99,102,241,0.5)">
         <div style="flex-shrink:0;">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
             <rect width="80" height="80" rx="20" fill="rgba(255,255,255,0.1)"/>
@@ -1731,6 +1749,7 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:paint-brush-broad-bold"></iconify-icon></div>
         <div class="pratique-title">Desenho</div>
         <div class="pratique-desc">Estilo Paint. Pincéis, formas, baldinho de tinta, desfazer e mais.</div>
+        <div class="pratique-arrow">→</div>
         <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="40" cy="40" r="28" stroke="currentColor" stroke-width="2"/>
           <path d="M28 52 Q36 28 52 30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
@@ -1741,6 +1760,7 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:text-aa-bold"></iconify-icon></div>
         <div class="pratique-title">Texto</div>
         <div class="pratique-desc">Editor estilo Word. Escreva textos com formatação e baixe o arquivo.</div>
+        <div class="pratique-arrow">→</div>
         <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="6" width="52" height="68" rx="4" stroke="currentColor" stroke-width="2"/>
           <line x1="18" y1="22" x2="54" y2="22" stroke="currentColor" stroke-width="2"/>
@@ -1754,6 +1774,7 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:cards-three-bold"></iconify-icon></div>
         <div class="pratique-title">Jogo da Memória</div>
         <div class="pratique-desc">Encontre os pares de informática. Quanto menos jogadas, mais pontos!</div>
+        <div class="pratique-arrow">→</div>
         <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="4" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
           <rect x="10" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
@@ -1767,6 +1788,7 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:target-bold"></iconify-icon></div>
         <div class="pratique-title">Caça-Hardware</div>
         <div class="pratique-desc">Apareceu o nome? Acha o ícone certo antes do tempo acabar!</div>
+        <div class="pratique-arrow">→</div>
         <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
           <circle cx="40" cy="40" r="20" stroke="currentColor" stroke-width="1.5"/>
@@ -1782,6 +1804,7 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:lightning-bold"></iconify-icon></div>
         <div class="pratique-title">Desafio Relâmpago</div>
         <div class="pratique-desc">60 segundos pra acertar o máximo que conseguir. Vale pontos extras!</div>
+        <div class="pratique-arrow">→</div>
         <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
           <polyline points="40,14 40,42 52,42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1792,6 +1815,7 @@
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
         <div class="pratique-desc">Palavras voam pela tela! Digite rápido pra destruir os balões antes que cheguem ao fim!</div>
+        <div class="pratique-arrow">→</div>
         <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <ellipse cx="40" cy="28" rx="18" ry="16" stroke="currentColor" stroke-width="2"/>
           <line x1="40" y1="44" x2="40" y2="60" stroke="currentColor" stroke-width="2"/>
@@ -2073,6 +2097,14 @@
     </div>
 
     <div class="dig-texto-box" id="rankeadaTextoBox" style="border-radius:16px;border:2px solid var(--line);background:var(--bg-2);"></div>
+    <div class="teclado-virtual" id="rankeadaTeclado" style="margin-top:14px;"></div>
+    <div class="teclado-legenda" id="rankeadaTecladoLegenda" style="display:none;">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
     <div id="rankeadaResultado"></div>
   </div>
 </div>
@@ -4796,10 +4828,7 @@ function listenerDigitacao(e) {
   const digitado = e.key;
   flashTecla(digitado);
 
-  // Tolerância de case e acento (treino aceita aproximado, ranqueado exige exato)
-  const certo = (digState.modo === 'treino')
-    ? normalizarChar(esperado) === normalizarChar(digitado)
-    : esperado.toLowerCase() === digitado.toLowerCase();
+  const certo = normalizarChar(esperado) === normalizarChar(digitado);
 
   if (certo) {
     // marca como done
@@ -6321,6 +6350,7 @@ function iniciarRankeada(textoId) {
   document.getElementById('rankeadaTopTitle').textContent = `⏱️ ${texto.titulo}`;
   document.getElementById('rankeadaResultado').innerHTML = '';
   renderTextoRankeada();
+  renderTecladoRankeada();
   atualizarTimerDisplay();
   showScreen('digitacao-rankeada');
   document.addEventListener('keydown', listenerRankeada);
@@ -6343,6 +6373,47 @@ function renderTextoRankeada() {
     const target = cur.offsetTop - (box.clientHeight / 2) + (cur.offsetHeight / 2);
     box.scrollTop = Math.max(0, target);
   }
+}
+
+function renderTecladoRankeada() {
+  const linhas = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L','Ç'],
+    ['Z','X','C','V','B','N','M']
+  ];
+  let html = '';
+  linhas.forEach((linha, li) => {
+    html += '<div class="teclado-linha">';
+    if (li === 1) html += '<div class="tecla wide-1.5">Caps</div>';
+    if (li === 2) html += '<div class="tecla wide-2">Shift</div>';
+    linha.forEach(letra => {
+      const finger = FINGER_MAP[letra.toLowerCase()] || '';
+      html += `<div class="tecla" data-tecla="${letra.toLowerCase()}" data-rkd="1" data-finger="${finger}">${letra}</div>`;
+    });
+    if (li === 1) html += '<div class="tecla wide-1.5">Enter</div>';
+    if (li === 2) html += '<div class="tecla wide-2">Shift</div>';
+    html += '</div>';
+  });
+  html += '<div class="teclado-linha"><div class="tecla wide-3" data-tecla=" " data-rkd="1" data-finger="5">Espaço</div></div>';
+  const el = document.getElementById('rankeadaTeclado');
+  if (el) { el.innerHTML = html; }
+  const leg = document.getElementById('rankeadaTecladoLegenda');
+  if (leg) leg.style.display = 'flex';
+  destacarProximaTeclaRankeada();
+}
+
+function destacarProximaTeclaRankeada() {
+  document.querySelectorAll('.tecla[data-rkd]').forEach(t => t.classList.remove('next'));
+  if (!rankeadaState.texto || rankeadaState.pos >= rankeadaState.texto.texto.length) return;
+  const proxChar = rankeadaState.texto.texto[rankeadaState.pos].toLowerCase();
+  document.querySelectorAll(`.tecla[data-rkd][data-tecla="${proxChar}"]`).forEach(t => t.classList.add('next'));
+}
+
+function flashTeclaRankeada(char) {
+  const t = document.querySelector(`.tecla[data-rkd][data-tecla="${char.toLowerCase()}"]`);
+  if (!t) return;
+  t.classList.add('pressed');
+  setTimeout(() => t.classList.remove('pressed'), 120);
 }
 
 function atualizarTimerDisplay() {
@@ -6380,6 +6451,7 @@ function listenerRankeada(e) {
   const texto = rankeadaState.texto.texto;
   const esperado = texto[rankeadaState.pos];
   const digitado = isEnter ? '\n' : e.key;
+  flashTeclaRankeada(digitado);
   const certo = normalizarChar(esperado)===normalizarChar(digitado) || (esperado==='\n' && isEnter);
   const spans = document.querySelectorAll('#rankeadaTextoBox .dig-char');
   if (certo) {
@@ -6388,6 +6460,7 @@ function listenerRankeada(e) {
     rankeadaState.pos++;
     if (rankeadaState.pos>=texto.length) { finalizarRankeada(true); return; }
     spans[rankeadaState.pos]?.classList.add('current');
+    destacarProximaTeclaRankeada();
     // bônus de tempo por acerto
     const bon = rankeadaState.cfg?.bonus || 0;
     if (bon > 0) {
