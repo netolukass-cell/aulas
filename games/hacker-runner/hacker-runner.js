@@ -24,8 +24,8 @@ function salvarResultadoJogo(score, detalhes) {
 /* ── Constantes globais ──────────────────────────────────────── */
 const GW   = 1280;   // largura do canvas
 const GH   = 720;    // altura do canvas
-const GY   = 630;    // topo do chão (87% da altura)
-const PH   = 20;     // espessura das plataformas
+const GY   = 676;    // topo do chão (94% da altura — ação na parte inferior)
+const PH   = 26;     // espessura das plataformas
 const WW   = 11200;  // comprimento total do mundo
 
 // Física (referência: yandeu platformer, thedevdojo)
@@ -86,7 +86,7 @@ function buildLevel() {
 
   const g  = (x, w)          => platforms.push({ x, y:GY,    w, h:PH, type:'g' });
   const p  = (x, y, w)       => platforms.push({ x, y,       w, h:PH, type:'p' });
-  const en = (x, range, fast) => enemies.push({ x, y:GY-32, range, fast:!!fast });
+  const en = (x, range, fast) => enemies.push({ x, y:GY-19, range, fast:!!fast });
   const d  = (x, y)          => dataItems.push({ x, y: y ?? GY-44 });
   const fw = (x)             => firewalls.push({ x });
   const t  = (x, qi)         => terminals.push({ x, y:GY-64, quizIdx:qi });
@@ -392,7 +392,6 @@ class GameScene extends Phaser.Scene {
 
     // ── Colisores ──
     this.physics.add.collider(this.player, this.platforms, null, this._platProcess, this);
-    this.physics.add.collider(this.enemyGroup, this.platforms, null, this._platProcess, this);
 
     // ── Controles ──
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -463,40 +462,65 @@ class GameScene extends Phaser.Scene {
       g.fillStyle(C.blue, 0.9); g.fillRect(56, 5, 4, 4);
     });
 
-    // Firewall (22×72) — barreira digital com listras de aviso
-    tex('tex_fw', 22, 72, g => {
-      // Glow externo
-      g.fillStyle(0xFF2200, 0.2); g.fillRect(0, 0, 22, 72);
-      // Corpo
-      g.fillStyle(0xCC1100, 1); g.fillRect(2, 0, 18, 72);
-      // Listras diagonais (aviso)
-      g.fillStyle(0xFF5500, 0.8);
-      for (let y = -72; y < 72; y += 14) {
-        g.fillRect(2, Math.max(0,y), 18, Math.min(7, 72-Math.max(0,y)));
+    // Firewall (26×80) — barreira digital imponente
+    tex('tex_fw', 26, 80, g => {
+      // Glow externo alaranjado-vermelho
+      g.fillStyle(0xFF2200, 0.25); g.fillRect(0, 0, 26, 80);
+      g.fillStyle(0xFF1100, 0.15); g.fillRect(1, 0, 24, 80);
+      // Corpo base
+      g.fillStyle(0x990A00, 1); g.fillRect(3, 0, 20, 80);
+      g.fillStyle(0xBB1100, 1); g.fillRect(4, 0, 18, 80);
+      // Listras de perigo preto/amarelo alternadas
+      for (let y = 0; y < 80; y += 10) {
+        g.fillStyle(y % 20 === 0 ? 0xFFAA00 : 0x550000, 0.55);
+        g.fillRect(4, y, 18, 5);
       }
-      // Bordas brilhantes
-      g.fillStyle(0xFF3300, 1); g.fillRect(2, 0, 3, 72); g.fillRect(17, 0, 3, 72);
-      // Letras "FW" em pixels
+      // Colunas de energia nas bordas
+      g.fillStyle(0xFF3300, 1); g.fillRect(3, 0, 3, 80); g.fillRect(20, 0, 3, 80);
+      g.fillStyle(0xFF6600, 0.8); g.fillRect(4, 0, 2, 80); g.fillRect(20, 0, 2, 80);
+      // Brilho central pulsante (streak)
+      g.fillStyle(0xFF6600, 0.3); g.fillRect(12, 0, 2, 80);
+      // Pixel skull / símbolo de aviso no centro
+      g.fillStyle(0xFFDD00, 1);
+      // Triângulo ▲ feito de pixels
+      g.fillRect(12, 20, 2, 2);
+      g.fillRect(10, 22, 6, 2);
+      g.fillRect(8, 24, 10, 2);
+      g.fillRect(7, 26, 12, 2);
+      g.fillRect(7, 28, 12, 3);
+      // Olhos do símbolo
+      g.fillStyle(0x990A00, 1); g.fillRect(9, 28, 3, 2); g.fillRect(14, 28, 3, 2);
+      // Barra inferior "FW"
+      g.fillStyle(0xFF4400, 1); g.fillRect(4, 52, 18, 2);
       g.fillStyle(0xFFCC00, 1);
-      // F
-      g.fillRect(5,  8, 8, 2); g.fillRect(5, 10, 2, 8); g.fillRect(5, 14, 6, 2);
-      // W
-      g.fillRect(5, 22, 2, 10); g.fillRect(9, 27, 2, 5); g.fillRect(13, 22, 2, 10);
-      g.fillRect(7, 30, 2, 2); g.fillRect(11, 30, 2, 2);
+      g.fillRect(6, 56, 6, 2); g.fillRect(6, 58, 2, 6); g.fillRect(6, 61, 5, 2);
+      g.fillRect(14, 56, 2, 8); g.fillRect(16, 56, 2, 2); g.fillRect(16, 60, 2, 2); g.fillRect(18, 56, 2, 4);
+      // Topo com indicador vermelho piscante (estático)
+      g.fillStyle(0xFF0000, 1); g.fillRect(11, 2, 4, 4);
+      g.fillStyle(0xFFAAAA, 0.8); g.fillRect(12, 3, 2, 2);
     });
 
-    // Dado coletável (22×22) — cristal ciano
-    tex('tex_data', 22, 22, g => {
-      // Aura
-      g.fillStyle(C.neon, 0.15); g.fillRect(0, 0, 22, 22);
-      // Forma de diamante
-      g.fillStyle(C.cyan, 1);
-      g.fillRect(9, 1, 4, 2);  g.fillRect(7, 3, 8, 2);  g.fillRect(5, 5, 12, 2);
-      g.fillRect(3, 7, 16, 3); g.fillRect(3, 10, 16, 3);
-      g.fillRect(5, 13, 12, 2); g.fillRect(7, 15, 8, 2); g.fillRect(9, 17, 4, 2);
-      // Brilho interior
-      g.fillStyle(0xCCFFFF, 0.9); g.fillRect(9, 6, 4, 4);
-      g.fillStyle(0xFFFFFF, 1); g.fillRect(10, 7, 2, 2);
+    // Dado coletável (24×24) — cristal ciano brilhante
+    tex('tex_data', 24, 24, g => {
+      // Aura exterior
+      g.fillStyle(C.neon, 0.2); g.fillRect(0, 0, 24, 24);
+      g.fillStyle(C.neon, 0.12); g.fillCircle(12, 12, 10);
+      // Forma de diamante (maior e mais vistosa)
+      g.fillStyle(0x00BBAA, 1);
+      g.fillRect(10, 1, 4, 2); g.fillRect(8, 3, 8, 2); g.fillRect(6, 5, 12, 2);
+      g.fillRect(4, 7, 16, 3); g.fillRect(3, 10, 18, 4);
+      g.fillRect(4, 14, 16, 3); g.fillRect(6, 17, 12, 2);
+      g.fillRect(8, 19, 8, 2); g.fillRect(10, 21, 4, 2);
+      // Camada interna mais clara
+      g.fillStyle(C.neon, 0.9);
+      g.fillRect(9, 4, 6, 2); g.fillRect(7, 6, 10, 2);
+      g.fillRect(6, 8, 12, 3); g.fillRect(6, 11, 12, 2);
+      g.fillRect(7, 13, 10, 2); g.fillRect(9, 15, 6, 2);
+      // Reflexo/brilho
+      g.fillStyle(0xCCFFFF, 0.9); g.fillRect(9, 7, 5, 4);
+      g.fillStyle(0xFFFFFF, 1); g.fillRect(10, 8, 2, 2);
+      // Ponto de brilho canto
+      g.fillStyle(0xFFFFFF, 0.7); g.fillRect(15, 6, 2, 2);
     });
 
     // Terminal (38×64)
@@ -537,161 +561,255 @@ class GameScene extends Phaser.Scene {
       g.fillStyle(C.green, 0.2); g.fillRect(0, 0, 28, 44);
     });
 
-    // Jogador (32×50) — hacker com hoodie
-    tex('tex_player', 32, 50, g => {
+    // Jogador (40×62) — hacker icônico com hoodie e visor largo
+    tex('tex_player', 40, 62, g => {
       // Pernas
-      g.fillStyle(0x1A2840, 1);
-      g.fillRect(6, 34, 8, 14); g.fillRect(18, 34, 8, 14);
-      // Tênis neon
-      g.fillStyle(C.neon, 1); g.fillRect(18, 46, 10, 3);
-      g.fillStyle(0x009977, 1); g.fillRect(5, 46, 9, 3);
+      g.fillStyle(0x111E30, 1);
+      g.fillRect(8, 42, 10, 17); g.fillRect(22, 42, 10, 17);
+      // Tênis
+      g.fillStyle(C.neon, 1); g.fillRect(22, 57, 12, 4);
+      g.fillStyle(0x007755, 1); g.fillRect(6, 57, 11, 4);
+      // Detalhe joelho
+      g.fillStyle(0x1A2E48, 1); g.fillRect(8, 47, 10, 4); g.fillRect(22, 47, 10, 4);
       // Corpo
-      g.fillStyle(0x1A2840, 1); g.fillRect(4, 18, 24, 18);
-      g.fillStyle(0x1E304C, 1); g.fillRect(5, 19, 22, 16);
-      // Tiras neon laterais
-      g.fillStyle(C.neon, 1); g.fillRect(4, 19, 2, 14); g.fillRect(26, 19, 2, 14);
-      // Braço
-      g.fillStyle(0x1A2840, 1); g.fillRect(0, 19, 4, 10);
-      // Mochila
-      g.fillStyle(0x090E14, 1); g.fillRect(1, 17, 4, 12);
-      g.fillStyle(C.blue, 1); g.fillRect(1, 18, 4, 3);
-      g.fillStyle(C.neon, 0.6); g.fillRect(1, 23, 4, 2);
-      // Capuz
-      g.fillStyle(0x152030, 1); g.fillRect(4, 4, 24, 16);
-      g.fillStyle(0x1E304C, 1); g.fillRect(5, 5, 22, 14);
-      // Borda capuz
-      g.fillStyle(C.neon, 0.4); g.fillRect(4, 4, 24, 1);
-      // Visor
-      g.fillStyle(0x0077CC, 1); g.fillRect(6, 9, 20, 7);
-      g.fillStyle(0x0099EE, 1); g.fillRect(6, 9, 20, 3);
-      g.fillStyle(0xFFFFFF, 0.6); g.fillRect(7, 10, 6, 3);
-      g.fillStyle(0x00CCFF, 0.4); g.fillRect(20, 12, 4, 2);
+      g.fillStyle(0x101C2E, 1); g.fillRect(5, 22, 30, 22);
+      g.fillStyle(0x172438, 1); g.fillRect(6, 23, 28, 20);
+      // Listras laterais neon
+      g.fillStyle(C.neon, 0.9); g.fillRect(5, 23, 2, 18); g.fillRect(33, 23, 2, 18);
+      // Logo no peito (diamante pequeno)
+      g.fillStyle(C.neon, 0.7); g.fillRect(18, 29, 4, 2); g.fillRect(16, 31, 8, 2); g.fillRect(18, 33, 4, 2);
       // Cinto
-      g.fillStyle(C.neon, 0.5); g.fillRect(4, 33, 24, 2);
+      g.fillStyle(C.neon, 0.5); g.fillRect(5, 41, 30, 2);
+      // Braço esquerdo
+      g.fillStyle(0x101C2E, 1); g.fillRect(0, 23, 5, 14);
+      g.fillStyle(C.neon, 0.6); g.fillRect(0, 23, 2, 14);
+      // Mochila / datapack nas costas
+      g.fillStyle(0x07101C, 1); g.fillRect(1, 20, 5, 18);
+      g.fillStyle(C.blue, 0.9); g.fillRect(1, 21, 5, 5);
+      g.fillStyle(C.neon, 0.5); g.fillRect(1, 29, 5, 3); g.fillRect(1, 34, 5, 2);
+      // Capuz — grande e dramático
+      g.fillStyle(0x0C1828, 1); g.fillRect(4, 4, 32, 20);
+      g.fillStyle(0x152030, 1); g.fillRect(5, 5, 30, 18);
+      // Borda do capuz com neon sutil
+      g.fillStyle(C.neon, 0.35); g.fillRect(4, 4, 32, 1);
+      g.fillStyle(C.neon, 0.15); g.fillRect(4, 5, 1, 18); g.fillRect(35, 5, 1, 18);
+      // VISOR — elemento mais icônico, largo e brilhante
+      g.fillStyle(0x003B77, 1); g.fillRect(6, 9, 28, 11);
+      g.fillStyle(0x0055AA, 1); g.fillRect(6, 9, 28, 5);
+      g.fillStyle(0x0088DD, 1); g.fillRect(6, 9, 28, 3);
+      // Brilho/reflexo no visor
+      g.fillStyle(0xFFFFFF, 0.55); g.fillRect(7, 10, 9, 3);
+      g.fillStyle(0xFFFFFF, 0.25); g.fillRect(18, 10, 5, 2);
+      // Glow neon externo do visor
+      g.fillStyle(C.neon, 0.22); g.fillRect(5, 8, 30, 13);
+      // Borda neon do visor
+      g.fillStyle(C.neon, 0.8); g.fillRect(6, 9, 28, 1); g.fillRect(6, 19, 28, 1);
+      // Scanline no visor
+      g.fillStyle(0x000000, 0.2); g.fillRect(6, 12, 28, 1); g.fillRect(6, 15, 28, 1);
     });
 
-    // Inimigo lento (30×32) — vírus roxo agressivo
-    tex('tex_enemy_slow', 30, 32, g => {
-      // Sombra
-      g.fillStyle(0x2D0F50, 0.6); g.fillRect(3, 4, 24, 24);
-      // Corpo
-      g.fillStyle(0x5D1A9E, 1);
-      g.fillRect(4, 8, 22, 16); g.fillRect(7, 5, 16, 20);
-      g.fillStyle(0x8035C8, 1);
-      g.fillRect(5, 9, 20, 14); g.fillRect(8, 6, 14, 18);
-      // Espinhos
-      g.fillStyle(0x9945D5, 1);
-      g.fillRect(1, 10, 3, 8); g.fillRect(26, 10, 3, 8);
-      g.fillRect(10, 1, 4, 4); g.fillRect(16, 1, 4, 4);
-      // Olhos
-      g.fillStyle(0xFF2222, 1); g.fillRect(7, 10, 6, 6); g.fillRect(17, 10, 6, 6);
-      g.fillStyle(0xFFAAAA, 0.9); g.fillRect(8, 11, 3, 3); g.fillRect(18, 11, 3, 3);
-      // Pernas
-      g.fillStyle(0x6825A8, 1);
-      g.fillRect(7, 25, 7, 7); g.fillRect(16, 25, 7, 7);
+    // Inimigo lento (36×38) — vírus roxo grande e ameaçador
+    tex('tex_enemy_slow', 36, 38, g => {
+      // Aura de glitch
+      g.fillStyle(0x4400AA, 0.18); g.fillRect(0, 2, 36, 34);
+      // Corpo hexagonal
+      g.fillStyle(0x3D0E88, 1);
+      g.fillRect(5, 10, 26, 18); g.fillRect(8, 6, 20, 26);
+      g.fillStyle(0x6820C0, 1);
+      g.fillRect(6, 11, 24, 16); g.fillRect(9, 7, 18, 24);
+      // Camada interna mais clara
+      g.fillStyle(0x8030D8, 1); g.fillRect(10, 12, 16, 12);
+      // Espinhos — longos e intimidadores
+      g.fillStyle(0xAA44EE, 1);
+      g.fillRect(0, 12, 5, 4); g.fillRect(0, 18, 5, 4);
+      g.fillRect(31, 12, 5, 4); g.fillRect(31, 18, 5, 4);
+      g.fillRect(10, 0, 5, 6); g.fillRect(17, 0, 4, 5); g.fillRect(22, 0, 5, 6);
+      g.fillRect(10, 32, 4, 6); g.fillRect(22, 32, 4, 6);
+      // Olhos — vermelhos e grandes
+      g.fillStyle(0xFF1111, 1); g.fillRect(9, 13, 8, 8); g.fillRect(19, 13, 8, 8);
+      g.fillStyle(0xFF6666, 1); g.fillRect(10, 14, 4, 4); g.fillRect(20, 14, 4, 4);
+      g.fillStyle(0xFFEEEE, 1); g.fillRect(10, 14, 2, 2); g.fillRect(20, 14, 2, 2);
+      // Sobrancelha maligna
+      g.fillStyle(0x220055, 1); g.fillRect(9, 12, 8, 2); g.fillRect(19, 12, 8, 2);
+      // Boca ameaçadora
+      g.fillStyle(0xFF1111, 0.8); g.fillRect(11, 23, 14, 3);
+      g.fillStyle(0xFFFFFF, 1); g.fillRect(12, 23, 2, 3); g.fillRect(16, 23, 2, 3); g.fillRect(20, 23, 2, 3);
     });
 
-    // Inimigo rápido (30×32) — vírus vermelho-rosa angular
-    tex('tex_enemy_fast', 30, 32, g => {
-      g.fillStyle(0x500A20, 0.6); g.fillRect(3, 4, 24, 24);
-      g.fillStyle(0xAA1540, 1);
-      g.fillRect(4, 8, 22, 16); g.fillRect(7, 5, 16, 20);
-      g.fillStyle(0xCC2255, 1);
-      g.fillRect(5, 9, 20, 14); g.fillRect(8, 6, 14, 18);
-      // Espinhos maiores (parece rápido)
-      g.fillStyle(0xEE2266, 1);
-      g.fillRect(1, 9, 3, 10); g.fillRect(26, 9, 3, 10);
-      g.fillRect(9, 0, 5, 5); g.fillRect(16, 0, 5, 5); g.fillRect(13, 1, 4, 3);
-      // Olhos laranja
-      g.fillStyle(0xFF5500, 1); g.fillRect(7, 10, 6, 6); g.fillRect(17, 10, 6, 6);
-      g.fillStyle(0xFFAA44, 0.9); g.fillRect(8, 11, 3, 3); g.fillRect(18, 11, 3, 3);
-      // Pernas longas
-      g.fillStyle(0xBB1145, 1);
-      g.fillRect(6, 25, 7, 8); g.fillRect(17, 25, 7, 8);
-      g.fillRect(10, 23, 5, 5);
+    // Inimigo rápido (36×38) — vírus rosa-magenta ágil com design mais angular
+    tex('tex_enemy_fast', 36, 38, g => {
+      g.fillStyle(0x660020, 0.18); g.fillRect(0, 2, 36, 34);
+      // Corpo angular (losango achatado)
+      g.fillStyle(0x880030, 1);
+      g.fillRect(5, 10, 26, 18); g.fillRect(8, 6, 20, 26);
+      g.fillStyle(0xCC1155, 1);
+      g.fillRect(6, 11, 24, 16); g.fillRect(9, 7, 18, 24);
+      g.fillStyle(0xEE2277, 1); g.fillRect(10, 12, 16, 12);
+      // Espinhos mais longos (sugere velocidade)
+      g.fillStyle(0xFF3399, 1);
+      g.fillRect(0, 10, 5, 4); g.fillRect(0, 16, 5, 4); g.fillRect(0, 22, 5, 4);
+      g.fillRect(31, 10, 5, 4); g.fillRect(31, 16, 5, 4); g.fillRect(31, 22, 5, 4);
+      g.fillRect(9, 0, 4, 7); g.fillRect(15, 0, 3, 6); g.fillRect(21, 0, 4, 7); g.fillRect(24, 0, 4, 5);
+      g.fillRect(10, 31, 3, 7); g.fillRect(23, 31, 3, 7);
+      // Olhos laranja brilhante
+      g.fillStyle(0xFF5500, 1); g.fillRect(9, 13, 8, 8); g.fillRect(19, 13, 8, 8);
+      g.fillStyle(0xFF9922, 1); g.fillRect(10, 14, 4, 4); g.fillRect(20, 14, 4, 4);
+      g.fillStyle(0xFFFFCC, 1); g.fillRect(10, 14, 2, 2); g.fillRect(20, 14, 2, 2);
+      g.fillStyle(0x330000, 1); g.fillRect(9, 12, 8, 2); g.fillRect(19, 12, 8, 2);
+      // Boca com dentes afiados
+      g.fillStyle(0xFF3300, 0.9); g.fillRect(11, 23, 14, 3);
+      g.fillStyle(0xFFFFFF, 1); g.fillRect(11, 23, 2, 3); g.fillRect(14, 23, 2, 3); g.fillRect(17, 23, 2, 3); g.fillRect(20, 23, 2, 3); g.fillRect(23, 23, 2, 3);
     });
   }
 
   /* ── Fundo em camadas parallax ──────────────────────────────── */
   _buildBackground() {
-    // Gradiente do céu (scrollFactor=0 → fixo na tela, zoom=1 → cobre 1280×720)
+    // Gradiente do céu — vai de quase-preto no topo a azul-noite na base
     const sky = this.add.graphics().setScrollFactor(0).setDepth(-20);
-    sky.fillGradientStyle(C.sky0, C.sky0, C.sky1, C.sky1, 1);
+    sky.fillGradientStyle(0x010408, 0x010408, 0x071830, 0x071830, 1);
     sky.fillRect(0, 0, GW, GH);
 
-    // Estrelas (fixas na tela)
+    // Estrelas fixas na tela
     this._drawBgStars(sky);
 
-    // Linha de horizonte luminosa
-    sky.lineStyle(1, C.neon, 0.08);
-    sky.lineBetween(0, GY - 2, GW, GY - 2);
+    // Lua / astro decorativo
+    sky.fillStyle(0xAADDFF, 0.12); sky.fillCircle(GW * 0.82, 80, 48);
+    sky.fillStyle(0xCCEEFF, 0.07); sky.fillCircle(GW * 0.82, 80, 62);
+    sky.fillStyle(0xEEF8FF, 0.28); sky.fillCircle(GW * 0.82, 80, 28);
 
-    // Grid de perspectiva — parallax lento (0.25)
-    const grid = this.add.graphics().setScrollFactor(0.25).setDepth(-18);
-    grid.lineStyle(1, C.neon, 0.035);
-    for (let x = 0; x < WW + 64; x += 60) grid.lineBetween(x, 0, x, GH);
-    for (let y = 0; y < GH; y += 60)      grid.lineBetween(0, y, WW + 64, y);
+    // Nebulosa — brilho suave atrás dos prédios
+    sky.fillStyle(0x0033AA, 0.07); sky.fillEllipse(GW * 0.3, 200, 500, 250);
+    sky.fillStyle(0x440088, 0.05); sky.fillEllipse(GW * 0.7, 160, 400, 200);
 
-    // Prédios distantes — parallax lento (0.1)
-    const bgBld = this.add.graphics().setScrollFactor(0.1).setDepth(-17);
-    this._drawBuildings(bgBld, 36, 80, 0x040B18, 0.85, 0.3);
+    // Camada 1 — megaestruturas no fundo (scrollFactor=0.05 — quase estáticas)
+    const far = this.add.graphics().setScrollFactor(0.05).setDepth(-19);
+    this._drawSkyscrapers(far, 'far', 0x020608, 0.95, 0.18, 240, 560);
 
-    // Prédios próximos — parallax médio (0.3)
-    const fgBld = this.add.graphics().setScrollFactor(0.3).setDepth(-16);
-    this._drawBuildings(fgBld, 50, 130, 0x060F1E, 0.9, 0.5);
+    // Camada 2 — prédios médios distantes (scrollFactor=0.15)
+    const mid1 = this.add.graphics().setScrollFactor(0.15).setDepth(-18);
+    this._drawSkyscrapers(mid1, 'mid1', 0x030A14, 0.95, 0.3, 120, 380);
 
-    // Chão / piso da rua
+    // Antenas e torres de comunicação (scrollFactor=0.15)
+    this._drawAntennas(mid1, 0x030A14);
+
+    // Camada 3 — prédios próximos (scrollFactor=0.35)
+    const near = this.add.graphics().setScrollFactor(0.35).setDepth(-17);
+    this._drawSkyscrapers(near, 'near', 0x050E1C, 0.98, 0.55, 60, 220);
+
+    // Detalhes neon nos prédios próximos (letreiros, hologramas)
+    this._drawNeonSigns(near);
+
+    // Linhas de horizonte de smog luminoso
+    const haze = this.add.graphics().setScrollFactor(0).setDepth(-16);
+    haze.fillGradientStyle(0x000000, 0x000000, 0x0A2040, 0x0A2040, 0);
+    haze.fillRect(0, GY - 180, GW, 180);
+    haze.lineStyle(1, C.neon, 0.06); haze.lineBetween(0, GY - 2, GW, GY - 2);
+
+    // Chão
     const floor = this.add.graphics().setDepth(-14);
-    floor.fillStyle(0x050D1A, 1);
+    floor.fillStyle(0x040B14, 1);
     floor.fillRect(0, GY + PH, WW, GH - (GY + PH));
-    // Linhas do piso (estética grid)
-    floor.lineStyle(1, C.neon, 0.12);
-    for (let x = 0; x < WW; x += 200) floor.lineBetween(x, GY + PH, x, GH);
-    floor.lineStyle(1, C.neon, 0.06);
-    floor.lineBetween(0, GY + PH + 30, WW, GY + PH + 30);
-    floor.lineBetween(0, GY + PH + 60, WW, GY + PH + 60);
+    floor.lineStyle(1, C.neon, 0.1);
+    for (let x = 0; x < WW; x += 160) floor.lineBetween(x, GY + PH, x, GH);
+    floor.lineStyle(1, C.neon, 0.05);
+    floor.lineBetween(0, GY + PH + 20, WW, GY + PH + 20);
+    floor.lineBetween(0, GY + PH + 44, WW, GY + PH + 44);
   }
 
   _drawBgStars(g) {
-    const rng = new Phaser.Math.RandomDataGenerator(['bg_stars']);
-    for (let i = 0; i < 160; i++) {
+    const rng = new Phaser.Math.RandomDataGenerator(['bg_stars_v2']);
+    for (let i = 0; i < 200; i++) {
       const sx = rng.integerInRange(0, GW);
-      const sy = rng.integerInRange(0, Math.floor(GH * 0.78));
-      const bright = rng.realInRange(0.25, 0.95);
-      const col = rng.pick([0xFFFFFF, 0xAADDFF, 0x88CCFF, 0xCCFFFF, 0xFFEEDD]);
+      const sy = rng.integerInRange(0, Math.floor(GH * 0.65));
+      const bright = rng.realInRange(0.2, 0.85);
+      const col = rng.pick([0xFFFFFF, 0xBBDDFF, 0x88BBFF, 0xCCFFFF, 0xFFEEEE]);
       g.fillStyle(col, bright);
-      g.fillRect(sx, sy, rng.integerInRange(1,2), 1);
+      g.fillRect(sx, sy, 1, 1);
     }
-    // Alguns pixels maiores
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
       const sx = rng.integerInRange(0, GW);
-      const sy = rng.integerInRange(0, Math.floor(GH * 0.6));
-      g.fillStyle(0xFFFFFF, 0.9); g.fillRect(sx, sy, 2, 2);
-      g.fillStyle(0xAADDFF, 0.4); g.fillRect(sx-1, sy, 4, 2);
+      const sy = rng.integerInRange(0, Math.floor(GH * 0.55));
+      g.fillStyle(0xFFFFFF, 0.95); g.fillRect(sx, sy, 2, 2);
+      g.fillStyle(0xAADDFF, 0.25); g.fillRect(sx-1, sy-1, 4, 4);
     }
   }
 
-  _drawBuildings(g, minW, maxH, col, alpha, winAlpha) {
-    const rng = new Phaser.Math.RandomDataGenerator(['bld_' + maxH]);
+  _drawSkyscrapers(g, seed, col, bodyAlpha, winAlpha, minH, maxH) {
+    const rng = new Phaser.Math.RandomDataGenerator(['sky_' + seed]);
     let bx = 0;
-    while (bx < WW + 200) {
-      const bw = rng.integerInRange(minW * 0.5, minW * 1.5);
-      const bh = rng.integerInRange(maxH * 0.4, maxH);
-      const by = GY + PH - bh;
-      g.fillStyle(col, alpha); g.fillRect(bx, by, bw, bh);
-      // Borda sutil
-      g.fillStyle(C.edge, 0.12); g.fillRect(bx, by, 1, bh); g.fillRect(bx+bw-1, by, 1, bh);
-      // Janelas
-      for (let wy = by+5; wy < by+bh-5; wy += 9) {
-        for (let wx = bx+3; wx < bx+bw-3; wx += 6) {
-          if (rng.frac() < 0.5) {
-            const wc = rng.pick([0xFFEE88, 0x88AAFF, 0x44DDAA, 0xFF9944]);
-            g.fillStyle(wc, winAlpha * rng.realInRange(0.4, 1.0));
-            g.fillRect(wx, wy, 3, 5);
+    const worldW = WW * (seed === 'far' ? 0.12 : seed === 'mid1' ? 0.25 : 0.5);
+    while (bx < worldW + 400) {
+      const bw = rng.integerInRange(30, 90);
+      const bh = rng.integerInRange(minH, maxH);
+      const by = GY - bh;
+      // Corpo principal
+      g.fillStyle(col, bodyAlpha); g.fillRect(bx, by, bw, bh + PH);
+      // Bordas sutis de brilho neon azul
+      g.fillStyle(0x1155AA, 0.18); g.fillRect(bx, by, 1, bh); g.fillRect(bx+bw-1, by, 1, bh);
+      g.fillStyle(0x1155AA, 0.08); g.fillRect(bx, by, bw, 1);
+      // Setback (recuo no topo)
+      if (bw > 50 && rng.frac() > 0.4) {
+        const sw = rng.integerInRange(12, bw-10);
+        const sx = bx + rng.integerInRange(0, bw-sw);
+        const sh = rng.integerInRange(30, 80);
+        g.fillStyle(col, bodyAlpha); g.fillRect(sx, by - sh, sw, sh);
+        g.fillStyle(0x1155AA, 0.15); g.fillRect(sx, by-sh, 1, sh); g.fillRect(sx+sw-1, by-sh, 1, sh);
+      }
+      // Janelas em grade
+      const wStep = 7, wH = 5;
+      for (let wy = by + 10; wy < by + bh - 8; wy += wH + 4) {
+        for (let wx = bx + 4; wx < bx + bw - 4; wx += wStep) {
+          if (rng.frac() < (winAlpha > 0.4 ? 0.65 : 0.5)) {
+            const wc = rng.pick([0xFFEE88, 0x88AAFF, 0x44DDBB, 0xFF9955, 0xCCBBFF]);
+            g.fillStyle(wc, winAlpha * rng.realInRange(0.5, 1.0));
+            g.fillRect(wx, wy, 4, wH);
           }
         }
       }
-      bx += bw + rng.integerInRange(4, 16);
+      // Linha de topo neon
+      const topCol = rng.pick([C.neon, C.blue, 0x9933FF, 0xFF3388]);
+      g.fillStyle(topCol, 0.4 + rng.frac() * 0.4); g.fillRect(bx, by, bw, 1);
+      bx += bw + rng.integerInRange(3, 18);
+    }
+  }
+
+  _drawAntennas(g, col) {
+    const rng = new Phaser.Math.RandomDataGenerator(['ant']);
+    let bx = 80;
+    while (bx < WW * 0.25) {
+      if (rng.frac() > 0.5) {
+        const h = rng.integerInRange(40, 110);
+        const by = GY - rng.integerInRange(120, 380) - h;
+        g.fillStyle(0x223344, 0.8); g.fillRect(bx, by, 3, h);
+        // Blink red light
+        g.fillStyle(0xFF2222, 0.7); g.fillRect(bx, by, 5, 4);
+        // Braço lateral
+        if (rng.frac() > 0.5) {
+          const armL = rng.integerInRange(12, 28);
+          g.fillStyle(0x223344, 0.7); g.fillRect(bx - armL, by + rng.integerInRange(8, h/2), armL, 2);
+        }
+      }
+      bx += rng.integerInRange(60, 200);
+    }
+  }
+
+  _drawNeonSigns(g) {
+    const rng = new Phaser.Math.RandomDataGenerator(['signs']);
+    const colors = [C.neon, 0xFF3388, 0x9933FF, C.blue, 0xFF6600];
+    let bx = 100;
+    while (bx < WW * 0.6) {
+      if (rng.frac() > 0.6) {
+        const sy = rng.integerInRange(GY - 300, GY - 100);
+        const sw = rng.integerInRange(20, 60);
+        const sh = rng.integerInRange(6, 14);
+        const nc = rng.pick(colors);
+        g.fillStyle(nc, rng.realInRange(0.12, 0.35)); g.fillRect(bx, sy, sw, sh);
+        g.lineStyle(1, nc, rng.realInRange(0.5, 0.85)); g.strokeRect(bx, sy, sw, sh);
+        // Pixel art text placeholder (bar lines)
+        g.fillStyle(nc, 0.7);
+        for (let i = 3; i < sw - 3; i += 5) g.fillRect(bx + i, sy + 2, 3, sh - 4);
+      }
+      bx += rng.integerInRange(80, 300);
     }
   }
 
@@ -709,7 +827,7 @@ class GameScene extends Phaser.Scene {
 
     this.fwGroup = this.physics.add.staticGroup();
     for (const fw of LVL.firewalls) {
-      const spr = this.fwGroup.create(fw.x + 11, GY - 36 + 36, 'tex_fw');
+      const spr = this.fwGroup.create(fw.x + 11, GY - 36, 'tex_fw');
       spr.body.setSize(22, 72);
       spr.refreshBody();
     }
@@ -765,8 +883,8 @@ class GameScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(LVL.playerStart.x, LVL.playerStart.y, 'tex_player');
     this.player.setCollideWorldBounds(true);
     this.player.body.setMaxVelocityY(900);
-    this.player.body.setSize(24, 46);
-    this.player.body.setOffset(4, 2);
+    this.player.body.setSize(28, 58);
+    this.player.body.setOffset(6, 3);
   }
 
   /* ── Meta: PC Central ───────────────────────────────────────── */
