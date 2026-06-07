@@ -994,40 +994,79 @@
     font-family: Georgia, "Times New Roman", serif; border: 1px solid var(--line);
   }
 
-  /* ===== RAM Game ===== */
-  .ram-bar-wrap { background: var(--bg-2); border-radius: 16px; padding: 20px 24px; border: 1px solid var(--line); margin-bottom: 18px; }
-  .ram-bar-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
-  .ram-bar-track { height: 20px; background: var(--bg-soft); border-radius: 10px; overflow: hidden; }
-  .ram-bar-fill { height: 100%; border-radius: 10px; transition: width 0.4s ease, background 0.4s; background: linear-gradient(90deg,#6366F1,#8B5CF6); }
-  .ram-bar-fill.warning { background: linear-gradient(90deg,#F59E0B,#EF4444); }
-  .ram-bar-fill.full { background: linear-gradient(90deg,#EF4444,#DC2626); animation: ramPulse 0.5s ease infinite alternate; }
-  @keyframes ramPulse { from { opacity:1; } to { opacity:0.6; } }
-  .ram-stats { display: flex; gap: 16px; margin-bottom: 18px; }
-  .ram-stat { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; flex: 1; text-align: center; }
-  .ram-stat-val { font-size: 22px; font-weight: 900; font-family: 'Plus Jakarta Sans',sans-serif; }
-  .ram-stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--ink-soft); text-transform: uppercase; }
-  .ram-programs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-  .ram-program {
-    background: var(--bg-2); border: 2px solid var(--line); border-radius: 14px;
-    padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative;
-    user-select: none;
+  /* ===== RAM Arcade Game ===== */
+  @keyframes ramPulse { from { opacity:1; } to { opacity:0.5; } }
+  @keyframes ramSpawn { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
+  @keyframes ramKill  { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(1.3); } }
+
+  .ram-arcade-wrap {
+    display: flex; flex-direction: column; height: calc(100vh - 60px);
+    background: #0D1117; color: #E6EDF3; font-family: 'JetBrains Mono', 'Courier New', monospace;
+    padding: 12px 16px; box-sizing: border-box; user-select: none;
   }
-  .ram-program:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .ram-program.ativo { border-color: #6366F1; background: rgba(99,102,241,0.08); }
-  .ram-program.ativo .ram-prog-status { color: #6366F1; }
-  .ram-program.blocked { opacity: 0.5; cursor: not-allowed; }
-  .ram-prog-icon { font-size: 32px; margin-bottom: 6px; }
-  .ram-prog-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-  .ram-prog-size { font-size: 11px; color: var(--ink-soft); font-weight: 600; }
-  .ram-prog-status { font-size: 10px; font-weight: 800; letter-spacing: 1px; margin-top: 6px; color: var(--ink-light); text-transform: uppercase; }
-  .ram-msg { text-align: center; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; margin-bottom: 14px; display: none; }
-  .ram-msg.show { display: block; }
-  .ram-msg.ok { background: #D1FAE5; color: #065F46; }
-  .ram-msg.erro { background: var(--red-soft); color: #7F1D1D; }
-  .ram-task-bar { background: var(--bg-2); border-top: 1px solid var(--line); padding: 10px 16px; border-radius: 0 0 16px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
-  .ram-task-chip { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; color: #4338CA; display: flex; align-items: center; gap: 6px; }
-  .ram-task-chip .chip-x { cursor: pointer; opacity: 0.6; }
-  .ram-task-chip .chip-x:hover { opacity: 1; }
+  .ram-hud {
+    display: grid; grid-template-columns: 1fr auto auto auto; gap: 12px; align-items: center;
+    background: #161B22; border: 1px solid #30363D; border-radius: 10px;
+    padding: 10px 16px; margin-bottom: 12px; flex-shrink: 0;
+  }
+  .ram-hud-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .ram-hud-bar-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #8B949E; }
+  .ram-hud-bar-track { height: 14px; background: #21262D; border-radius: 7px; overflow: hidden; border: 1px solid #30363D; }
+  .ram-hud-bar-fill { height: 100%; border-radius: 7px; transition: width 0.15s linear, background 0.3s; background: #238636; }
+  .ram-hud-bar-fill.warn { background: #D29922; }
+  .ram-hud-bar-fill.crit { background: #DA3633; animation: ramPulse 0.3s ease infinite alternate; }
+  .ram-hud-stat { background: #21262D; border: 1px solid #30363D; border-radius: 8px; padding: 6px 14px; text-align: center; min-width: 70px; }
+  .ram-hud-stat-val { font-size: 18px; font-weight: 900; color: #58A6FF; line-height: 1; }
+  .ram-hud-stat-lbl { font-size: 9px; letter-spacing: 1.5px; color: #8B949E; text-transform: uppercase; margin-top: 2px; }
+
+  .ram-slots {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    flex: 1; overflow-y: auto; align-content: start;
+  }
+  .ram-slot {
+    background: #161B22; border: 1px solid #30363D; border-radius: 8px;
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;
+    cursor: default; position: relative; min-height: 110px;
+  }
+  .ram-slot.active {
+    border-color: #388BFD; cursor: pointer; animation: ramSpawn 0.2s ease;
+  }
+  .ram-slot.active:hover { background: #1C2128; border-color: #58A6FF; }
+  .ram-slot.active.virus { border-color: #DA3633; }
+  .ram-slot.active.virus:hover { background: #1C0E0E; }
+  .ram-slot.killing { animation: ramKill 0.2s ease forwards; pointer-events: none; }
+  .ram-slot.empty { border-style: dashed; opacity: 0.2; }
+  .ram-slot-pid { font-size: 9px; color: #8B949E; letter-spacing: 1px; }
+  .ram-slot-name { font-size: 12px; font-weight: 700; color: #E6EDF3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ram-slot.virus .ram-slot-name { color: #FF7B72; }
+  .ram-slot-mb { font-size: 10px; color: #8B949E; }
+  .ram-slot-bar-track { height: 6px; background: #21262D; border-radius: 3px; overflow: hidden; }
+  .ram-slot-bar-fill { height: 100%; border-radius: 3px; background: #388BFD; transition: width 0.15s linear; }
+  .ram-slot.virus .ram-slot-bar-fill { background: #DA3633; }
+  .ram-slot-type { font-size: 9px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
+  .ram-slot.virus .ram-slot-type { color: #FF7B72; }
+  .ram-slot:not(.virus) .ram-slot-type { color: #3FB950; }
+
+  .ram-gameover-overlay {
+    position: absolute; inset: 0; background: rgba(13,17,23,0.96);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; z-index: 10;
+  }
+  .ram-go-title { font-size: 32px; font-weight: 900; color: #DA3633; letter-spacing: 2px; }
+  .ram-go-sub { font-size: 14px; color: #8B949E; }
+  .ram-go-score { font-size: 48px; font-weight: 900; color: #58A6FF; }
+  .ram-go-btns { display: flex; gap: 10px; }
+  .ram-go-btn { background: #238636; border: 1px solid #2EA043; color: white; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 14px; font-weight: 700; padding: 10px 28px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; }
+  .ram-go-btn:hover { background: #2EA043; }
+  .ram-go-btn.secondary { background: #21262D; border-color: #30363D; color: #E6EDF3; }
+  .ram-go-btn.secondary:hover { background: #30363D; }
+  .ram-wave-toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: #161B22; border: 1px solid #388BFD; border-radius: 8px;
+    padding: 8px 24px; font-size: 13px; font-weight: 700; color: #58A6FF;
+    letter-spacing: 2px; z-index: 999; animation: ramSpawn 0.3s ease;
+    pointer-events: none;
+  }
 
   /* ===== Pratique menu ===== */
   .pratique-grid {
@@ -1952,9 +1991,33 @@
       </div>
     </div>
 
+    <!-- DIGITAÇÃO em destaque no topo -->
+    <div onclick="abrirMenuDigitacao()" style="cursor:pointer;background:linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%);border-radius:20px;padding:28px 36px;display:flex;align-items:center;gap:32px;margin-bottom:32px;box-shadow:0 20px 60px -12px rgba(99,102,241,0.45);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.25),transparent 65%);pointer-events:none;"></div>
+      <svg width="72" height="72" viewBox="0 0 80 80" fill="none" style="flex-shrink:0;">
+        <rect width="80" height="80" rx="20" fill="rgba(255,255,255,0.08)"/>
+        <rect x="10" y="20" width="60" height="40" rx="6" fill="none" stroke="white" stroke-width="2"/>
+        <rect x="14" y="24" width="9" height="8" rx="2" fill="#6366F1"/>
+        <rect x="26" y="24" width="9" height="8" rx="2" fill="#F97316"/>
+        <rect x="38" y="24" width="9" height="8" rx="2" fill="#10B981"/>
+        <rect x="50" y="24" width="9" height="8" rx="2" fill="#6366F1"/>
+        <rect x="14" y="35" width="9" height="8" rx="2" fill="rgba(255,255,255,0.2)"/>
+        <rect x="26" y="35" width="9" height="8" rx="2" fill="#FBBF24"/>
+        <rect x="38" y="35" width="9" height="8" rx="2" fill="#FBBF24"/>
+        <rect x="50" y="35" width="9" height="8" rx="2" fill="rgba(255,255,255,0.2)"/>
+        <rect x="18" y="46" width="44" height="8" rx="2" fill="rgba(255,255,255,0.15)"/>
+      </svg>
+      <div style="flex:1;position:relative;z-index:1;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;color:rgba(255,255,255,0.45);margin-bottom:6px;">ATIVIDADE PRINCIPAL</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:900;color:#fff;line-height:1;margin-bottom:8px;">Digitação</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.5;">Lições por fileira · Treino livre · Ranqueado com ranking da turma</div>
+      </div>
+      <div style="flex-shrink:0;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 20px;font-size:14px;font-weight:700;color:#fff;position:relative;z-index:1;">Entrar →</div>
+    </div>
+
     <div class="section-titulo">
       <iconify-icon icon="ph:book-open-bold"></iconify-icon>
-      MATÉRIA — ESTUDE E FAÇA O QUIZ DE CADA MÓDULO
+      MATÉRIA — MÓDULOS
     </div>
     <div class="modulos-grid" id="modulosGrid"></div>
 
@@ -1965,48 +2028,13 @@
     <div class="prova-card" id="provaCard" onclick="iniciarProva()">
       <div class="prova-icon">🏆</div>
       <div class="prova-title">Prova Final</div>
-      <div class="prova-desc">Você só desbloqueia a prova após completar todos os 4 módulos com pelo menos 50% de acerto.</div>
+      <div class="prova-desc">Você só desbloqueia a prova após completar todos os módulos com pelo menos 50% de acerto.</div>
       <div class="prova-status" id="provaStatus">🔒 BLOQUEADA</div>
     </div>
 
     <div class="section-titulo">
-      <iconify-icon icon="ph:keyboard-bold"></iconify-icon>
-      ⌨️ DIGITAÇÃO — FOCO PRINCIPAL
-    </div>
-    <div class="pratique-grid">
-      <div class="pratique-card" onclick="abrirMenuDigitacao()" style="grid-column: 1/-1; background: linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%); color:white; border:none; display:flex; align-items:center; gap:28px; padding:32px; box-shadow: 0 20px 60px -12px rgba(99,102,241,0.5)">
-        <div style="flex-shrink:0;">
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect width="80" height="80" rx="20" fill="rgba(255,255,255,0.1)"/>
-            <rect x="12" y="22" width="56" height="36" rx="6" fill="none" stroke="white" stroke-width="2"/>
-            <rect x="16" y="26" width="8" height="7" rx="2" fill="#6366F1"/>
-            <rect x="26" y="26" width="8" height="7" rx="2" fill="#F97316"/>
-            <rect x="36" y="26" width="8" height="7" rx="2" fill="#10B981"/>
-            <rect x="46" y="26" width="8" height="7" rx="2" fill="#6366F1"/>
-            <rect x="56" y="26" width="8" height="7" rx="2" fill="#F97316"/>
-            <rect x="16" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-            <rect x="26" y="36" width="8" height="7" rx="2" fill="#FBBF24"/>
-            <rect x="36" y="36" width="8" height="7" rx="2" fill="#FBBF24"/>
-            <rect x="46" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-            <rect x="56" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-            <rect x="20" y="46" width="40" height="7" rx="2" fill="rgba(255,255,255,0.2)"/>
-          </svg>
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:11px;font-weight:800;letter-spacing:2px;opacity:0.6;margin-bottom:4px;">MÓDULO PRINCIPAL</div>
-          <div class="pratique-title" style="color:white;font-size:26px;margin-bottom:6px;">Digitação</div>
-          <div class="pratique-desc" style="color:rgba(255,255,255,0.7);font-size:15px;">Aprenda a digitar de verdade — lições por fileira, treino livre e modo ranqueado com ranking da turma.</div>
-        </div>
-        <div style="flex-shrink:0;text-align:center;">
-          <div style="font-size:42px;font-weight:900;color:#FBBF24;font-family:'Plus Jakarta Sans',sans-serif;line-height:1;">→</div>
-          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;opacity:0.6;margin-top:4px;">ENTRAR</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-titulo">
       <iconify-icon icon="ph:game-controller-bold"></iconify-icon>
-      🎮 JOGOS E ATIVIDADES
+      JOGOS E ATIVIDADES
     </div>
     <div class="pratique-grid">
       <div class="pratique-card" onclick="goPaint()">
@@ -2014,100 +2042,47 @@
         <div class="pratique-title">Desenho</div>
         <div class="pratique-desc">Estilo Paint. Pincéis, formas, baldinho de tinta, desfazer e mais.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="28" stroke="currentColor" stroke-width="2"/>
-          <path d="M28 52 Q36 28 52 30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="52" cy="28" r="4" fill="currentColor" opacity="0.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="goWord()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:text-aa-bold"></iconify-icon></div>
-        <div class="pratique-title">Texto</div>
-        <div class="pratique-desc">Editor estilo Word. Escreva textos com formatação e baixe o arquivo.</div>
+        <div class="pratique-title">Editor de Texto</div>
+        <div class="pratique-desc">Estilo Word. Escreva com formatação e salve o arquivo.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="6" width="52" height="68" rx="4" stroke="currentColor" stroke-width="2"/>
-          <line x1="18" y1="22" x2="54" y2="22" stroke="currentColor" stroke-width="2"/>
-          <line x1="18" y1="32" x2="50" y2="32" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="18" y1="40" x2="46" y2="40" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="18" y1="48" x2="52" y2="48" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="18" y1="56" x2="38" y2="56" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarJogoMemoria()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:cards-three-bold"></iconify-icon></div>
         <div class="pratique-title">Jogo da Memória</div>
-        <div class="pratique-desc">Encontre os pares de informática. Quanto menos jogadas, mais pontos!</div>
+        <div class="pratique-desc">Encontre os pares de informática. Menos jogadas = mais pontos.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
-          <rect x="10" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
-          <rect x="42" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
-          <rect x="48" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
-          <line x1="4" y1="58" x2="38" y2="58" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="42" y1="58" x2="76" y2="58" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
       </div>
-      <div class="pratique-card" onclick="iniciarCacaHardware()">
-        <div class="pratique-icon-wrap"><iconify-icon icon="ph:target-bold"></iconify-icon></div>
-        <div class="pratique-title">Caça-Hardware</div>
-        <div class="pratique-desc">Apareceu o nome? Acha o ícone certo antes do tempo acabar!</div>
+      <div class="pratique-card" onclick="iniciarHackerRunner()">
+        <div class="pratique-icon-wrap"><iconify-icon icon="ph:game-controller-bold"></iconify-icon></div>
+        <div class="pratique-title">Hacker Runner</div>
+        <div class="pratique-desc">Fase de plataforma pixel art. Colete dados, derrote virus, chegue ao PC Central.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
-          <circle cx="40" cy="40" r="20" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="40" cy="40" r="10" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="40" cy="40" r="3" fill="currentColor" opacity="0.5"/>
-          <line x1="40" y1="6" x2="40" y2="14" stroke="currentColor" stroke-width="2"/>
-          <line x1="40" y1="66" x2="40" y2="74" stroke="currentColor" stroke-width="2"/>
-          <line x1="6" y1="40" x2="14" y2="40" stroke="currentColor" stroke-width="2"/>
-          <line x1="66" y1="40" x2="74" y2="40" stroke="currentColor" stroke-width="2"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarRelampago()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:lightning-bold"></iconify-icon></div>
         <div class="pratique-title">Desafio Relâmpago</div>
-        <div class="pratique-desc">60 segundos pra acertar o máximo que conseguir. Vale pontos extras!</div>
+        <div class="pratique-desc">60 segundos pra acertar o máximo. Vale pontos extras.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
-          <polyline points="40,14 40,42 52,42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="40" cy="40" r="3" fill="currentColor" opacity="0.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarAtiradorPalavras()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
-        <div class="pratique-desc">Palavras voam pela tela! Digite rápido pra destruir os balões antes que cheguem ao fim!</div>
+        <div class="pratique-desc">Palavras voam pela tela — digite rápido antes que cheguem ao fim.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="40" cy="28" rx="18" ry="16" stroke="currentColor" stroke-width="2"/>
-          <line x1="40" y1="44" x2="40" y2="60" stroke="currentColor" stroke-width="2"/>
-          <path d="M26 60 Q40 54 54 60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="14" y1="18" x2="6" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="66" y1="18" x2="74" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarRedePuzzle()" style="background:linear-gradient(135deg,#0F172A,#1E293B);color:white;border:none;">
         <div class="pratique-icon-wrap" style="background:rgba(99,102,241,0.2);"><iconify-icon icon="ph:graph-bold" style="color:#818CF8;"></iconify-icon></div>
         <div class="pratique-title" style="color:white;">Reparar a Rede</div>
-        <div class="pratique-desc" style="color:#94A3B8;">Vírus infectou a rede! Responda perguntas para consertar os nós e salvar o sistema.</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.2;">
-          <circle cx="40" cy="40" r="8" stroke="white" stroke-width="2"/>
-          <circle cx="14" cy="24" r="6" stroke="white" stroke-width="1.5"/>
-          <circle cx="66" cy="24" r="6" stroke="white" stroke-width="1.5"/>
-          <circle cx="14" cy="56" r="6" stroke="white" stroke-width="1.5"/>
-          <circle cx="66" cy="56" r="6" stroke="white" stroke-width="1.5"/>
-          <line x1="20" y1="27" x2="34" y2="36" stroke="white" stroke-width="1.5"/>
-          <line x1="60" y1="27" x2="46" y2="36" stroke="white" stroke-width="1.5"/>
-          <line x1="20" y1="53" x2="34" y2="44" stroke="white" stroke-width="1.5"/>
-          <line x1="60" y1="53" x2="46" y2="44" stroke="white" stroke-width="1.5"/>
-        </svg>
+        <div class="pratique-desc" style="color:#94A3B8;">Vírus infectou a rede. Responda perguntas para salvar os nós.</div>
+        <div class="pratique-arrow" style="color:white;">→</div>
       </div>
       <div class="pratique-card" onclick="iniciarRamGame()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:memory-bold"></iconify-icon></div>
         <div class="pratique-title">Gerenciador de RAM</div>
-        <div class="pratique-desc">Abra e feche programas sem travar o PC. Aprenda quanto cada coisa usa de memória!</div>
+        <div class="pratique-desc">Processos invadem a memória — mate-os antes de travar o sistema.</div>
         <div class="pratique-arrow">→</div>
       </div>
     </div>
@@ -2277,20 +2252,18 @@
   </div>
 </div>
 
-<!-- ====================== CAÇA-HARDWARE ====================== -->
-<div class="screen" id="screen-caca">
-  <div class="container">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Voltar</button>
-      <div class="top-bar-title">🎯 Caça-Hardware</div>
+<!-- ====================== HACKER RUNNER ====================== -->
+<div class="screen" id="screen-caca" style="padding:0;background:#000;display:flex;align-items:center;justify-content:center;">
+  <div style="position:relative;width:100%;max-width:960px;">
+    <canvas id="hrCanvas" style="display:block;width:100%;image-rendering:pixelated;cursor:none;"></canvas>
+    <div id="hrOverlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,8,0.92);font-family:'JetBrains Mono','Courier New',monospace;color:#E6EDF3;">
+      <div style="font-size:clamp(18px,4vw,32px);font-weight:900;color:#00FFCC;letter-spacing:3px;margin-bottom:8px;">HACKER RUNNER</div>
+      <div style="font-size:clamp(10px,2vw,13px);color:#8B949E;margin-bottom:24px;letter-spacing:1px;">INFILTRE A REDE. COLETE OS DADOS. CHEGUE AO PC CENTRAL.</div>
+      <div style="font-size:clamp(9px,1.5vw,11px);color:#3FB950;margin-bottom:6px;letter-spacing:1px;">[ SETAS / WASD ] MOVER &nbsp;&nbsp; [ SPACE / W ] PULAR</div>
+      <div style="font-size:clamp(9px,1.5vw,11px);color:#3FB950;margin-bottom:28px;letter-spacing:1px;">PULE EM CIMA DOS VIRUS PARA DESTRUI-LOS</div>
+      <button onclick="hrStart()" style="background:#00FFCC;color:#000;border:none;font-family:inherit;font-size:clamp(12px,2vw,15px);font-weight:900;padding:12px 36px;border-radius:4px;cursor:pointer;letter-spacing:2px;">INICIAR FASE</button>
+      <button onclick="goDashboard()" style="margin-top:10px;background:transparent;color:#8B949E;border:1px solid #30363D;font-family:inherit;font-size:clamp(10px,1.5vw,12px);padding:8px 24px;border-radius:4px;cursor:pointer;letter-spacing:1px;">VOLTAR</button>
     </div>
-    <div class="jogo-header">
-      <div class="jogo-stat"><div class="jogo-stat-val" id="cacaPontos">0</div><div class="jogo-stat-label">PONTOS</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="cacaRodada">1/10</div><div class="jogo-stat-label">RODADA</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="cacaErros">0</div><div class="jogo-stat-label">ERROS</div></div>
-    </div>
-    <div class="caca-target" id="cacaTarget"></div>
-    <div class="caca-grid" id="cacaGrid"></div>
   </div>
 </div>
 
@@ -2504,14 +2477,8 @@
 </div>
 
 <!-- ====================== GERENCIADOR DE RAM ====================== -->
-<div class="screen" id="screen-ram-game">
-  <div class="container-narrow">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Sair</button>
-      <div class="top-bar-title">🧠 Gerenciador de RAM</div>
-    </div>
-    <div id="ramGameContent"></div>
-  </div>
+<div class="screen" id="screen-ram-game" style="padding:0;position:relative;">
+  <div id="ramGameContent" style="height:100%;"></div>
 </div>
 
 <!-- ====================== PAINT ====================== -->
@@ -4897,98 +4864,397 @@ function finalizarMemoria() {
 }
 
 // =============================================================
-// CAÇA-HARDWARE
+// HACKER RUNNER — pixel-art platformer (replaces Caca-Hardware)
 // =============================================================
-const CACA_ITENS = [
-  {icon:"ph:desktop-bold", nome:"Monitor"},
-  {icon:"ph:keyboard-bold", nome:"Teclado"},
-  {icon:"ph:mouse-bold", nome:"Mouse"},
-  {icon:"ph:printer-bold", nome:"Impressora"},
-  {icon:"ph:hard-drives-bold", nome:"HD"},
-  {icon:"ph:cpu-bold", nome:"CPU"},
-  {icon:"ph:webcam-bold", nome:"Webcam"},
-  {icon:"ph:microphone-bold", nome:"Microfone"},
-  {icon:"ph:speaker-high-bold", nome:"Alto-falante"},
-  {icon:"ph:headphones-bold", nome:"Fone"},
-  {icon:"ph:device-mobile-bold", nome:"Celular"},
-  {icon:"ph:disc-bold", nome:"CD"},
-  {icon:"ph:windows-logo-bold", nome:"Windows"},
-  {icon:"ph:globe-bold", nome:"Chrome"},
-  {icon:"ph:file-text-bold", nome:"Word"},
-  {icon:"ph:shield-check-bold", nome:"Antivírus"},
-  {icon:"ph:game-controller-bold", nome:"Joystick"},
-  {icon:"ph:lightning-bold", nome:"Memória RAM"},
-  {icon:"ph:camera-bold", nome:"Câmera"},
-  {icon:"ph:wifi-high-bold", nome:"Wi-Fi"}
-];
-let cacaState = { rodada: 0, pontos: 0, erros: 0, target: null };
+(function() {
+  const GW = 480, GH = 270, TS = 16;
+  const GRAV = 0.28, MAX_FALL = 8;
 
-function iniciarCacaHardware() {
-  cacaState = { rodada: 0, pontos: 0, erros: 0, target: null };
-  document.getElementById("cacaPontos").textContent = "0";
-  document.getElementById("cacaErros").textContent = "0";
-  showScreen("caca");
-  proximaRodadaCaca();
-}
+  // Tilemap legend:
+  // # = ground  p = platform  . = empty
+  // P = player start  D = data packet  V = virus
+  // F = firewall  C = checkpoint  X = PC Central
+  const RAW_MAP = [
+    "................................................................................",
+    "................................................................................",
+    ".......D...........D.....p..........D.................D.........................",
+    ".....pppppp.......pppp..............pppp....................ppp...................",
+    "..P...........................................V........D......................D.X.",
+    "....................D.....V.....ppp.....ppp...............pppp....ppp..pppp..ppp",
+    ".....pppppp........ppp.......F........F..........C..........................F...",
+    "################....##############.....##############....#####################..",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+    "................................................................................",
+  ];
 
-function proximaRodadaCaca() {
-  cacaState.rodada++;
-  if (cacaState.rodada > 10) { finalizarCaca(); return; }
-  document.getElementById("cacaRodada").textContent = `${cacaState.rodada}/10`;
-
-  // sorteia 1 target + 5 distratores
-  const pool = [...CACA_ITENS].sort(() => Math.random() - 0.5);
-  const target = pool[0];
-  const opcoes = pool.slice(0, 6).sort(() => Math.random() - 0.5);
-  cacaState.target = target;
-
-  document.getElementById("cacaTarget").innerHTML = `
-    <div class="caca-target-label">ACHE O ÍCONE DE:</div>
-    <div class="caca-target-word">${target.nome}</div>`;
-
-  // sem nome embaixo — só ícone grande
-  document.getElementById("cacaGrid").innerHTML = opcoes.map(op =>
-    `<div class="caca-option" onclick="responderCaca('${op.nome}', this)">
-      <iconify-icon icon="${op.icon}"></iconify-icon>
-    </div>`).join("");
-}
-
-function responderCaca(nome, el) {
-  if (el.classList.contains("correct") || el.classList.contains("wrong")) return;
-  if (nome === cacaState.target.nome) {
-    el.classList.add("correct");
-    cacaState.pontos += 10;
-    document.getElementById("cacaPontos").textContent = cacaState.pontos;
-    setTimeout(proximaRodadaCaca, 600);
-  } else {
-    el.classList.add("wrong");
-    cacaState.erros++;
-    document.getElementById("cacaErros").textContent = cacaState.erros;
+  function parseMap(raw) {
+    const tiles=[], collectibles=[], enemies=[], firewalls=[], checkpoints=[];
+    let playerStart={x:2*TS,y:4*TS}, goalPos=null;
+    raw.forEach((row,ry)=>{
+      row.split('').forEach((ch,cx)=>{
+        const px=cx*TS, py=ry*TS;
+        if(ch==='#'||ch==='p') tiles.push({x:px,y:py,w:TS,h:TS,type:ch});
+        if(ch==='D') collectibles.push({x:px+4,y:py+4,w:8,h:8,alive:true,glow:0});
+        if(ch==='V') enemies.push({x:px,y:py,w:14,h:14,vx:-0.7,alive:true,anim:0,startX:px,rangeX:48});
+        if(ch==='F') firewalls.push({x:px,y:py,w:TS,h:TS*2,pulse:0});
+        if(ch==='C') checkpoints.push({x:px,y:py,w:TS,h:TS*2,activated:false});
+        if(ch==='P') playerStart={x:px,y:py-TS};
+        if(ch==='X') goalPos={x:px,y:py-TS*2,w:TS*2,h:TS*3};
+      });
+    });
+    return {tiles,collectibles,enemies,firewalls,checkpoints,playerStart,goalPos};
   }
-}
 
-function finalizarCaca() {
-  const pontosFinais = cacaState.pontos - (cacaState.erros * 2);
-  adicionarPontosJogo(Math.max(0, pontosFinais));
-  if (!alunoAtivo.progresso.jogos) alunoAtivo.progresso.jogos = {};
-  alunoAtivo.progresso.jogos.caca = true;
-  salvarAluno(alunoAtivo);
+  let canvas, ctx, animId=null;
+  let map, player, particles=[], gameState='idle';
+  let keys={}, time=0, score=0, lastCheckpoint=null, flashMsg={txt:'',t:0};
 
-  document.getElementById("cacaTarget").innerHTML = "";
-  document.getElementById("cacaGrid").innerHTML = `
-    <div class="result-screen" style="grid-column: 1 / -1;">
-      <div class="result-emoji">🎯</div>
-      <div class="result-title">Acabou o jogo!</div>
-      <div style="font-size:18px;color:var(--ink-soft);margin-bottom:12px;">
-        ${cacaState.pontos} pontos brutos · ${cacaState.erros} erros
-      </div>
-      <div class="result-score" data-n="${alunoAtivo.nivel}">+${Math.max(0, pontosFinais)} ⭐</div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn ghost" onclick="iniciarCacaHardware()">↻ Jogar de novo</button>
-        <button class="btn" onclick="goDashboard()">Ir pro menu</button>
-      </div>
-    </div>`;
-}
+  function mkPlayer(x,y){
+    return{x,y,w:12,h:20,vx:0,vy:0,grounded:false,facing:1,anim:0,animT:0,energy:5,invincible:0,coyote:0};
+  }
+
+  function hrInit(){
+    canvas=document.getElementById('hrCanvas');
+    canvas.width=GW; canvas.height=GH;
+    canvas.style.width='100%'; canvas.style.imageRendering='pixelated';
+    ctx=canvas.getContext('2d');
+    ctx.imageSmoothingEnabled=false;
+    function onKey(e,down){
+      keys[e.code]=down;
+      if(['Space','ArrowUp','ArrowLeft','ArrowRight','KeyW','KeyA','KeyD'].includes(e.code)) e.preventDefault();
+    }
+    document.addEventListener('keydown',e=>onKey(e,true));
+    document.addEventListener('keyup',e=>onKey(e,false));
+    let touchStartX=0;
+    canvas.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;keys['Space']=true;setTimeout(()=>{keys['Space']=false;},120);},{passive:true});
+    canvas.addEventListener('touchmove',e=>{const dx=e.touches[0].clientX-touchStartX;keys['ArrowLeft']=dx<-15;keys['ArrowRight']=dx>15;},{passive:true});
+    canvas.addEventListener('touchend',()=>{keys['ArrowLeft']=keys['ArrowRight']=false;},{passive:true});
+  }
+
+  window.iniciarHackerRunner=function(){
+    showScreen('caca');
+    document.getElementById('hrOverlay').style.display='flex';
+  };
+
+  window.hrStart=function(){
+    document.getElementById('hrOverlay').style.display='none';
+    if(!canvas) hrInit();
+    map=parseMap(RAW_MAP);
+    player=mkPlayer(map.playerStart.x,map.playerStart.y);
+    particles=[]; keys={}; score=0; lastCheckpoint=null; flashMsg={txt:'',t:0};
+    gameState='playing';
+    if(animId) cancelAnimationFrame(animId);
+    loop();
+  };
+
+  function loop(){
+    animId=requestAnimationFrame(loop);
+    if(gameState==='playing') update();
+    render();
+  }
+
+  function rectsOverlap(a,b){
+    return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+  }
+
+  function resolveX(ent){
+    map.tiles.forEach(t=>{
+      if(!rectsOverlap(ent,t)) return;
+      if(ent.vx>0) ent.x=t.x-ent.w;
+      else if(ent.vx<0) ent.x=t.x+t.w;
+      ent.vx=0;
+    });
+  }
+
+  function resolveY(ent,wasGrounded){
+    map.tiles.forEach(t=>{
+      if(!rectsOverlap(ent,t)) return;
+      if(ent.vy>0){ent.y=t.y-ent.h;ent.vy=0;ent.grounded=true;}
+      else if(ent.vy<0){ent.y=t.y+t.h;ent.vy=0;}
+    });
+    if(ent===player&&wasGrounded&&!ent.grounded) ent.coyote=6;
+  }
+
+  function spawnParticles(x,y,col,n){
+    for(let i=0;i<n;i++){
+      const a=Math.random()*Math.PI*2, s=1+Math.random()*2.5;
+      particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1.5,col,life:20+Math.random()*20|0,size:2});
+    }
+  }
+
+  function flash(txt){flashMsg={txt,t:80};}
+
+  function update(){
+    time++;
+    const p=player;
+    const left=keys['ArrowLeft']||keys['KeyA'];
+    const right=keys['ArrowRight']||keys['KeyD'];
+    const jump=keys['Space']||keys['ArrowUp']||keys['KeyW'];
+
+    if(left){p.vx=-1.8;p.facing=-1;}
+    else if(right){p.vx=1.8;p.facing=1;}
+    else p.vx*=0.72;
+
+    if(jump&&(p.grounded||p.coyote>0)){
+      p.vy=-5.4;p.grounded=false;p.coyote=0;
+      keys['Space']=false;keys['ArrowUp']=false;keys['KeyW']=false;
+    }
+
+    p.vy=Math.min(p.vy+GRAV,MAX_FALL);
+    if(p.coyote>0) p.coyote--;
+    if(p.invincible>0) p.invincible--;
+
+    p.animT++;
+    if(Math.abs(p.vx)>0.3&&p.grounded){if(p.animT%10===0)p.anim=(p.anim+1)%4;}
+    else if(!p.grounded)p.anim=1;
+    else p.anim=0;
+
+    p.x+=p.vx; resolveX(p);
+    const wasGrounded=p.grounded; p.grounded=false;
+    p.y+=p.vy; resolveY(p,wasGrounded);
+
+    // collectibles
+    map.collectibles.forEach(d=>{
+      if(!d.alive) return;
+      d.glow=(d.glow+0.1)%(Math.PI*2);
+      if(rectsOverlap(p,d)){d.alive=false;score+=10;spawnParticles(d.x+4,d.y+4,'#00FFCC',10);flash('DADO COLETADO  +10');}
+    });
+
+    // enemies
+    map.enemies.forEach(en=>{
+      if(!en.alive) return;
+      en.anim=(en.anim+0.12)%(Math.PI*2);
+      en.x+=en.vx;
+      if(en.x<en.startX-en.rangeX||en.x>en.startX+en.rangeX) en.vx*=-1;
+      resolveX(en);
+      if(rectsOverlap(p,en)){
+        const stomp=p.vy>0&&p.y+p.h<=en.y+8;
+        if(stomp){en.alive=false;p.vy=-4;score+=25;spawnParticles(en.x+7,en.y+7,'#9B59B6',14);flash('VIRUS DESTRUIDO  +25');}
+        else if(p.invincible===0){p.energy--;p.invincible=80;spawnParticles(p.x+6,p.y+10,'#DA3633',8);if(p.energy<=0){gameState='gameover';showEndOverlay(false);}}
+      }
+    });
+
+    // firewalls
+    map.firewalls.forEach(fw=>{
+      fw.pulse=(fw.pulse+0.07)%(Math.PI*2);
+      if(p.invincible===0&&rectsOverlap(p,fw)){p.energy--;p.invincible=90;p.vx=p.vx>0?-3:3;p.vy=-3;spawnParticles(p.x+6,p.y+10,'#FF4500',8);if(p.energy<=0){gameState='gameover';showEndOverlay(false);}}
+    });
+
+    // checkpoints
+    map.checkpoints.forEach(cp=>{
+      if(!cp.activated&&rectsOverlap(p,cp)){cp.activated=true;lastCheckpoint={x:cp.x,y:cp.y-p.h};flash('CHECKPOINT!');spawnParticles(cp.x+8,cp.y+8,'#FFDD57',12);}
+    });
+
+    // goal
+    if(map.goalPos&&rectsOverlap(p,map.goalPos)){gameState='victory';score+=100;showEndOverlay(true);}
+
+    // void death
+    if(p.y>GH+40){
+      if(lastCheckpoint){p.x=lastCheckpoint.x;p.y=lastCheckpoint.y;p.vx=0;p.vy=0;p.energy=Math.max(1,p.energy-1);flash('RESPAWN');}
+      else{p.energy--;p.x=map.playerStart.x;p.y=map.playerStart.y;p.vx=0;p.vy=0;if(p.energy<=0){gameState='gameover';showEndOverlay(false);}}
+    }
+
+    particles=particles.filter(pt=>pt.life>0);
+    particles.forEach(pt=>{pt.x+=pt.vx;pt.y+=pt.vy;pt.vy+=0.15;pt.life--;});
+    if(flashMsg.t>0) flashMsg.t--;
+  }
+
+  function render(){
+    const levelW=RAW_MAP[0].length*TS;
+    const camX=player?Math.max(0,Math.min(player.x-GW/2+player.w/2,levelW-GW)):0;
+
+    // bg
+    const bg=ctx.createLinearGradient(0,0,0,GH);
+    bg.addColorStop(0,'#050A18');bg.addColorStop(1,'#0A1428');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,GW,GH);
+
+    drawParallax(camX);
+
+    ctx.save();ctx.translate(-camX,0);
+    map&&map.tiles.forEach(t=>drawTile(t));
+    map&&map.firewalls.forEach(fw=>drawFirewall(fw));
+    map&&map.checkpoints.forEach(cp=>drawCheckpoint(cp));
+    map&&map.goalPos&&drawGoal(map.goalPos);
+    map&&map.collectibles.forEach(d=>{if(d.alive)drawData(d);});
+    map&&map.enemies.forEach(en=>{if(en.alive)drawVirus(en);});
+    particles.forEach(pt=>{ctx.globalAlpha=pt.life/40;ctx.fillStyle=pt.col;ctx.fillRect(pt.x|0,pt.y|0,pt.size,pt.size);});
+    ctx.globalAlpha=1;
+    player&&drawPlayer(player);
+    ctx.restore();
+
+    drawHUD();
+
+    if(flashMsg.t>0){
+      ctx.globalAlpha=Math.min(1,flashMsg.t/20);
+      ctx.fillStyle='#00FFCC';ctx.font='bold 7px monospace';ctx.textAlign='center';
+      ctx.fillText(flashMsg.txt,GW/2,20);ctx.globalAlpha=1;ctx.textAlign='left';
+    }
+  }
+
+  function drawParallax(camX){
+    ctx.strokeStyle='rgba(0,255,180,0.04)';ctx.lineWidth=0.5;
+    const off1=(camX*0.15)%32;
+    for(let x=-off1;x<GW+32;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GH);ctx.stroke();}
+    for(let y=0;y<GH;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GW,y);ctx.stroke();}
+
+    const off2=(camX*0.25)%GW;
+    ctx.fillStyle='rgba(0,30,60,0.5)';
+    [20,40,24,56,32,28,48,20,60,36,44,52,28,16,40].forEach((bh,i)=>{
+      const bx=i*20-off2;
+      ctx.fillRect(bx|0,GH-bh-60,18,bh);
+      if(Math.sin(time*0.03+bx)>0.3){
+        ctx.fillStyle='rgba(0,180,255,0.3)';
+        for(let by=GH-bh-58;by<GH-62;by+=6) ctx.fillRect(bx+3|0,by,4,3);
+        ctx.fillStyle='rgba(0,30,60,0.5)';
+      }
+    });
+
+    ctx.fillStyle='rgba(100,200,255,0.4)';
+    const off3=(camX*0.05)%480;
+    [[10,20],[60,8],[120,35],[200,12],[300,28],[400,5],[450,22],[80,40],[250,18]].forEach(([sx,sy])=>{
+      const rx=(sx-off3+GW*2)%GW;
+      const s=Math.sin(time*0.04+sx)>0.5?2:1;
+      ctx.fillRect(rx|0,sy,s,s);
+    });
+  }
+
+  function drawTile(t){
+    if(t.type==='#'){
+      ctx.fillStyle='#0D2240';ctx.fillRect(t.x,t.y,TS,TS);
+      ctx.fillStyle='#0A3060';ctx.fillRect(t.x+1,t.y+1,TS-2,2);
+      ctx.fillStyle='rgba(0,255,204,0.25)';
+      ctx.fillRect(t.x+2,t.y+TS-3,TS-4,1);ctx.fillRect(t.x+TS-3,t.y+2,1,TS-4);
+      ctx.fillStyle='rgba(0,255,204,0.5)';
+      ctx.fillRect(t.x+3,t.y+3,2,2);ctx.fillRect(t.x+TS-5,t.y+TS-5,2,2);
+      ctx.fillStyle='#1A4080';ctx.fillRect(t.x,t.y,TS,1);
+    } else {
+      ctx.fillStyle='#1C2333';ctx.fillRect(t.x,t.y,TS,TS);
+      ctx.fillStyle='#2A3F5A';ctx.fillRect(t.x,t.y,TS,3);
+      const bl=Math.sin(time*0.08+t.x*0.3)>0;
+      ctx.fillStyle=bl?'#3FB950':'#1A2530';ctx.fillRect(t.x+3,t.y+1,2,1);
+      ctx.fillStyle=Math.sin(time*0.05+t.x*0.5)>0.3?'#388BFD':'#1A2530';ctx.fillRect(t.x+8,t.y+1,2,1);
+    }
+  }
+
+  function drawFirewall(fw){
+    const a=0.6+Math.sin(fw.pulse)*0.3;
+    ctx.fillStyle=`rgba(218,54,51,${a})`;ctx.fillRect(fw.x+4,fw.y,fw.w-8,fw.h);
+    ctx.fillStyle=`rgba(255,90,40,${a*0.5})`;
+    ctx.fillRect(fw.x+2,fw.y,2,fw.h);ctx.fillRect(fw.x+fw.w-4,fw.y,2,fw.h);
+    ctx.fillStyle='rgba(0,0,0,0.3)';
+    for(let sy=fw.y;sy<fw.y+fw.h;sy+=4) ctx.fillRect(fw.x+4,sy,fw.w-8,1);
+    ctx.fillStyle='#FFAA00';ctx.font='5px monospace';ctx.fillText('FW',fw.x+3,fw.y+10);
+  }
+
+  function drawCheckpoint(cp){
+    const col=cp.activated?'#3FB950':'#8B949E';
+    ctx.fillStyle=col;ctx.fillRect(cp.x+6,cp.y,2,cp.h);
+    ctx.fillRect(cp.x+8,cp.y,8,6);
+    ctx.fillStyle=cp.activated?'#D3F9D8':'#444';ctx.fillRect(cp.x+9,cp.y+1,6,4);
+  }
+
+  function drawGoal(g){
+    const gl=0.5+Math.sin(time*0.06)*0.3;
+    ctx.fillStyle='#1A2A40';ctx.fillRect(g.x,g.y+4,g.w,g.h-4);
+    ctx.fillStyle=`rgba(0,255,180,${gl})`;ctx.fillRect(g.x+3,g.y+8,g.w-6,g.h-20);
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    for(let sy=g.y+8;sy<g.y+g.h-12;sy+=3) ctx.fillRect(g.x+3,sy,g.w-6,1);
+    ctx.fillStyle='#FFFFFF';ctx.font='5px monospace';ctx.fillText('PC',g.x+6,g.y+18);
+    ctx.strokeStyle=`rgba(0,255,180,${gl*0.5})`;ctx.lineWidth=2;
+    ctx.strokeRect(g.x-2,g.y+2,g.w+4,g.h);ctx.lineWidth=1;
+  }
+
+  function drawData(d){
+    const g=0.5+Math.sin(d.glow)*0.4;
+    ctx.fillStyle=`rgba(0,255,204,${g*0.3})`;ctx.fillRect(d.x-1,d.y-1,10,10);
+    ctx.fillStyle=`rgba(0,255,204,${g})`;ctx.fillRect(d.x+1,d.y+1,6,6);
+    ctx.fillStyle='#FFFFFF';ctx.fillRect(d.x+2,d.y+2,4,4);
+  }
+
+  function drawVirus(en){
+    const w=Math.sin(en.anim)*1.5;
+    const ex=en.x|0,ey=(en.y+w)|0;
+    ctx.fillStyle='#7B2FBE';
+    ctx.fillRect(ex+2,ey+4,10,8);ctx.fillRect(ex+4,ey+2,6,10);
+    ctx.fillStyle='#FF4444';ctx.fillRect(ex+3,ey+4,3,3);ctx.fillRect(ex+8,ey+4,3,3);
+    ctx.fillStyle='#FFAAAA';ctx.fillRect(ex+4,ey+5,1,1);ctx.fillRect(ex+9,ey+5,1,1);
+    const leg=Math.sin(en.anim*4)>0;
+    ctx.fillStyle='#9B59B6';
+    ctx.fillRect(ex+3,ey+12,3,leg?3:2);ctx.fillRect(ex+8,ey+12,3,leg?2:3);
+    if(Math.sin(time*0.3+en.x)>0.85){ctx.fillStyle='rgba(255,0,0,0.3)';ctx.fillRect(ex,ey,14,14);}
+  }
+
+  function drawPlayer(p){
+    if(p.invincible>0&&Math.floor(p.invincible/6)%2===0) return;
+    const px=p.x|0,py=p.y|0,f=p.facing;
+    ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(px+1,py+p.h,p.w-2,2);
+    ctx.fillStyle='#1C2333';ctx.fillRect(px+2,py+8,p.w-4,10);
+    ctx.fillStyle='#232D3F';ctx.fillRect(px+2,py+2,p.w-4,8);
+    ctx.fillStyle='#00FFCC';ctx.fillRect(px+2,py+10,1,4);ctx.fillRect(px+p.w-3,py+10,1,4);
+    ctx.fillStyle='#141C28';ctx.fillRect(px+3,py+2,6,7);
+    ctx.fillStyle='#00DDFF';ctx.fillRect(px+3,py+5,6,2);
+    ctx.fillStyle='#0D1A2A';ctx.fillRect(f>0?px+1:px+p.w-4,py+8,3,6);
+    ctx.fillStyle='#388BFD';ctx.fillRect(f>0?px+1:px+p.w-4,py+9,1,1);
+    const lp=p.anim%4;
+    ctx.fillStyle='#0F1923';
+    if(!p.grounded){
+      ctx.fillRect(px+3,py+18,3,3);ctx.fillRect(px+7,py+17,3,4);
+    } else {
+      const ly=(lp===1||lp===3)?py+18:py+17;
+      const ry=(lp===0||lp===2)?py+18:py+17;
+      ctx.fillRect(px+3,ly,3,p.h-(ly-py));ctx.fillRect(px+7,ry,3,p.h-(ry-py));
+      ctx.fillStyle='#3FB950';ctx.fillRect(px+(f>0?7:3),py+p.h-1,4,1);
+    }
+  }
+
+  function drawHUD(){
+    ctx.fillStyle='rgba(0,0,8,0.6)';ctx.fillRect(0,0,GW,14);
+    ctx.fillStyle='#21262D';ctx.fillRect(4,3,62,8);
+    const ep=player?player.energy/5:0;
+    ctx.fillStyle=ep>0.5?'#3FB950':ep>0.25?'#D29922':'#DA3633';
+    ctx.fillRect(4,3,(62*ep)|0,8);
+    ctx.fillStyle='rgba(255,255,255,0.7)';ctx.font='5px monospace';ctx.fillText('ENERGIA',6,9);
+    ctx.fillStyle='#8B949E';ctx.font='5px monospace';ctx.fillText('PTS',GW-36,9);
+    ctx.fillStyle='#00FFCC';ctx.font='bold 7px monospace';ctx.fillText(String(score).padStart(4,'0'),GW-36,17);
+  }
+
+  function showEndOverlay(win){
+    const ov=document.getElementById('hrOverlay');
+    ov.style.display='flex';
+    if(win){
+      if(typeof adicionarPontosJogo==='function') adicionarPontosJogo(score);
+      if(typeof alunoAtivo!=='undefined'&&alunoAtivo){
+        if(!alunoAtivo.progresso.jogos) alunoAtivo.progresso.jogos={};
+        alunoAtivo.progresso.jogos.caca=true;
+        if(typeof salvarAluno==='function') salvarAluno(alunoAtivo);
+      }
+      ov.innerHTML=`
+        <div style="font-size:clamp(16px,3.5vw,28px);font-weight:900;color:#00FFCC;letter-spacing:3px;margin-bottom:6px;">MISSAO CONCLUIDA</div>
+        <div style="font-size:clamp(9px,1.5vw,11px);color:#3FB950;margin-bottom:4px;letter-spacing:1px;">PC CENTRAL CONECTADO</div>
+        <div style="font-size:clamp(24px,6vw,48px);font-weight:900;color:#FFF;margin:12px 0;">${score}<span style="font-size:0.4em;color:#8B949E;"> PTS</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button onclick="hrStart()" style="background:#3FB950;color:#000;border:none;font-family:inherit;font-size:clamp(11px,2vw,14px);font-weight:900;padding:10px 28px;border-radius:4px;cursor:pointer;letter-spacing:1px;">JOGAR NOVAMENTE</button>
+          <button onclick="goDashboard()" style="background:transparent;color:#8B949E;border:1px solid #30363D;font-family:inherit;font-size:clamp(10px,1.5vw,12px);padding:10px 24px;border-radius:4px;cursor:pointer;letter-spacing:1px;">MENU</button>
+        </div>`;
+    } else {
+      ov.innerHTML=`
+        <div style="font-size:clamp(16px,3.5vw,28px);font-weight:900;color:#DA3633;letter-spacing:3px;margin-bottom:6px;">SISTEMA COMPROMETIDO</div>
+        <div style="font-size:clamp(9px,1.5vw,11px);color:#8B949E;margin-bottom:4px;letter-spacing:1px;">ENERGIA ESGOTADA</div>
+        <div style="font-size:clamp(24px,6vw,48px);font-weight:900;color:#FFF;margin:12px 0;">${score}<span style="font-size:0.4em;color:#8B949E;"> PTS</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button onclick="hrStart()" style="background:#DA3633;color:#FFF;border:none;font-family:inherit;font-size:clamp(11px,2vw,14px);font-weight:900;padding:10px 28px;border-radius:4px;cursor:pointer;letter-spacing:1px;">TENTAR NOVAMENTE</button>
+          <button onclick="goDashboard()" style="background:transparent;color:#8B949E;border:1px solid #30363D;font-family:inherit;font-size:clamp(10px,1.5vw,12px);padding:10px 24px;border-radius:4px;cursor:pointer;letter-spacing:1px;">MENU</button>
+        </div>`;
+    }
+  }
+})();
 
 // =============================================================
 // DESAFIO RELÂMPAGO
@@ -5170,138 +5436,236 @@ let digState = {
 };
 
 // =============================================================
-// GERENCIADOR DE RAM — Jogo de memória educativo
+// GERENCIADOR DE RAM — Arcade Survival
 // =============================================================
-const RAM_PROGRAMAS = [
-  { id:'navegador', nome:'Navegador',   icone:'🌐', mb:512  },
-  { id:'word',      nome:'Word',        icone:'📝', mb:256  },
-  { id:'jogo',      nome:'Jogo',        icone:'🎮', mb:2048 },
-  { id:'video',     nome:'Vídeo 4K',    icone:'🎬', mb:1024 },
-  { id:'antivirus', nome:'Antivírus',   icone:'🛡️', mb:128  },
-  { id:'spotify',   nome:'Música',      icone:'🎵', mb:200  },
-  { id:'camera',    nome:'Webcam',      icone:'📷', mb:300  },
-  { id:'planilha',  nome:'Planilha',    icone:'📊', mb:180  },
-  { id:'editor',    nome:'Foto Editor', icone:'🎨', mb:800  },
-  { id:'chat',      nome:'Chat',        icone:'💬', mb:150  },
+const RAM_TOTAL = 8192; // MB
+const RAM_SLOTS = 16;
+const RAM_PROC_NAMES = [
+  'chrome.exe','firefox.exe','steam.exe','discord.exe','explorer.exe',
+  'photoshop.exe','vlc.exe','spotify.exe','obs.exe','vscode.exe',
+  'word.exe','excel.exe','teams.exe','zoom.exe','minecraft.exe',
+  'outlook.exe','skype.exe','winrar.exe','torrent.exe','cmd.exe',
+  'notepad.exe','paint.exe','powershell.exe','taskhost.exe','svchost.exe',
+];
+const RAM_VIRUS_NAMES = [
+  'trojan.exe','keylogger.exe','worm.bat','adware.exe','ransomware.exe',
+  'spyware.exe','rootkit.sys','malware.exe','backdoor.exe','botnet.exe',
 ];
 
-let ramState = { totalMb: 8192, abertos: {}, pontos: 0, missaoIdx: 0, timerId: null };
-
-const RAM_MISSOES = [
-  { desc: 'Abra o Navegador e o Word ao mesmo tempo.', check: s => s.navegador && s.word },
-  { desc: 'Feche tudo e abra só o Jogo.', check: s => Object.keys(s).length===1 && s.jogo },
-  { desc: 'Abra 4 programas sem travar o PC.', check: s => Object.keys(s).length >= 4 },
-  { desc: 'Abra programas usando menos de 1 GB no total.', check: (s, used) => Object.keys(s).length > 0 && used < 1024 },
-  { desc: 'Abra todos os 10 programas (vai precisar de mais RAM!).', check: s => Object.keys(s).length === 10 },
-];
-
-function ramUsedMb() {
-  return Object.keys(ramState.abertos).reduce((sum, id) => {
-    const p = RAM_PROGRAMAS.find(p => p.id === id);
-    return sum + (p ? p.mb : 0);
-  }, 0);
-}
+let ramArcState = null;
+let ramArcLoop = null;
+let ramArcSpawnTimer = null;
 
 function ramFmt(mb) {
   return mb >= 1024 ? (mb/1024).toFixed(1)+' GB' : mb+' MB';
 }
 
 function iniciarRamGame() {
-  ramState = { totalMb: 8192, abertos: {}, pontos: 0, missaoIdx: 0, timerId: null };
+  clearInterval(ramArcLoop);
+  clearTimeout(ramArcSpawnTimer);
+  ramArcState = {
+    slots: Array.from({length: RAM_SLOTS}, () => null),
+    usedMb: 0,
+    pontos: 0,
+    wave: 1,
+    morto: false,
+    tick: 0,
+    nextPid: 1,
+  };
   showScreen('ram-game');
-  renderRamGame();
+  _ramBuildUI();
+  _ramStartLoop();
+  _ramScheduleSpawn();
 }
 
-function renderRamGame() {
-  const used = ramUsedMb();
-  const pct = Math.min(100, (used / ramState.totalMb) * 100);
-  const missao = RAM_MISSOES[ramState.missaoIdx] || null;
-  const barClass = pct >= 95 ? 'full' : pct >= 75 ? 'warning' : '';
-
-  const programasHtml = RAM_PROGRAMAS.map(p => {
-    const ativo = !!ramState.abertos[p.id];
-    const bloqueado = !ativo && used + p.mb > ramState.totalMb;
-    let cls = 'ram-program'; if (ativo) cls += ' ativo'; if (bloqueado) cls += ' blocked';
-    const statusTxt = ativo ? '● Rodando' : bloqueado ? '⛔ Sem RAM' : '○ Fechado';
-    return `<div class="${cls}" onclick="toggleRamProgram('${p.id}')">
-      <div class="ram-prog-icon">${p.icone}</div>
-      <div class="ram-prog-name">${p.nome}</div>
-      <div class="ram-prog-size">${ramFmt(p.mb)}</div>
-      <div class="ram-prog-status">${statusTxt}</div>
-    </div>`;
-  }).join('');
-
-  const abertosChips = Object.keys(ramState.abertos).map(id => {
-    const p = RAM_PROGRAMAS.find(p => p.id === id);
-    return `<div class="ram-task-chip">${p.icone} ${p.nome} <span class="chip-x" onclick="event.stopPropagation();toggleRamProgram('${id}')">✕</span></div>`;
-  }).join('');
-
-  document.getElementById('ramGameContent').innerHTML = `
-    <div class="ram-bar-wrap">
-      <div class="ram-bar-label">
-        <span>💾 RAM: <strong>${ramFmt(used)}</strong> usados de ${ramFmt(ramState.totalMb)}</span>
-        <span style="color:${pct>=95?'#EF4444':pct>=75?'#F59E0B':'var(--ink-soft)'}">${Math.round(pct)}%</span>
+function _ramBuildUI() {
+  const el = document.getElementById('ramGameContent');
+  const slotsHtml = ramArcState.slots.map((_,i) =>
+    `<div class="ram-slot empty" id="ramSlot${i}"></div>`
+  ).join('');
+  el.innerHTML = `
+    <div class="ram-arcade-wrap" id="ramArcWrap">
+      <div class="ram-hud">
+        <div class="ram-hud-bar-wrap">
+          <div class="ram-hud-bar-label">
+            <span>RAM USO</span>
+            <span id="ramHudPct">0%</span>
+          </div>
+          <div class="ram-hud-bar-track">
+            <div class="ram-hud-bar-fill" id="ramHudBar" style="width:0%"></div>
+          </div>
+          <div style="font-size:10px;color:#8B949E;margin-top:2px;" id="ramHudMb">0 MB / 8.0 GB</div>
+        </div>
+        <div class="ram-hud-stat">
+          <div class="ram-hud-stat-val" id="ramHudPontos">0</div>
+          <div class="ram-hud-stat-lbl">PONTOS</div>
+        </div>
+        <div class="ram-hud-stat">
+          <div class="ram-hud-stat-val" id="ramHudWave">1</div>
+          <div class="ram-hud-stat-lbl">WAVE</div>
+        </div>
+        <button onclick="goDashboard()" style="background:#21262D;border:1px solid #30363D;color:#8B949E;font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;">SAIR</button>
       </div>
-      <div class="ram-bar-track"><div class="ram-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+      <div class="ram-slots" id="ramSlotsGrid">${slotsHtml}</div>
     </div>
-
-    <div class="ram-stats">
-      <div class="ram-stat"><div class="ram-stat-val" style="color:#6366F1">${Object.keys(ramState.abertos).length}</div><div class="ram-stat-label">Programas Abertos</div></div>
-      <div class="ram-stat"><div class="ram-stat-val" style="color:#10B981">${ramFmt(ramState.totalMb - used)}</div><div class="ram-stat-label">RAM Livre</div></div>
-      <div class="ram-stat"><div class="ram-stat-val" style="color:#F59E0B">${ramState.pontos}</div><div class="ram-stat-label">Pontos</div></div>
-    </div>
-
-    ${missao ? `<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:14px;">
-      <span style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#6366F1;display:block;margin-bottom:4px;">MISSÃO ${ramState.missaoIdx+1}/${RAM_MISSOES.length}</span>
-      🎯 ${missao.desc}
-    </div>` : `<div style="background:#D1FAE5;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-weight:700;color:#065F46;">🏆 Todas as missões concluídas! ${ramState.pontos} pontos!</div>`}
-
-    <div id="ramMsg" class="ram-msg"></div>
-    <div class="ram-programs">${programasHtml}</div>
-
-    ${abertosChips ? `<div class="ram-task-bar">${abertosChips}</div>` : ''}
   `;
 }
 
-function toggleRamProgram(id) {
-  const used = ramUsedMb();
-  const p = RAM_PROGRAMAS.find(p => p.id === id);
-  if (!p) return;
+function _ramStartLoop() {
+  ramArcLoop = setInterval(() => {
+    if (!ramArcState || ramArcState.morto) return;
+    ramArcState.tick++;
 
-  if (ramState.abertos[id]) {
-    delete ramState.abertos[id];
-    showRamMsg(`${p.icone} ${p.nome} fechado — liberou ${ramFmt(p.mb)}.`, 'ok');
-  } else {
-    if (used + p.mb > ramState.totalMb) {
-      showRamMsg(`⛔ Sem RAM! Feche um programa antes de abrir ${p.nome}.`, 'erro');
-      return;
+    // Wave progression every 20 seconds (200 ticks at 100ms)
+    const newWave = Math.floor(ramArcState.tick / 200) + 1;
+    if (newWave > ramArcState.wave) {
+      ramArcState.wave = newWave;
+      _ramShowWaveToast(newWave);
+      document.getElementById('ramHudWave').textContent = newWave;
     }
-    ramState.abertos[id] = true;
-    ramState.pontos += Math.round(p.mb / 100);
-    showRamMsg(`✅ ${p.nome} aberto! Usou +${ramFmt(p.mb)} de RAM.`, 'ok');
-    checkRamMissao();
-  }
-  renderRamGame();
+
+    // Each active process consumes more RAM per tick as wave increases
+    let totalUsed = 0;
+    const speedMult = 1 + (ramArcState.wave - 1) * 0.3;
+    ramArcState.slots.forEach((proc, i) => {
+      if (!proc) return;
+      const drainRate = proc.isVirus ? 0.8 * speedMult : 0.3 * speedMult;
+      proc.fill = Math.min(100, proc.fill + drainRate);
+      totalUsed += proc.mb * (proc.fill / 100);
+      _ramUpdateSlotBar(i, proc);
+    });
+
+    ramArcState.usedMb = Math.round(totalUsed);
+    const pct = Math.min(100, (ramArcState.usedMb / RAM_TOTAL) * 100);
+
+    // Update HUD
+    const bar = document.getElementById('ramHudBar');
+    const pctEl = document.getElementById('ramHudPct');
+    const mbEl = document.getElementById('ramHudMb');
+    if (bar) {
+      bar.style.width = pct + '%';
+      bar.className = 'ram-hud-bar-fill' + (pct >= 90 ? ' crit' : pct >= 65 ? ' warn' : '');
+    }
+    if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+    if (mbEl) mbEl.textContent = `${ramFmt(ramArcState.usedMb)} / ${ramFmt(RAM_TOTAL)}`;
+
+    if (pct >= 100) _ramGameOver();
+  }, 100);
 }
 
-function checkRamMissao() {
-  if (ramState.missaoIdx >= RAM_MISSOES.length) return;
-  const missao = RAM_MISSOES[ramState.missaoIdx];
-  const s = ramState.abertos;
-  const used = ramUsedMb();
-  if (missao.check(s, used)) {
-    ramState.pontos += 50;
-    ramState.missaoIdx++;
-    setTimeout(() => { showRamMsg(`🎉 Missão completa! +50 pontos!`, 'ok'); renderRamGame(); }, 300);
-  }
+function _ramScheduleSpawn() {
+  if (!ramArcState || ramArcState.morto) return;
+  const wave = ramArcState.wave || 1;
+  const baseDelay = Math.max(800, 2500 - wave * 180);
+  const delay = baseDelay * (0.7 + Math.random() * 0.6);
+  ramArcSpawnTimer = setTimeout(() => {
+    if (!ramArcState || ramArcState.morto) return;
+    _ramSpawnProcess();
+    _ramScheduleSpawn();
+  }, delay);
 }
 
-function showRamMsg(txt, tipo) {
-  const el = document.getElementById('ramMsg');
+function _ramSpawnProcess() {
+  const freeSlots = ramArcState.slots.map((v,i) => v===null ? i : -1).filter(i=>i>=0);
+  if (freeSlots.length === 0) return;
+  const slotIdx = freeSlots[Math.floor(Math.random() * freeSlots.length)];
+  const wave = ramArcState.wave;
+  const isVirus = Math.random() < Math.min(0.35, 0.05 + wave * 0.04);
+  const names = isVirus ? RAM_VIRUS_NAMES : RAM_PROC_NAMES;
+  const name = names[Math.floor(Math.random() * names.length)];
+  const mbBase = isVirus ? [512, 1024, 2048] : [128, 256, 512, 768, 1024];
+  const mb = mbBase[Math.floor(Math.random() * mbBase.length)];
+
+  const proc = {
+    pid: ramArcState.nextPid++,
+    name,
+    mb,
+    isVirus,
+    fill: 0,
+  };
+  ramArcState.slots[slotIdx] = proc;
+  _ramRenderSlot(slotIdx, proc);
+}
+
+function _ramRenderSlot(i, proc) {
+  const el = document.getElementById('ramSlot' + i);
   if (!el) return;
-  el.textContent = txt; el.className = `ram-msg show ${tipo}`;
-  clearTimeout(ramState._msgTimer);
-  ramState._msgTimer = setTimeout(() => { if(el) el.classList.remove('show'); }, 2500);
+  el.className = 'ram-slot active' + (proc.isVirus ? ' virus' : '');
+  el.onclick = () => _ramKillProcess(i);
+  el.innerHTML = `
+    <div class="ram-slot-pid">PID ${proc.pid}</div>
+    <div class="ram-slot-name" title="${proc.name}">${proc.name}</div>
+    <div class="ram-slot-mb">${ramFmt(proc.mb)}</div>
+    <div class="ram-slot-bar-track"><div class="ram-slot-bar-fill" id="ramSlotBar${i}" style="width:${proc.fill}%"></div></div>
+    <div class="ram-slot-type">${proc.isVirus ? 'VIRUS' : 'PROC'}</div>
+  `;
+}
+
+function _ramUpdateSlotBar(i, proc) {
+  const bar = document.getElementById('ramSlotBar' + i);
+  if (bar) bar.style.width = proc.fill + '%';
+}
+
+function _ramKillProcess(i) {
+  if (!ramArcState || ramArcState.morto) return;
+  const proc = ramArcState.slots[i];
+  if (!proc) return;
+  const el = document.getElementById('ramSlot' + i);
+  if (el) {
+    el.classList.add('killing');
+    el.onclick = null;
+  }
+  const pts = proc.isVirus ? 30 : 10;
+  ramArcState.pontos += pts;
+  document.getElementById('ramHudPontos').textContent = ramArcState.pontos;
+
+  setTimeout(() => {
+    ramArcState.slots[i] = null;
+    const slotEl = document.getElementById('ramSlot' + i);
+    if (slotEl) {
+      slotEl.className = 'ram-slot empty';
+      slotEl.innerHTML = '';
+      slotEl.onclick = null;
+    }
+    // Virus spawns an extra process when killed
+    if (proc.isVirus) {
+      setTimeout(() => _ramSpawnProcess(), 300);
+    }
+  }, 200);
+}
+
+function _ramShowWaveToast(wave) {
+  const old = document.getElementById('ramWaveToast');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'ramWaveToast';
+  el.className = 'ram-wave-toast';
+  el.textContent = `WAVE ${wave}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+
+function _ramGameOver() {
+  if (!ramArcState || ramArcState.morto) return;
+  ramArcState.morto = true;
+  clearInterval(ramArcLoop);
+  clearTimeout(ramArcSpawnTimer);
+
+  const wrap = document.getElementById('ramArcWrap');
+  if (!wrap) return;
+  wrap.style.position = 'relative';
+  const overlay = document.createElement('div');
+  overlay.className = 'ram-gameover-overlay';
+  overlay.innerHTML = `
+    <div class="ram-go-title">RAM CHEIA</div>
+    <div class="ram-go-sub">O sistema travou na wave ${ramArcState.wave}</div>
+    <div class="ram-go-score">${ramArcState.pontos} pts</div>
+    <div class="ram-go-btns">
+      <button class="ram-go-btn" onclick="iniciarRamGame()">REINICIAR</button>
+      <button class="ram-go-btn secondary" onclick="goDashboard()">SAIR</button>
+    </div>
+  `;
+  wrap.appendChild(overlay);
 }
 
 function abrirMenuDigitacao() {
