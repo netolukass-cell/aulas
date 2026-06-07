@@ -115,40 +115,64 @@
      HOME — Hero + alunos
      ============================ */
   .home-hero {
-    display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px;
-    align-items: center; padding: 48px; background: var(--bg-2);
-    border-radius: 28px; box-shadow: var(--shadow-sm);
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px;
+    align-items: center; padding: 56px 60px;
+    background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+    border-radius: 28px; box-shadow: 0 32px 80px -16px rgba(99,102,241,0.35);
     margin-bottom: 40px; position: relative; overflow: hidden;
   }
   .home-hero::before {
-    content: ""; position: absolute; top: -120px; right: -120px;
-    width: 420px; height: 420px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(99,102,241,0.08), transparent 70%);
+    content: ""; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1' fill='white' opacity='0.06'/%3E%3Ccircle cx='0' cy='0' r='1' fill='white' opacity='0.04'/%3E%3Ccircle cx='60' cy='60' r='1' fill='white' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .home-hero::after {
+    content: ""; position: absolute; top: -200px; right: -100px;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,0.25), transparent 65%);
     pointer-events: none;
   }
   .home-tag {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 14px; background: var(--ink); color: white;
-    border-radius: var(--radius-pill); font-size: 12px; font-weight: 700;
-    letter-spacing: 1.8px; margin-bottom: 18px; position: relative; z-index: 1;
+    padding: 6px 14px; background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px); color: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; margin-bottom: 20px; position: relative; z-index: 1;
   }
   .home-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 56px; font-weight: 800; line-height: 1.05;
-    letter-spacing: -1.8px; margin-bottom: 14px;
-    background: linear-gradient(135deg, #0F172A 0%, #6366F1 100%);
+    font-size: 58px; font-weight: 900; line-height: 1.0;
+    letter-spacing: -2px; margin-bottom: 18px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #C7D2FE 60%, #A5B4FC 100%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; position: relative; z-index: 1;
   }
   .home-sub {
-    font-size: 17px; color: var(--ink-soft); max-width: 460px;
-    line-height: 1.55; position: relative; z-index: 1;
+    font-size: 16px; color: rgba(255,255,255,0.65); max-width: 420px;
+    line-height: 1.65; position: relative; z-index: 1; margin-bottom: 28px;
+  }
+  .home-hero-stats {
+    display: flex; gap: 24px; position: relative; z-index: 1;
+  }
+  .home-hero-stat {
+    text-align: center;
+  }
+  .home-hero-stat-val {
+    font-size: 24px; font-weight: 900; color: white;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .home-hero-stat-label {
+    font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 1px;
+  }
+  .home-hero-divider {
+    width: 1px; background: rgba(255,255,255,0.15); align-self: stretch;
   }
   .home-illustration {
     position: relative; display: flex; align-items: center; justify-content: center;
-    min-height: 240px;
+    min-height: 240px; z-index: 1;
   }
-  .home-illustration svg { width: 100%; max-width: 300px; }
+  .home-illustration svg { width: 100%; max-width: 320px; filter: drop-shadow(0 24px 48px rgba(99,102,241,0.4)); }
 
   .section-titulo {
     font-size: 11px; font-weight: 800; letter-spacing: 2.5px;
@@ -376,15 +400,50 @@
     gap: 18px;
   }
   .modulo-card {
-    background: var(--bg-2); border-radius: var(--radius); padding: 24px;
-    box-shadow: var(--shadow-sm); cursor: pointer;
-    transition: all 0.25s ease; position: relative; overflow: hidden;
+    background: var(--bg-2); border-radius: var(--radius); padding: 0;
+    box-shadow: var(--shadow); cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden;
     border: 1px solid var(--line);
   }
   .modulo-card:hover {
-    transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: transparent;
+    transform: translateY(-6px); box-shadow: 0 24px 48px -12px rgba(99,102,241,0.2); border-color: transparent;
   }
-  .modulo-card.locked { opacity: 0.5; cursor: not-allowed; }
+  .modulo-card-banner {
+    height: 100px; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; padding: 20px 24px;
+  }
+  .modulo-card[data-m="hardware"] .modulo-card-banner { background: linear-gradient(135deg,#F97316,#EA580C); }
+  .modulo-card[data-m="software"] .modulo-card-banner { background: linear-gradient(135deg,#6366F1,#4338CA); }
+  .modulo-card[data-m="navegadores"] .modulo-card-banner { background: linear-gradient(135deg,#06B6D4,#0284C7); }
+  .modulo-card[data-m="antivirus"] .modulo-card-banner { background: linear-gradient(135deg,#10B981,#047857); }
+  .modulo-card-banner-num {
+    font-size: 72px; font-weight: 900; color: rgba(255,255,255,0.12);
+    font-family: 'Plus Jakarta Sans',sans-serif; line-height: 1; letter-spacing: -4px;
+    position: absolute; right: 16px; bottom: -10px;
+  }
+  .modulo-card-icon-wrap {
+    width: 52px; height: 52px; border-radius: 16px;
+    background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.3); font-size: 26px;
+  }
+  .modulo-card-status {
+    background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3); border-radius: var(--radius-pill);
+    color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; letter-spacing: 0.5px;
+    align-self: flex-start;
+  }
+  .modulo-card-body { padding: 20px 24px 22px; }
+  .modulo-card-num { font-size: 11px; font-weight: 700; color: var(--ink-light); letter-spacing: 1.5px; margin-bottom: 4px; text-transform: uppercase; }
+  .modulo-card-title { font-size: 19px; font-weight: 800; font-family: 'Plus Jakarta Sans',sans-serif; margin-bottom: 6px; color: var(--ink); }
+  .modulo-card-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 14px; }
+  .modulo-card-score-bar { height: 5px; background: var(--bg-soft); border-radius: 3px; overflow: hidden; }
+  .modulo-card-score-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .modulo-card[data-m="hardware"] .modulo-card-score-fill { background: linear-gradient(90deg,#F97316,#FBBF24); }
+  .modulo-card[data-m="software"] .modulo-card-score-fill { background: linear-gradient(90deg,#6366F1,#818CF8); }
+  .modulo-card[data-m="navegadores"] .modulo-card-score-fill { background: linear-gradient(90deg,#06B6D4,#38BDF8); }
+  .modulo-card[data-m="antivirus"] .modulo-card-score-fill { background: linear-gradient(90deg,#10B981,#34D399); }
+  .modulo-card.locked { opacity: 0.6; cursor: not-allowed; }
   .modulo-card.locked:hover { transform: none; box-shadow: var(--shadow-sm); border-color: var(--line); }
   .modulo-card.done { border-left: 4px solid var(--green); }
 
@@ -1388,6 +1447,22 @@
         </div>
         <h1 class="home-title">Aulas de<br>Informática</h1>
         <p class="home-sub">Aprenda no seu ritmo com módulos, quizzes, jogos e desafios. Suba no ranking e ganhe medalhas.</p>
+        <div class="home-hero-stats">
+          <div class="home-hero-stat">
+            <div class="home-hero-stat-val">4</div>
+            <div class="home-hero-stat-label">MÓDULOS</div>
+          </div>
+          <div class="home-hero-divider"></div>
+          <div class="home-hero-stat">
+            <div class="home-hero-stat-val">10+</div>
+            <div class="home-hero-stat-label">JOGOS</div>
+          </div>
+          <div class="home-hero-divider"></div>
+          <div class="home-hero-stat">
+            <div class="home-hero-stat-val">3</div>
+            <div class="home-hero-stat-label">NÍVEIS</div>
+          </div>
+        </div>
       </div>
       <div class="home-illustration">
         <svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
@@ -3133,16 +3208,23 @@ function renderDashboard() {
     };
 
     const onClick = liberado ? `onclick="iniciarModulo('${m}')"` : "";
+    const scorePct = prog.quizDone ? Math.round((prog.quizScore/prog.quizTotal)*100) : 0;
     html += `
-      <div class="${classes}" ${onClick}>
-        <div class="modulo-num">${i + 1}</div>
-        <div class="modulo-icon-wrap" data-i="${i}">
-          <iconify-icon icon="${iconName}"></iconify-icon>
+      <div class="${classes}" data-m="${m}" ${onClick}>
+        <div class="modulo-card-banner">
+          <span class="modulo-card-banner-num">0${i+1}</span>
+          <div class="modulo-card-icon-wrap"><iconify-icon icon="${iconName}"></iconify-icon></div>
+          ${decoSVG[m] || ""}
         </div>
-        <div class="modulo-title">${mod.titulo}</div>
-        <div class="modulo-desc">${mod.desc}</div>
-        ${statusHtml}
-        ${decoSVG[m] || ""}
+        <div class="modulo-card-body">
+          <div class="modulo-card-num">MÓDULO ${i+1}</div>
+          <div class="modulo-card-title">${mod.titulo}</div>
+          <div class="modulo-card-desc">${mod.desc}</div>
+          ${statusHtml}
+          <div class="modulo-card-score-bar" style="margin-top:12px;" title="${scorePct}% no quiz">
+            <div class="modulo-card-score-fill" style="width:${scorePct}%"></div>
+          </div>
+        </div>
       </div>`;
   });
   grid.innerHTML = html;
@@ -6228,7 +6310,7 @@ function atualizarTimerDisplay() {
   const t = rankeadaState.tempoRestante;
   const el = document.getElementById('rankeadaTimer');
   if (!el) return;
-  el.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+  const ts = Math.floor(t); el.textContent = `${Math.floor(ts/60)}:${String(ts%60).padStart(2,'0')}`;
   const pct = t / rankeadaState.tempoTotal;
   el.style.color = pct < 0.2 ? '#EF4444' : pct < 0.4 ? '#F59E0B' : 'var(--ink)';
   const barra = document.getElementById('rankeadaTimerBar');
