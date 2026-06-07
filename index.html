@@ -4602,7 +4602,7 @@ function renderTextoDigitacao() {
     if (c === ' ') cls += ' space';
     if (i < digState.pos) cls += ' done';
     else if (i === digState.pos) cls += ' current';
-    const display = c === ' ' ? '·' : escapeHtml(c);
+    const display = c === ' ' ? ' ' : escapeHtml(c);
     return `<span class="${cls}" data-i="${i}">${display}</span>`;
   }).join('');
   const box = document.getElementById('digTextoBox');
@@ -6211,7 +6211,7 @@ function renderTextoRankeada() {
     if (c===' ') cls+=' space';
     if (i < rankeadaState.pos) cls+=' done';
     else if (i===rankeadaState.pos) cls+=' current';
-    const disp = c==='\n' ? '↵<br>' : (c===' ' ? '·' : escapeHtml(c));
+    const disp = c==='\n' ? '↵<br>' : (c===' ' ? ' ' : escapeHtml(c));
     return `<span class="${cls}" data-i="${i}">${disp}</span>`;
   }).join('');
   const box = document.getElementById('rankeadaTextoBox');
