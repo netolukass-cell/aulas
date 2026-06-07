@@ -2073,6 +2073,14 @@
     </div>
 
     <div class="dig-texto-box" id="rankeadaTextoBox" style="border-radius:16px;border:2px solid var(--line);background:var(--bg-2);"></div>
+    <div class="teclado-virtual" id="rankeadaTeclado" style="margin-top:14px;"></div>
+    <div class="teclado-legenda" id="rankeadaTecladoLegenda" style="display:none;">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
     <div id="rankeadaResultado"></div>
   </div>
 </div>
@@ -6321,6 +6329,7 @@ function iniciarRankeada(textoId) {
   document.getElementById('rankeadaTopTitle').textContent = `⏱️ ${texto.titulo}`;
   document.getElementById('rankeadaResultado').innerHTML = '';
   renderTextoRankeada();
+  renderTecladoRankeada();
   atualizarTimerDisplay();
   showScreen('digitacao-rankeada');
   document.addEventListener('keydown', listenerRankeada);
@@ -6343,6 +6352,47 @@ function renderTextoRankeada() {
     const target = cur.offsetTop - (box.clientHeight / 2) + (cur.offsetHeight / 2);
     box.scrollTop = Math.max(0, target);
   }
+}
+
+function renderTecladoRankeada() {
+  const linhas = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L','Ç'],
+    ['Z','X','C','V','B','N','M']
+  ];
+  let html = '';
+  linhas.forEach((linha, li) => {
+    html += '<div class="teclado-linha">';
+    if (li === 1) html += '<div class="tecla wide-1.5">Caps</div>';
+    if (li === 2) html += '<div class="tecla wide-2">Shift</div>';
+    linha.forEach(letra => {
+      const finger = FINGER_MAP[letra.toLowerCase()] || '';
+      html += `<div class="tecla" data-tecla="${letra.toLowerCase()}" data-rkd="1" data-finger="${finger}">${letra}</div>`;
+    });
+    if (li === 1) html += '<div class="tecla wide-1.5">Enter</div>';
+    if (li === 2) html += '<div class="tecla wide-2">Shift</div>';
+    html += '</div>';
+  });
+  html += '<div class="teclado-linha"><div class="tecla wide-3" data-tecla=" " data-rkd="1" data-finger="5">Espaço</div></div>';
+  const el = document.getElementById('rankeadaTeclado');
+  if (el) { el.innerHTML = html; }
+  const leg = document.getElementById('rankeadaTecladoLegenda');
+  if (leg) leg.style.display = 'flex';
+  destacarProximaTeclaRankeada();
+}
+
+function destacarProximaTeclaRankeada() {
+  document.querySelectorAll('.tecla[data-rkd]').forEach(t => t.classList.remove('next'));
+  if (!rankeadaState.texto || rankeadaState.pos >= rankeadaState.texto.texto.length) return;
+  const proxChar = rankeadaState.texto.texto[rankeadaState.pos].toLowerCase();
+  document.querySelectorAll(`.tecla[data-rkd][data-tecla="${proxChar}"]`).forEach(t => t.classList.add('next'));
+}
+
+function flashTeclaRankeada(char) {
+  const t = document.querySelector(`.tecla[data-rkd][data-tecla="${char.toLowerCase()}"]`);
+  if (!t) return;
+  t.classList.add('pressed');
+  setTimeout(() => t.classList.remove('pressed'), 120);
 }
 
 function atualizarTimerDisplay() {
@@ -6380,6 +6430,7 @@ function listenerRankeada(e) {
   const texto = rankeadaState.texto.texto;
   const esperado = texto[rankeadaState.pos];
   const digitado = isEnter ? '\n' : e.key;
+  flashTeclaRankeada(digitado);
   const certo = normalizarChar(esperado)===normalizarChar(digitado) || (esperado==='\n' && isEnter);
   const spans = document.querySelectorAll('#rankeadaTextoBox .dig-char');
   if (certo) {
@@ -6388,6 +6439,7 @@ function listenerRankeada(e) {
     rankeadaState.pos++;
     if (rankeadaState.pos>=texto.length) { finalizarRankeada(true); return; }
     spans[rankeadaState.pos]?.classList.add('current');
+    destacarProximaTeclaRankeada();
     // bônus de tempo por acerto
     const bon = rankeadaState.cfg?.bonus || 0;
     if (bon > 0) {
