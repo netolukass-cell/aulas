@@ -1354,25 +1354,18 @@ class EndScene extends Phaser.Scene {
    Config e inicialização
 ═══════════════════════════════════════════════════════════════ */
 const game = new Phaser.Game({
-  type: Phaser.AUTO,
-  width:  GW,
-  height: GH,
+  type:            Phaser.AUTO,
   backgroundColor: '#020810',
-  parent: 'gameContainer',
   physics: {
     default: 'arcade',
-    arcade: { gravity:{ y:0 }, debug:false },
+    arcade:  { gravity:{ y:0 }, debug:false },
   },
   scale: {
     mode:       Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    parent:     'gameContainer',
+    width:      GW,
+    height:     GH,
   },
   scene: [StartScene, GameScene, EndScene],
-  // Inicializar coyoteTime no GameScene
-  callbacks: {
-    postBoot: (g) => {
-      // Garante que o canvas preenche o container
-      g.scale.on('resize', () => g.canvas.style.display = 'block');
-    }
-  }
 });
