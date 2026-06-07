@@ -994,40 +994,79 @@
     font-family: Georgia, "Times New Roman", serif; border: 1px solid var(--line);
   }
 
-  /* ===== RAM Game ===== */
-  .ram-bar-wrap { background: var(--bg-2); border-radius: 16px; padding: 20px 24px; border: 1px solid var(--line); margin-bottom: 18px; }
-  .ram-bar-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
-  .ram-bar-track { height: 20px; background: var(--bg-soft); border-radius: 10px; overflow: hidden; }
-  .ram-bar-fill { height: 100%; border-radius: 10px; transition: width 0.4s ease, background 0.4s; background: linear-gradient(90deg,#6366F1,#8B5CF6); }
-  .ram-bar-fill.warning { background: linear-gradient(90deg,#F59E0B,#EF4444); }
-  .ram-bar-fill.full { background: linear-gradient(90deg,#EF4444,#DC2626); animation: ramPulse 0.5s ease infinite alternate; }
-  @keyframes ramPulse { from { opacity:1; } to { opacity:0.6; } }
-  .ram-stats { display: flex; gap: 16px; margin-bottom: 18px; }
-  .ram-stat { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; flex: 1; text-align: center; }
-  .ram-stat-val { font-size: 22px; font-weight: 900; font-family: 'Plus Jakarta Sans',sans-serif; }
-  .ram-stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--ink-soft); text-transform: uppercase; }
-  .ram-programs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-  .ram-program {
-    background: var(--bg-2); border: 2px solid var(--line); border-radius: 14px;
-    padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative;
-    user-select: none;
+  /* ===== RAM Arcade Game ===== */
+  @keyframes ramPulse { from { opacity:1; } to { opacity:0.5; } }
+  @keyframes ramSpawn { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
+  @keyframes ramKill  { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(1.3); } }
+
+  .ram-arcade-wrap {
+    display: flex; flex-direction: column; height: calc(100vh - 60px);
+    background: #0D1117; color: #E6EDF3; font-family: 'JetBrains Mono', 'Courier New', monospace;
+    padding: 12px 16px; box-sizing: border-box; user-select: none;
   }
-  .ram-program:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .ram-program.ativo { border-color: #6366F1; background: rgba(99,102,241,0.08); }
-  .ram-program.ativo .ram-prog-status { color: #6366F1; }
-  .ram-program.blocked { opacity: 0.5; cursor: not-allowed; }
-  .ram-prog-icon { font-size: 32px; margin-bottom: 6px; }
-  .ram-prog-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-  .ram-prog-size { font-size: 11px; color: var(--ink-soft); font-weight: 600; }
-  .ram-prog-status { font-size: 10px; font-weight: 800; letter-spacing: 1px; margin-top: 6px; color: var(--ink-light); text-transform: uppercase; }
-  .ram-msg { text-align: center; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; margin-bottom: 14px; display: none; }
-  .ram-msg.show { display: block; }
-  .ram-msg.ok { background: #D1FAE5; color: #065F46; }
-  .ram-msg.erro { background: var(--red-soft); color: #7F1D1D; }
-  .ram-task-bar { background: var(--bg-2); border-top: 1px solid var(--line); padding: 10px 16px; border-radius: 0 0 16px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
-  .ram-task-chip { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; color: #4338CA; display: flex; align-items: center; gap: 6px; }
-  .ram-task-chip .chip-x { cursor: pointer; opacity: 0.6; }
-  .ram-task-chip .chip-x:hover { opacity: 1; }
+  .ram-hud {
+    display: grid; grid-template-columns: 1fr auto auto auto; gap: 12px; align-items: center;
+    background: #161B22; border: 1px solid #30363D; border-radius: 10px;
+    padding: 10px 16px; margin-bottom: 12px; flex-shrink: 0;
+  }
+  .ram-hud-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .ram-hud-bar-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #8B949E; }
+  .ram-hud-bar-track { height: 14px; background: #21262D; border-radius: 7px; overflow: hidden; border: 1px solid #30363D; }
+  .ram-hud-bar-fill { height: 100%; border-radius: 7px; transition: width 0.15s linear, background 0.3s; background: #238636; }
+  .ram-hud-bar-fill.warn { background: #D29922; }
+  .ram-hud-bar-fill.crit { background: #DA3633; animation: ramPulse 0.3s ease infinite alternate; }
+  .ram-hud-stat { background: #21262D; border: 1px solid #30363D; border-radius: 8px; padding: 6px 14px; text-align: center; min-width: 70px; }
+  .ram-hud-stat-val { font-size: 18px; font-weight: 900; color: #58A6FF; line-height: 1; }
+  .ram-hud-stat-lbl { font-size: 9px; letter-spacing: 1.5px; color: #8B949E; text-transform: uppercase; margin-top: 2px; }
+
+  .ram-slots {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    flex: 1; overflow-y: auto; align-content: start;
+  }
+  .ram-slot {
+    background: #161B22; border: 1px solid #30363D; border-radius: 8px;
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;
+    cursor: default; position: relative; min-height: 110px;
+  }
+  .ram-slot.active {
+    border-color: #388BFD; cursor: pointer; animation: ramSpawn 0.2s ease;
+  }
+  .ram-slot.active:hover { background: #1C2128; border-color: #58A6FF; }
+  .ram-slot.active.virus { border-color: #DA3633; }
+  .ram-slot.active.virus:hover { background: #1C0E0E; }
+  .ram-slot.killing { animation: ramKill 0.2s ease forwards; pointer-events: none; }
+  .ram-slot.empty { border-style: dashed; opacity: 0.2; }
+  .ram-slot-pid { font-size: 9px; color: #8B949E; letter-spacing: 1px; }
+  .ram-slot-name { font-size: 12px; font-weight: 700; color: #E6EDF3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ram-slot.virus .ram-slot-name { color: #FF7B72; }
+  .ram-slot-mb { font-size: 10px; color: #8B949E; }
+  .ram-slot-bar-track { height: 6px; background: #21262D; border-radius: 3px; overflow: hidden; }
+  .ram-slot-bar-fill { height: 100%; border-radius: 3px; background: #388BFD; transition: width 0.15s linear; }
+  .ram-slot.virus .ram-slot-bar-fill { background: #DA3633; }
+  .ram-slot-type { font-size: 9px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
+  .ram-slot.virus .ram-slot-type { color: #FF7B72; }
+  .ram-slot:not(.virus) .ram-slot-type { color: #3FB950; }
+
+  .ram-gameover-overlay {
+    position: absolute; inset: 0; background: rgba(13,17,23,0.96);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; z-index: 10;
+  }
+  .ram-go-title { font-size: 32px; font-weight: 900; color: #DA3633; letter-spacing: 2px; }
+  .ram-go-sub { font-size: 14px; color: #8B949E; }
+  .ram-go-score { font-size: 48px; font-weight: 900; color: #58A6FF; }
+  .ram-go-btns { display: flex; gap: 10px; }
+  .ram-go-btn { background: #238636; border: 1px solid #2EA043; color: white; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 14px; font-weight: 700; padding: 10px 28px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; }
+  .ram-go-btn:hover { background: #2EA043; }
+  .ram-go-btn.secondary { background: #21262D; border-color: #30363D; color: #E6EDF3; }
+  .ram-go-btn.secondary:hover { background: #30363D; }
+  .ram-wave-toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: #161B22; border: 1px solid #388BFD; border-radius: 8px;
+    padding: 8px 24px; font-size: 13px; font-weight: 700; color: #58A6FF;
+    letter-spacing: 2px; z-index: 999; animation: ramSpawn 0.3s ease;
+    pointer-events: none;
+  }
 
   /* ===== Pratique menu ===== */
   .pratique-grid {
@@ -1952,9 +1991,33 @@
       </div>
     </div>
 
+    <!-- DIGITAÇÃO em destaque no topo -->
+    <div onclick="abrirMenuDigitacao()" style="cursor:pointer;background:linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%);border-radius:20px;padding:28px 36px;display:flex;align-items:center;gap:32px;margin-bottom:32px;box-shadow:0 20px 60px -12px rgba(99,102,241,0.45);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.25),transparent 65%);pointer-events:none;"></div>
+      <svg width="72" height="72" viewBox="0 0 80 80" fill="none" style="flex-shrink:0;">
+        <rect width="80" height="80" rx="20" fill="rgba(255,255,255,0.08)"/>
+        <rect x="10" y="20" width="60" height="40" rx="6" fill="none" stroke="white" stroke-width="2"/>
+        <rect x="14" y="24" width="9" height="8" rx="2" fill="#6366F1"/>
+        <rect x="26" y="24" width="9" height="8" rx="2" fill="#F97316"/>
+        <rect x="38" y="24" width="9" height="8" rx="2" fill="#10B981"/>
+        <rect x="50" y="24" width="9" height="8" rx="2" fill="#6366F1"/>
+        <rect x="14" y="35" width="9" height="8" rx="2" fill="rgba(255,255,255,0.2)"/>
+        <rect x="26" y="35" width="9" height="8" rx="2" fill="#FBBF24"/>
+        <rect x="38" y="35" width="9" height="8" rx="2" fill="#FBBF24"/>
+        <rect x="50" y="35" width="9" height="8" rx="2" fill="rgba(255,255,255,0.2)"/>
+        <rect x="18" y="46" width="44" height="8" rx="2" fill="rgba(255,255,255,0.15)"/>
+      </svg>
+      <div style="flex:1;position:relative;z-index:1;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;color:rgba(255,255,255,0.45);margin-bottom:6px;">ATIVIDADE PRINCIPAL</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:900;color:#fff;line-height:1;margin-bottom:8px;">Digitação</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.5;">Lições por fileira · Treino livre · Ranqueado com ranking da turma</div>
+      </div>
+      <div style="flex-shrink:0;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 20px;font-size:14px;font-weight:700;color:#fff;position:relative;z-index:1;">Entrar →</div>
+    </div>
+
     <div class="section-titulo">
       <iconify-icon icon="ph:book-open-bold"></iconify-icon>
-      MATÉRIA — ESTUDE E FAÇA O QUIZ DE CADA MÓDULO
+      MATÉRIA — MÓDULOS
     </div>
     <div class="modulos-grid" id="modulosGrid"></div>
 
@@ -1965,48 +2028,13 @@
     <div class="prova-card" id="provaCard" onclick="iniciarProva()">
       <div class="prova-icon">🏆</div>
       <div class="prova-title">Prova Final</div>
-      <div class="prova-desc">Você só desbloqueia a prova após completar todos os 4 módulos com pelo menos 50% de acerto.</div>
+      <div class="prova-desc">Você só desbloqueia a prova após completar todos os módulos com pelo menos 50% de acerto.</div>
       <div class="prova-status" id="provaStatus">🔒 BLOQUEADA</div>
     </div>
 
     <div class="section-titulo">
-      <iconify-icon icon="ph:keyboard-bold"></iconify-icon>
-      ⌨️ DIGITAÇÃO — FOCO PRINCIPAL
-    </div>
-    <div class="pratique-grid">
-      <div class="pratique-card" onclick="abrirMenuDigitacao()" style="grid-column: 1/-1; background: linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%); color:white; border:none; display:flex; align-items:center; gap:28px; padding:32px; box-shadow: 0 20px 60px -12px rgba(99,102,241,0.5)">
-        <div style="flex-shrink:0;">
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect width="80" height="80" rx="20" fill="rgba(255,255,255,0.1)"/>
-            <rect x="12" y="22" width="56" height="36" rx="6" fill="none" stroke="white" stroke-width="2"/>
-            <rect x="16" y="26" width="8" height="7" rx="2" fill="#6366F1"/>
-            <rect x="26" y="26" width="8" height="7" rx="2" fill="#F97316"/>
-            <rect x="36" y="26" width="8" height="7" rx="2" fill="#10B981"/>
-            <rect x="46" y="26" width="8" height="7" rx="2" fill="#6366F1"/>
-            <rect x="56" y="26" width="8" height="7" rx="2" fill="#F97316"/>
-            <rect x="16" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-            <rect x="26" y="36" width="8" height="7" rx="2" fill="#FBBF24"/>
-            <rect x="36" y="36" width="8" height="7" rx="2" fill="#FBBF24"/>
-            <rect x="46" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-            <rect x="56" y="36" width="8" height="7" rx="2" fill="rgba(255,255,255,0.3)"/>
-            <rect x="20" y="46" width="40" height="7" rx="2" fill="rgba(255,255,255,0.2)"/>
-          </svg>
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:11px;font-weight:800;letter-spacing:2px;opacity:0.6;margin-bottom:4px;">MÓDULO PRINCIPAL</div>
-          <div class="pratique-title" style="color:white;font-size:26px;margin-bottom:6px;">Digitação</div>
-          <div class="pratique-desc" style="color:rgba(255,255,255,0.7);font-size:15px;">Aprenda a digitar de verdade — lições por fileira, treino livre e modo ranqueado com ranking da turma.</div>
-        </div>
-        <div style="flex-shrink:0;text-align:center;">
-          <div style="font-size:42px;font-weight:900;color:#FBBF24;font-family:'Plus Jakarta Sans',sans-serif;line-height:1;">→</div>
-          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;opacity:0.6;margin-top:4px;">ENTRAR</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-titulo">
       <iconify-icon icon="ph:game-controller-bold"></iconify-icon>
-      🎮 JOGOS E ATIVIDADES
+      JOGOS E ATIVIDADES
     </div>
     <div class="pratique-grid">
       <div class="pratique-card" onclick="goPaint()">
@@ -2014,100 +2042,47 @@
         <div class="pratique-title">Desenho</div>
         <div class="pratique-desc">Estilo Paint. Pincéis, formas, baldinho de tinta, desfazer e mais.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="28" stroke="currentColor" stroke-width="2"/>
-          <path d="M28 52 Q36 28 52 30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="52" cy="28" r="4" fill="currentColor" opacity="0.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="goWord()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:text-aa-bold"></iconify-icon></div>
-        <div class="pratique-title">Texto</div>
-        <div class="pratique-desc">Editor estilo Word. Escreva textos com formatação e baixe o arquivo.</div>
+        <div class="pratique-title">Editor de Texto</div>
+        <div class="pratique-desc">Estilo Word. Escreva com formatação e salve o arquivo.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="6" width="52" height="68" rx="4" stroke="currentColor" stroke-width="2"/>
-          <line x1="18" y1="22" x2="54" y2="22" stroke="currentColor" stroke-width="2"/>
-          <line x1="18" y1="32" x2="50" y2="32" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="18" y1="40" x2="46" y2="40" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="18" y1="48" x2="52" y2="48" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="18" y1="56" x2="38" y2="56" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarJogoMemoria()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:cards-three-bold"></iconify-icon></div>
         <div class="pratique-title">Jogo da Memória</div>
-        <div class="pratique-desc">Encontre os pares de informática. Quanto menos jogadas, mais pontos!</div>
+        <div class="pratique-desc">Encontre os pares de informática. Menos jogadas = mais pontos.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
-          <rect x="10" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
-          <rect x="42" y="4" width="34" height="46" rx="4" stroke="currentColor" stroke-width="2"/>
-          <rect x="48" y="14" width="22" height="22" rx="3" fill="currentColor" opacity="0.15"/>
-          <line x1="4" y1="58" x2="38" y2="58" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="42" y1="58" x2="76" y2="58" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarCacaHardware()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:target-bold"></iconify-icon></div>
         <div class="pratique-title">Caça-Hardware</div>
-        <div class="pratique-desc">Apareceu o nome? Acha o ícone certo antes do tempo acabar!</div>
+        <div class="pratique-desc">Nome apareceu? Acha o ícone certo antes do tempo acabar.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
-          <circle cx="40" cy="40" r="20" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="40" cy="40" r="10" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="40" cy="40" r="3" fill="currentColor" opacity="0.5"/>
-          <line x1="40" y1="6" x2="40" y2="14" stroke="currentColor" stroke-width="2"/>
-          <line x1="40" y1="66" x2="40" y2="74" stroke="currentColor" stroke-width="2"/>
-          <line x1="6" y1="40" x2="14" y2="40" stroke="currentColor" stroke-width="2"/>
-          <line x1="66" y1="40" x2="74" y2="40" stroke="currentColor" stroke-width="2"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarRelampago()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:lightning-bold"></iconify-icon></div>
         <div class="pratique-title">Desafio Relâmpago</div>
-        <div class="pratique-desc">60 segundos pra acertar o máximo que conseguir. Vale pontos extras!</div>
+        <div class="pratique-desc">60 segundos pra acertar o máximo. Vale pontos extras.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="2"/>
-          <polyline points="40,14 40,42 52,42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="40" cy="40" r="3" fill="currentColor" opacity="0.5"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarAtiradorPalavras()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
-        <div class="pratique-desc">Palavras voam pela tela! Digite rápido pra destruir os balões antes que cheguem ao fim!</div>
+        <div class="pratique-desc">Palavras voam pela tela — digite rápido antes que cheguem ao fim.</div>
         <div class="pratique-arrow">→</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="40" cy="28" rx="18" ry="16" stroke="currentColor" stroke-width="2"/>
-          <line x1="40" y1="44" x2="40" y2="60" stroke="currentColor" stroke-width="2"/>
-          <path d="M26 60 Q40 54 54 60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="14" y1="18" x2="6" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="66" y1="18" x2="74" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
       </div>
       <div class="pratique-card" onclick="iniciarRedePuzzle()" style="background:linear-gradient(135deg,#0F172A,#1E293B);color:white;border:none;">
         <div class="pratique-icon-wrap" style="background:rgba(99,102,241,0.2);"><iconify-icon icon="ph:graph-bold" style="color:#818CF8;"></iconify-icon></div>
         <div class="pratique-title" style="color:white;">Reparar a Rede</div>
-        <div class="pratique-desc" style="color:#94A3B8;">Vírus infectou a rede! Responda perguntas para consertar os nós e salvar o sistema.</div>
-        <svg class="pratique-preview" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.2;">
-          <circle cx="40" cy="40" r="8" stroke="white" stroke-width="2"/>
-          <circle cx="14" cy="24" r="6" stroke="white" stroke-width="1.5"/>
-          <circle cx="66" cy="24" r="6" stroke="white" stroke-width="1.5"/>
-          <circle cx="14" cy="56" r="6" stroke="white" stroke-width="1.5"/>
-          <circle cx="66" cy="56" r="6" stroke="white" stroke-width="1.5"/>
-          <line x1="20" y1="27" x2="34" y2="36" stroke="white" stroke-width="1.5"/>
-          <line x1="60" y1="27" x2="46" y2="36" stroke="white" stroke-width="1.5"/>
-          <line x1="20" y1="53" x2="34" y2="44" stroke="white" stroke-width="1.5"/>
-          <line x1="60" y1="53" x2="46" y2="44" stroke="white" stroke-width="1.5"/>
-        </svg>
+        <div class="pratique-desc" style="color:#94A3B8;">Vírus infectou a rede. Responda perguntas para salvar os nós.</div>
+        <div class="pratique-arrow" style="color:white;">→</div>
       </div>
       <div class="pratique-card" onclick="iniciarRamGame()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:memory-bold"></iconify-icon></div>
         <div class="pratique-title">Gerenciador de RAM</div>
-        <div class="pratique-desc">Abra e feche programas sem travar o PC. Aprenda quanto cada coisa usa de memória!</div>
+        <div class="pratique-desc">Processos invadem a memória — mate-os antes de travar o sistema.</div>
         <div class="pratique-arrow">→</div>
       </div>
     </div>
@@ -2504,14 +2479,8 @@
 </div>
 
 <!-- ====================== GERENCIADOR DE RAM ====================== -->
-<div class="screen" id="screen-ram-game">
-  <div class="container-narrow">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Sair</button>
-      <div class="top-bar-title">🧠 Gerenciador de RAM</div>
-    </div>
-    <div id="ramGameContent"></div>
-  </div>
+<div class="screen" id="screen-ram-game" style="padding:0;position:relative;">
+  <div id="ramGameContent" style="height:100%;"></div>
 </div>
 
 <!-- ====================== PAINT ====================== -->
@@ -5170,138 +5139,236 @@ let digState = {
 };
 
 // =============================================================
-// GERENCIADOR DE RAM — Jogo de memória educativo
+// GERENCIADOR DE RAM — Arcade Survival
 // =============================================================
-const RAM_PROGRAMAS = [
-  { id:'navegador', nome:'Navegador',   icone:'🌐', mb:512  },
-  { id:'word',      nome:'Word',        icone:'📝', mb:256  },
-  { id:'jogo',      nome:'Jogo',        icone:'🎮', mb:2048 },
-  { id:'video',     nome:'Vídeo 4K',    icone:'🎬', mb:1024 },
-  { id:'antivirus', nome:'Antivírus',   icone:'🛡️', mb:128  },
-  { id:'spotify',   nome:'Música',      icone:'🎵', mb:200  },
-  { id:'camera',    nome:'Webcam',      icone:'📷', mb:300  },
-  { id:'planilha',  nome:'Planilha',    icone:'📊', mb:180  },
-  { id:'editor',    nome:'Foto Editor', icone:'🎨', mb:800  },
-  { id:'chat',      nome:'Chat',        icone:'💬', mb:150  },
+const RAM_TOTAL = 8192; // MB
+const RAM_SLOTS = 16;
+const RAM_PROC_NAMES = [
+  'chrome.exe','firefox.exe','steam.exe','discord.exe','explorer.exe',
+  'photoshop.exe','vlc.exe','spotify.exe','obs.exe','vscode.exe',
+  'word.exe','excel.exe','teams.exe','zoom.exe','minecraft.exe',
+  'outlook.exe','skype.exe','winrar.exe','torrent.exe','cmd.exe',
+  'notepad.exe','paint.exe','powershell.exe','taskhost.exe','svchost.exe',
+];
+const RAM_VIRUS_NAMES = [
+  'trojan.exe','keylogger.exe','worm.bat','adware.exe','ransomware.exe',
+  'spyware.exe','rootkit.sys','malware.exe','backdoor.exe','botnet.exe',
 ];
 
-let ramState = { totalMb: 8192, abertos: {}, pontos: 0, missaoIdx: 0, timerId: null };
-
-const RAM_MISSOES = [
-  { desc: 'Abra o Navegador e o Word ao mesmo tempo.', check: s => s.navegador && s.word },
-  { desc: 'Feche tudo e abra só o Jogo.', check: s => Object.keys(s).length===1 && s.jogo },
-  { desc: 'Abra 4 programas sem travar o PC.', check: s => Object.keys(s).length >= 4 },
-  { desc: 'Abra programas usando menos de 1 GB no total.', check: (s, used) => Object.keys(s).length > 0 && used < 1024 },
-  { desc: 'Abra todos os 10 programas (vai precisar de mais RAM!).', check: s => Object.keys(s).length === 10 },
-];
-
-function ramUsedMb() {
-  return Object.keys(ramState.abertos).reduce((sum, id) => {
-    const p = RAM_PROGRAMAS.find(p => p.id === id);
-    return sum + (p ? p.mb : 0);
-  }, 0);
-}
+let ramArcState = null;
+let ramArcLoop = null;
+let ramArcSpawnTimer = null;
 
 function ramFmt(mb) {
   return mb >= 1024 ? (mb/1024).toFixed(1)+' GB' : mb+' MB';
 }
 
 function iniciarRamGame() {
-  ramState = { totalMb: 8192, abertos: {}, pontos: 0, missaoIdx: 0, timerId: null };
+  clearInterval(ramArcLoop);
+  clearTimeout(ramArcSpawnTimer);
+  ramArcState = {
+    slots: Array.from({length: RAM_SLOTS}, () => null),
+    usedMb: 0,
+    pontos: 0,
+    wave: 1,
+    morto: false,
+    tick: 0,
+    nextPid: 1,
+  };
   showScreen('ram-game');
-  renderRamGame();
+  _ramBuildUI();
+  _ramStartLoop();
+  _ramScheduleSpawn();
 }
 
-function renderRamGame() {
-  const used = ramUsedMb();
-  const pct = Math.min(100, (used / ramState.totalMb) * 100);
-  const missao = RAM_MISSOES[ramState.missaoIdx] || null;
-  const barClass = pct >= 95 ? 'full' : pct >= 75 ? 'warning' : '';
-
-  const programasHtml = RAM_PROGRAMAS.map(p => {
-    const ativo = !!ramState.abertos[p.id];
-    const bloqueado = !ativo && used + p.mb > ramState.totalMb;
-    let cls = 'ram-program'; if (ativo) cls += ' ativo'; if (bloqueado) cls += ' blocked';
-    const statusTxt = ativo ? '● Rodando' : bloqueado ? '⛔ Sem RAM' : '○ Fechado';
-    return `<div class="${cls}" onclick="toggleRamProgram('${p.id}')">
-      <div class="ram-prog-icon">${p.icone}</div>
-      <div class="ram-prog-name">${p.nome}</div>
-      <div class="ram-prog-size">${ramFmt(p.mb)}</div>
-      <div class="ram-prog-status">${statusTxt}</div>
-    </div>`;
-  }).join('');
-
-  const abertosChips = Object.keys(ramState.abertos).map(id => {
-    const p = RAM_PROGRAMAS.find(p => p.id === id);
-    return `<div class="ram-task-chip">${p.icone} ${p.nome} <span class="chip-x" onclick="event.stopPropagation();toggleRamProgram('${id}')">✕</span></div>`;
-  }).join('');
-
-  document.getElementById('ramGameContent').innerHTML = `
-    <div class="ram-bar-wrap">
-      <div class="ram-bar-label">
-        <span>💾 RAM: <strong>${ramFmt(used)}</strong> usados de ${ramFmt(ramState.totalMb)}</span>
-        <span style="color:${pct>=95?'#EF4444':pct>=75?'#F59E0B':'var(--ink-soft)'}">${Math.round(pct)}%</span>
+function _ramBuildUI() {
+  const el = document.getElementById('ramGameContent');
+  const slotsHtml = ramArcState.slots.map((_,i) =>
+    `<div class="ram-slot empty" id="ramSlot${i}"></div>`
+  ).join('');
+  el.innerHTML = `
+    <div class="ram-arcade-wrap" id="ramArcWrap">
+      <div class="ram-hud">
+        <div class="ram-hud-bar-wrap">
+          <div class="ram-hud-bar-label">
+            <span>RAM USO</span>
+            <span id="ramHudPct">0%</span>
+          </div>
+          <div class="ram-hud-bar-track">
+            <div class="ram-hud-bar-fill" id="ramHudBar" style="width:0%"></div>
+          </div>
+          <div style="font-size:10px;color:#8B949E;margin-top:2px;" id="ramHudMb">0 MB / 8.0 GB</div>
+        </div>
+        <div class="ram-hud-stat">
+          <div class="ram-hud-stat-val" id="ramHudPontos">0</div>
+          <div class="ram-hud-stat-lbl">PONTOS</div>
+        </div>
+        <div class="ram-hud-stat">
+          <div class="ram-hud-stat-val" id="ramHudWave">1</div>
+          <div class="ram-hud-stat-lbl">WAVE</div>
+        </div>
+        <button onclick="goDashboard()" style="background:#21262D;border:1px solid #30363D;color:#8B949E;font-family:inherit;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;">SAIR</button>
       </div>
-      <div class="ram-bar-track"><div class="ram-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+      <div class="ram-slots" id="ramSlotsGrid">${slotsHtml}</div>
     </div>
-
-    <div class="ram-stats">
-      <div class="ram-stat"><div class="ram-stat-val" style="color:#6366F1">${Object.keys(ramState.abertos).length}</div><div class="ram-stat-label">Programas Abertos</div></div>
-      <div class="ram-stat"><div class="ram-stat-val" style="color:#10B981">${ramFmt(ramState.totalMb - used)}</div><div class="ram-stat-label">RAM Livre</div></div>
-      <div class="ram-stat"><div class="ram-stat-val" style="color:#F59E0B">${ramState.pontos}</div><div class="ram-stat-label">Pontos</div></div>
-    </div>
-
-    ${missao ? `<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:14px;">
-      <span style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#6366F1;display:block;margin-bottom:4px;">MISSÃO ${ramState.missaoIdx+1}/${RAM_MISSOES.length}</span>
-      🎯 ${missao.desc}
-    </div>` : `<div style="background:#D1FAE5;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-weight:700;color:#065F46;">🏆 Todas as missões concluídas! ${ramState.pontos} pontos!</div>`}
-
-    <div id="ramMsg" class="ram-msg"></div>
-    <div class="ram-programs">${programasHtml}</div>
-
-    ${abertosChips ? `<div class="ram-task-bar">${abertosChips}</div>` : ''}
   `;
 }
 
-function toggleRamProgram(id) {
-  const used = ramUsedMb();
-  const p = RAM_PROGRAMAS.find(p => p.id === id);
-  if (!p) return;
+function _ramStartLoop() {
+  ramArcLoop = setInterval(() => {
+    if (!ramArcState || ramArcState.morto) return;
+    ramArcState.tick++;
 
-  if (ramState.abertos[id]) {
-    delete ramState.abertos[id];
-    showRamMsg(`${p.icone} ${p.nome} fechado — liberou ${ramFmt(p.mb)}.`, 'ok');
-  } else {
-    if (used + p.mb > ramState.totalMb) {
-      showRamMsg(`⛔ Sem RAM! Feche um programa antes de abrir ${p.nome}.`, 'erro');
-      return;
+    // Wave progression every 20 seconds (200 ticks at 100ms)
+    const newWave = Math.floor(ramArcState.tick / 200) + 1;
+    if (newWave > ramArcState.wave) {
+      ramArcState.wave = newWave;
+      _ramShowWaveToast(newWave);
+      document.getElementById('ramHudWave').textContent = newWave;
     }
-    ramState.abertos[id] = true;
-    ramState.pontos += Math.round(p.mb / 100);
-    showRamMsg(`✅ ${p.nome} aberto! Usou +${ramFmt(p.mb)} de RAM.`, 'ok');
-    checkRamMissao();
-  }
-  renderRamGame();
+
+    // Each active process consumes more RAM per tick as wave increases
+    let totalUsed = 0;
+    const speedMult = 1 + (ramArcState.wave - 1) * 0.3;
+    ramArcState.slots.forEach((proc, i) => {
+      if (!proc) return;
+      const drainRate = proc.isVirus ? 0.8 * speedMult : 0.3 * speedMult;
+      proc.fill = Math.min(100, proc.fill + drainRate);
+      totalUsed += proc.mb * (proc.fill / 100);
+      _ramUpdateSlotBar(i, proc);
+    });
+
+    ramArcState.usedMb = Math.round(totalUsed);
+    const pct = Math.min(100, (ramArcState.usedMb / RAM_TOTAL) * 100);
+
+    // Update HUD
+    const bar = document.getElementById('ramHudBar');
+    const pctEl = document.getElementById('ramHudPct');
+    const mbEl = document.getElementById('ramHudMb');
+    if (bar) {
+      bar.style.width = pct + '%';
+      bar.className = 'ram-hud-bar-fill' + (pct >= 90 ? ' crit' : pct >= 65 ? ' warn' : '');
+    }
+    if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+    if (mbEl) mbEl.textContent = `${ramFmt(ramArcState.usedMb)} / ${ramFmt(RAM_TOTAL)}`;
+
+    if (pct >= 100) _ramGameOver();
+  }, 100);
 }
 
-function checkRamMissao() {
-  if (ramState.missaoIdx >= RAM_MISSOES.length) return;
-  const missao = RAM_MISSOES[ramState.missaoIdx];
-  const s = ramState.abertos;
-  const used = ramUsedMb();
-  if (missao.check(s, used)) {
-    ramState.pontos += 50;
-    ramState.missaoIdx++;
-    setTimeout(() => { showRamMsg(`🎉 Missão completa! +50 pontos!`, 'ok'); renderRamGame(); }, 300);
-  }
+function _ramScheduleSpawn() {
+  if (!ramArcState || ramArcState.morto) return;
+  const wave = ramArcState.wave || 1;
+  const baseDelay = Math.max(800, 2500 - wave * 180);
+  const delay = baseDelay * (0.7 + Math.random() * 0.6);
+  ramArcSpawnTimer = setTimeout(() => {
+    if (!ramArcState || ramArcState.morto) return;
+    _ramSpawnProcess();
+    _ramScheduleSpawn();
+  }, delay);
 }
 
-function showRamMsg(txt, tipo) {
-  const el = document.getElementById('ramMsg');
+function _ramSpawnProcess() {
+  const freeSlots = ramArcState.slots.map((v,i) => v===null ? i : -1).filter(i=>i>=0);
+  if (freeSlots.length === 0) return;
+  const slotIdx = freeSlots[Math.floor(Math.random() * freeSlots.length)];
+  const wave = ramArcState.wave;
+  const isVirus = Math.random() < Math.min(0.35, 0.05 + wave * 0.04);
+  const names = isVirus ? RAM_VIRUS_NAMES : RAM_PROC_NAMES;
+  const name = names[Math.floor(Math.random() * names.length)];
+  const mbBase = isVirus ? [512, 1024, 2048] : [128, 256, 512, 768, 1024];
+  const mb = mbBase[Math.floor(Math.random() * mbBase.length)];
+
+  const proc = {
+    pid: ramArcState.nextPid++,
+    name,
+    mb,
+    isVirus,
+    fill: 0,
+  };
+  ramArcState.slots[slotIdx] = proc;
+  _ramRenderSlot(slotIdx, proc);
+}
+
+function _ramRenderSlot(i, proc) {
+  const el = document.getElementById('ramSlot' + i);
   if (!el) return;
-  el.textContent = txt; el.className = `ram-msg show ${tipo}`;
-  clearTimeout(ramState._msgTimer);
-  ramState._msgTimer = setTimeout(() => { if(el) el.classList.remove('show'); }, 2500);
+  el.className = 'ram-slot active' + (proc.isVirus ? ' virus' : '');
+  el.onclick = () => _ramKillProcess(i);
+  el.innerHTML = `
+    <div class="ram-slot-pid">PID ${proc.pid}</div>
+    <div class="ram-slot-name" title="${proc.name}">${proc.name}</div>
+    <div class="ram-slot-mb">${ramFmt(proc.mb)}</div>
+    <div class="ram-slot-bar-track"><div class="ram-slot-bar-fill" id="ramSlotBar${i}" style="width:${proc.fill}%"></div></div>
+    <div class="ram-slot-type">${proc.isVirus ? 'VIRUS' : 'PROC'}</div>
+  `;
+}
+
+function _ramUpdateSlotBar(i, proc) {
+  const bar = document.getElementById('ramSlotBar' + i);
+  if (bar) bar.style.width = proc.fill + '%';
+}
+
+function _ramKillProcess(i) {
+  if (!ramArcState || ramArcState.morto) return;
+  const proc = ramArcState.slots[i];
+  if (!proc) return;
+  const el = document.getElementById('ramSlot' + i);
+  if (el) {
+    el.classList.add('killing');
+    el.onclick = null;
+  }
+  const pts = proc.isVirus ? 30 : 10;
+  ramArcState.pontos += pts;
+  document.getElementById('ramHudPontos').textContent = ramArcState.pontos;
+
+  setTimeout(() => {
+    ramArcState.slots[i] = null;
+    const slotEl = document.getElementById('ramSlot' + i);
+    if (slotEl) {
+      slotEl.className = 'ram-slot empty';
+      slotEl.innerHTML = '';
+      slotEl.onclick = null;
+    }
+    // Virus spawns an extra process when killed
+    if (proc.isVirus) {
+      setTimeout(() => _ramSpawnProcess(), 300);
+    }
+  }, 200);
+}
+
+function _ramShowWaveToast(wave) {
+  const old = document.getElementById('ramWaveToast');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'ramWaveToast';
+  el.className = 'ram-wave-toast';
+  el.textContent = `WAVE ${wave}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+
+function _ramGameOver() {
+  if (!ramArcState || ramArcState.morto) return;
+  ramArcState.morto = true;
+  clearInterval(ramArcLoop);
+  clearTimeout(ramArcSpawnTimer);
+
+  const wrap = document.getElementById('ramArcWrap');
+  if (!wrap) return;
+  wrap.style.position = 'relative';
+  const overlay = document.createElement('div');
+  overlay.className = 'ram-gameover-overlay';
+  overlay.innerHTML = `
+    <div class="ram-go-title">RAM CHEIA</div>
+    <div class="ram-go-sub">O sistema travou na wave ${ramArcState.wave}</div>
+    <div class="ram-go-score">${ramArcState.pontos} pts</div>
+    <div class="ram-go-btns">
+      <button class="ram-go-btn" onclick="iniciarRamGame()">REINICIAR</button>
+      <button class="ram-go-btn secondary" onclick="goDashboard()">SAIR</button>
+    </div>
+  `;
+  wrap.appendChild(overlay);
 }
 
 function abrirMenuDigitacao() {
