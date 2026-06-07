@@ -1025,15 +1025,40 @@
   .tecla.wide-1\.5 { min-width: 60px; }
   .tecla.wide-2 { min-width: 76px; }
   .tecla.wide-3 { min-width: 280px; }
+  /* Cores por dedo */
+  .tecla[data-finger="1"] { background: #FEE2E2; border-color: #FECACA; color: #991B1B; }
+  .tecla[data-finger="2"] { background: #FEF3C7; border-color: #FDE68A; color: #92400E; }
+  .tecla[data-finger="3"] { background: #D1FAE5; border-color: #A7F3D0; color: #065F46; }
+  .tecla[data-finger="4"] { background: #DBEAFE; border-color: #BFDBFE; color: #1E40AF; }
+  .tecla[data-finger="5"] { background: #EDE9FE; border-color: #DDD6FE; color: #5B21B6; }
   .tecla.next {
-    background: linear-gradient(135deg, #FBBF24, #F59E0B);
-    border-color: #D97706; color: white;
-    transform: scale(1.08); box-shadow: 0 6px 16px -4px rgba(245,158,11,0.6);
+    background: linear-gradient(135deg, #FBBF24, #F59E0B) !important;
+    border-color: #D97706 !important; color: white !important;
+    transform: scale(1.12); box-shadow: 0 8px 20px -4px rgba(245,158,11,0.7);
+    animation: pulseKey 0.7s ease-in-out infinite alternate;
+  }
+  @keyframes pulseKey {
+    from { box-shadow: 0 8px 20px -4px rgba(245,158,11,0.5); }
+    to   { box-shadow: 0 8px 28px -2px rgba(245,158,11,0.9); }
   }
   .tecla.pressed {
-    background: var(--ink); border-color: var(--ink); color: white;
-    transform: scale(0.92);
+    background: var(--ink) !important; border-color: var(--ink) !important; color: white !important;
+    transform: scale(0.88);
   }
+  /* legenda dos dedos */
+  .teclado-legenda {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-top: 10px; font-size: 11px; font-weight: 700;
+  }
+  .teclado-legenda-item {
+    display: flex; align-items: center; gap: 5px; padding: 3px 10px;
+    border-radius: 20px; border: 1px solid;
+  }
+  .teclado-legenda-item.f1 { background:#FEE2E2;border-color:#FECACA;color:#991B1B; }
+  .teclado-legenda-item.f2 { background:#FEF3C7;border-color:#FDE68A;color:#92400E; }
+  .teclado-legenda-item.f3 { background:#D1FAE5;border-color:#A7F3D0;color:#065F46; }
+  .teclado-legenda-item.f4 { background:#DBEAFE;border-color:#BFDBFE;color:#1E40AF; }
+  .teclado-legenda-item.f5 { background:#EDE9FE;border-color:#DDD6FE;color:#5B21B6; }
 
   .dig-completo {
     background: linear-gradient(135deg, var(--green), #047857); color: white;
@@ -2094,6 +2119,13 @@
 
     <div class="dig-texto-box" id="licaoTextoBox"></div>
     <div class="teclado-virtual" id="licaoTeclado"></div>
+    <div class="teclado-legenda">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
     <div id="licaoResultado"></div>
   </div>
 </div>
@@ -2127,6 +2159,13 @@
 
     <div class="dig-texto-box" id="digTextoBox" style="height:220px;overflow-y:auto;scroll-behavior:smooth;border-radius:16px;border:2px solid var(--line);"></div>
     <div class="teclado-virtual" id="tecladoVirtual" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);"></div>
+    <div class="teclado-legenda">
+      <div class="teclado-legenda-item f1">Mindinho</div>
+      <div class="teclado-legenda-item f2">Anelar</div>
+      <div class="teclado-legenda-item f3">Médio</div>
+      <div class="teclado-legenda-item f4">Indicador</div>
+      <div class="teclado-legenda-item f5">Polegar</div>
+    </div>
 
     <div id="digResultado"></div>
   </div>
