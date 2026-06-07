@@ -447,8 +447,9 @@ class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, WW, GH + 300);
     this.physics.world.gravity.y = 900;
 
-    // Câmera
-    this.cameras.main.setBounds(0, 0, WW, GH);
+    // Câmera zoom 2x: janela de 640x360 game units, foca onde o jogo acontece
+    this.cameras.main.setZoom(2);
+    this.cameras.main.setBounds(0, 342, WW, 360);
 
     // ── Background parallax ──
     this._createBackground();
@@ -531,8 +532,8 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemyGroup, this.platforms, null, this._platformProcess, this);
 
     // ── Câmera segue o jogador ──
-    this.cameras.main.startFollow(this.player, true, 0.10, 0);
-    this.cameras.main.setDeadzone(100, 0);
+    this.cameras.main.startFollow(this.player, true, 0.12, 0);
+    this.cameras.main.setDeadzone(60, 0);
 
     // ── Meta (PC Central) ──
     this._drawGoal();
@@ -1089,7 +1090,7 @@ class GameScene extends Phaser.Scene {
     }
 
     // Morte por queda
-    if (p.y > GH + 100) {
+    if (p.y > 820) {
       this._respawn();
     }
 
