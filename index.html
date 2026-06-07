@@ -576,6 +576,123 @@
   .aula-nav { display: flex; justify-content: space-between; gap: 12px; }
 
   /* ============================
+     AULA — Story Mode (Twine style)
+     ============================ */
+  #screen-aula.story-mode {
+    background: #111 !important;
+    padding: 0 !important;
+    min-height: 100vh;
+  }
+  .story-wrap {
+    display: grid; grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+  .story-sidebar {
+    background: #1B1B1B; border-right: 1px solid rgba(255,255,255,0.07);
+    padding: 28px 20px; display: flex; flex-direction: column; gap: 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .story-sidebar-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px; font-weight: 800; color: #fff; line-height: 1.2;
+  }
+  .story-sidebar-sub {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35); text-transform: uppercase; margin-top: 4px;
+  }
+  .story-sidebar-progress {
+    background: rgba(255,255,255,0.08); border-radius: 6px; overflow: hidden; height: 4px;
+  }
+  .story-sidebar-fill { height: 100%; background: #6366F1; transition: width 0.5s ease; }
+  .story-sidebar-pages { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .story-sidebar-page {
+    padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.35); cursor: pointer; transition: all 0.15s;
+    border: 1px solid transparent; display: flex; align-items: center; gap: 8px;
+  }
+  .story-sidebar-page.done { color: #10B981; }
+  .story-sidebar-page.done::before { content: '✓'; font-size: 10px; }
+  .story-sidebar-page.ativo {
+    background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4);
+    color: #A5B4FC; font-weight: 700;
+  }
+  .story-sidebar-page.ativo::before { content: '▶'; font-size: 9px; color: #6366F1; }
+  .story-sidebar-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.6); padding: 10px 14px; border-radius: 10px;
+    font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+    transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .story-sidebar-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+
+  /* Área principal da história */
+  .story-main {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 60px 40px; min-height: 100vh;
+  }
+  .story-passage {
+    max-width: 680px; width: 100%;
+    animation: storyFadeIn 0.5s ease;
+  }
+  @keyframes storyFadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .story-location {
+    font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.25); margin-bottom: 32px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .story-location::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+  .story-hero-emoji {
+    font-size: 72px; margin-bottom: 24px; display: block; text-align: center;
+    filter: drop-shadow(0 0 32px rgba(99,102,241,0.4));
+  }
+  .story-hero-items {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
+  }
+  .story-hero-item {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 14px 16px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 90px;
+    transition: all 0.2s;
+  }
+  .story-hero-item:hover { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.4); }
+  .story-hero-item-icon { font-size: 30px; }
+  .story-hero-item-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); }
+  .story-titulo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 32px; font-weight: 800; color: #fff; line-height: 1.2;
+    margin-bottom: 20px; letter-spacing: -0.5px;
+  }
+  .story-texto {
+    font-size: 17px; line-height: 1.85; color: rgba(255,255,255,0.75);
+  }
+  .story-texto p { margin-bottom: 16px; }
+  .story-texto strong { color: #fff; font-weight: 700; }
+  .story-texto strong[data-n="1"] { color: #FB923C; }
+  .story-texto strong[data-n="2"] { color: #818CF8; }
+  .story-texto strong[data-n="3"] { color: #34D399; }
+  .story-callout {
+    border-left: 3px solid #6366F1; padding: 16px 20px; margin: 20px 0;
+    background: rgba(99,102,241,0.08); border-radius: 0 10px 10px 0;
+    font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.6;
+  }
+  .story-choices { margin-top: 40px; display: flex; flex-direction: column; gap: 10px; }
+  .story-choice {
+    background: none; border: none; text-align: left; padding: 0;
+    color: #6EE7B7; font-size: 16px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; transition: all 0.15s;
+    font-family: inherit;
+  }
+  .story-choice::before { content: '▶'; font-size: 9px; color: #34D399; flex-shrink: 0; }
+  .story-choice:hover { color: #fff; transform: translateX(6px); }
+  .story-choice.final { color: #FFD23C; }
+  .story-choice.final::before { color: #FFD23C; }
+  .story-choice.prev { color: rgba(255,255,255,0.3); font-size: 13px; }
+  .story-choice.prev::before { content: '◀'; }
+
+  /* ============================
      QUIZ
      ============================ */
   .quiz-header { margin-bottom: 22px; }
@@ -2022,15 +2139,30 @@
 </div>
 
 <!-- ====================== AULA ====================== -->
-<div class="screen" id="screen-aula">
-  <div class="container-narrow">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="goDashboard()">← Voltar</button>
-      <div class="top-bar-title" id="aulaTopTitle"></div>
+<div class="screen story-mode" id="screen-aula">
+  <div class="story-wrap">
+    <!-- sidebar -->
+    <div class="story-sidebar">
+      <div>
+        <div class="story-sidebar-title" id="aulaTopTitle">Aula</div>
+        <div class="story-sidebar-sub" id="aulaSidebarSub">Módulo</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.3);margin-bottom:6px;">PROGRESSO</div>
+        <div class="story-sidebar-progress"><div class="story-sidebar-fill" id="aulaProgressFill"></div></div>
+      </div>
+      <div class="story-sidebar-pages" id="aulaSidebarPages"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto;">
+        <button class="story-sidebar-btn" onclick="goDashboard()">← Sair</button>
+      </div>
     </div>
-    <div class="aula-progress"><div class="aula-progress-fill" id="aulaProgressFill"></div></div>
-    <div id="aulaContent"></div>
+    <!-- main passage -->
+    <div class="story-main">
+      <div id="aulaContent"></div>
+    </div>
   </div>
+  <!-- compat (hidden) -->
+  <div style="display:none"><div class="aula-progress"><div class="aula-progress-fill" id="aulaProgressFillCompat"></div></div></div>
 </div>
 
 <!-- ====================== QUIZ ====================== -->
@@ -3462,66 +3594,71 @@ function renderAula() {
   const paginas = MODULOS[m].paginas[n];
   const idx = aulaState.pagina;
   const pag = paginas[idx];
+  const total = paginas.length;
 
-  // progresso bar
-  const pct = ((idx + 1) / paginas.length) * 100;
+  // progresso
+  const pct = ((idx + 1) / total) * 100;
   const fill = document.getElementById("aulaProgressFill");
-  fill.style.width = pct + "%";
-  fill.setAttribute("data-n", n);
+  if (fill) { fill.style.width = pct + "%"; }
 
-  // monta página
+  // sidebar titulo
+  const topTitle = document.getElementById("aulaTopTitle");
+  if (topTitle) topTitle.textContent = MODULOS[m].titulo;
+  const sidebarSub = document.getElementById("aulaSidebarSub");
+  if (sidebarSub) sidebarSub.textContent = `Nível ${n} · ${idx+1}/${total}`;
+
+  // sidebar índice de páginas
+  const pagesEl = document.getElementById("aulaSidebarPages");
+  if (pagesEl) {
+    pagesEl.innerHTML = paginas.map((p, i) => {
+      let cls = "story-sidebar-page";
+      if (i < idx) cls += " done";
+      else if (i === idx) cls += " ativo";
+      return `<div class="${cls}" onclick="aulaState.pagina=${i};renderAula()">
+        <span>${p.titulo.substring(0,28)}${p.titulo.length>28?'…':''}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // hero
   let heroHtml = "";
-  if (pag.tipo === "hero") {
-    heroHtml = `
-      <div class="aula-hero">
-        <div class="aula-hero-emoji">${pag.emoji}</div>
-      </div>`;
+  if (pag.tipo === "hero" || pag.tipo === "callout") {
+    heroHtml = `<span class="story-hero-emoji">${pag.emoji}</span>`;
   } else if (pag.tipo === "items") {
-    heroHtml = `
-      <div class="aula-hero">
-        <div class="aula-hero-row">
-          ${pag.items.map(it => `
-            <div class="aula-hero-item">
-              <div class="aula-hero-item-icon">${it.icone}</div>
-              <div class="aula-hero-item-label">${it.label}</div>
-            </div>`).join("")}
-        </div>
-      </div>`;
-  } else if (pag.tipo === "callout") {
-    heroHtml = `
-      <div class="aula-hero">
-        <div class="aula-hero-emoji">${pag.emoji}</div>
-      </div>`;
+    heroHtml = `<div class="story-hero-items">${pag.items.map(it =>
+      `<div class="story-hero-item">
+        <div class="story-hero-item-icon">${it.icone}</div>
+        <div class="story-hero-item-label">${it.label}</div>
+      </div>`).join("")}</div>`;
   }
 
-  let calloutHtml = "";
-  if (pag.callout) {
-    calloutHtml = `<div class="aula-callout">${pag.callout}</div>`;
-  }
+  const calloutHtml = pag.callout
+    ? `<div class="story-callout">${pag.callout}</div>` : "";
 
-  const isLast = idx >= paginas.length - 1;
-  const btnNext = isLast
-    ? `<button class="btn lg success" onclick="finalizarAula()">Ir para o Quiz →</button>`
-    : `<button class="btn lg" onclick="proximaPagina()">Próxima página →</button>`;
-  const btnPrev = idx > 0
-    ? `<button class="btn ghost" onclick="paginaAnterior()">← Anterior</button>`
-    : `<div></div>`;
+  const isLast = idx >= total - 1;
+  const choiceNext = isLast
+    ? `<button class="story-choice final" onclick="finalizarAula()">Ir para o Quiz →</button>`
+    : `<button class="story-choice" onclick="proximaPagina()">Continuar →</button>`;
+  const choicePrev = idx > 0
+    ? `<button class="story-choice prev" onclick="paginaAnterior()">← Página anterior</button>`
+    : "";
+
+  const modColor = {hardware:'#FB923C',software:'#818CF8',navegadores:'#38BDF8',antivirus:'#34D399'}[m] || '#6366F1';
 
   document.getElementById("aulaContent").innerHTML = `
-    <div class="aula-pagina">
+    <div class="story-passage">
+      <div class="story-location" style="color:${modColor}88;">
+        ${MODULOS[m].icone} ${MODULOS[m].titulo} — Página ${idx+1} de ${total}
+      </div>
       ${heroHtml}
-      <h1 class="aula-titulo">${pag.titulo}</h1>
-      <div class="aula-texto"><p>${pag.texto}</p></div>
+      <h1 class="story-titulo">${pag.titulo}</h1>
+      <div class="story-texto"><p>${pag.texto}</p></div>
       ${calloutHtml}
-    </div>
-    <div class="aula-nav">
-      ${btnPrev}
-      ${btnNext}
-    </div>
-    <div style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--ink-soft); font-weight: 600;">
-      Página ${idx + 1} de ${paginas.length}
-    </div>
-  `;
+      <div class="story-choices">
+        ${choiceNext}
+        ${choicePrev}
+      </div>
+    </div>`;
 }
 
 function proximaPagina() {
