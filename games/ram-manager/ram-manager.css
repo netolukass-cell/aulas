@@ -1,0 +1,93 @@
+/* ── RAM Manager — standalone game styles ────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #0D1117;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+@keyframes ramPulse { from { opacity:1; } to { opacity:0.5; } }
+@keyframes ramSpawn { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
+@keyframes ramKill  { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(1.3); } }
+
+.ram-arcade-wrap {
+  display: flex; flex-direction: column;
+  height: 100vh;
+  background: #0D1117; color: #E6EDF3;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  padding: 10px 14px; box-sizing: border-box; user-select: none;
+}
+
+.ram-hud {
+  display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 10px;
+  align-items: center;
+  background: #161B22; border: 1px solid #30363D; border-radius: 8px;
+  padding: 8px 14px; margin-bottom: 10px; flex-shrink: 0;
+}
+.ram-hud-bar-wrap { display: flex; flex-direction: column; gap: 3px; }
+.ram-hud-bar-label { display: flex; justify-content: space-between;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #8B949E; }
+.ram-hud-bar-track { height: 12px; background: #21262D; border-radius: 6px;
+  overflow: hidden; border: 1px solid #30363D; }
+.ram-hud-bar-fill { height: 100%; border-radius: 6px;
+  transition: width 0.15s linear, background 0.3s; background: #238636; }
+.ram-hud-bar-fill.warn { background: #D29922; }
+.ram-hud-bar-fill.crit { background: #DA3633; animation: ramPulse 0.3s ease infinite alternate; }
+.ram-hud-stat { background: #21262D; border: 1px solid #30363D;
+  border-radius: 6px; padding: 5px 12px; text-align: center; min-width: 60px; }
+.ram-hud-stat-val { font-size: 16px; font-weight: 900; color: #58A6FF; line-height: 1; }
+.ram-hud-stat-lbl { font-size: 8px; letter-spacing: 1.5px; color: #8B949E;
+  text-transform: uppercase; margin-top: 2px; }
+
+.ram-slots {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px;
+  flex: 1; overflow-y: auto; align-content: start;
+}
+.ram-slot {
+  background: #161B22; border: 1px solid #30363D; border-radius: 7px;
+  padding: 8px 10px; display: flex; flex-direction: column; gap: 5px;
+  cursor: default; min-height: 100px;
+}
+.ram-slot.active { border-color: #388BFD; cursor: pointer; animation: ramSpawn 0.2s ease; }
+.ram-slot.active:hover { background: #1C2128; border-color: #58A6FF; }
+.ram-slot.active.virus { border-color: #DA3633; }
+.ram-slot.active.virus:hover { background: #1C0E0E; }
+.ram-slot.killing { animation: ramKill 0.2s ease forwards; pointer-events: none; }
+.ram-slot.empty { border-style: dashed; opacity: 0.2; }
+.ram-slot-pid { font-size: 8px; color: #8B949E; letter-spacing: 1px; }
+.ram-slot-name { font-size: 11px; font-weight: 700; color: #E6EDF3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ram-slot.virus .ram-slot-name { color: #FF7B72; }
+.ram-slot-mb { font-size: 9px; color: #8B949E; }
+.ram-slot-bar-track { height: 5px; background: #21262D; border-radius: 3px; overflow: hidden; }
+.ram-slot-bar-fill { height: 100%; border-radius: 3px; background: #388BFD;
+  transition: width 0.15s linear; }
+.ram-slot.virus .ram-slot-bar-fill { background: #DA3633; }
+.ram-slot-type { font-size: 8px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
+.ram-slot.virus .ram-slot-type { color: #FF7B72; }
+.ram-slot:not(.virus) .ram-slot-type { color: #3FB950; }
+
+.ram-gameover-overlay {
+  position: fixed; inset: 0; background: rgba(13,17,23,0.96);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; z-index: 10;
+}
+.ram-go-title { font-size: 28px; font-weight: 900; color: #DA3633; letter-spacing: 2px; }
+.ram-go-sub { font-size: 13px; color: #8B949E; }
+.ram-go-score { font-size: 44px; font-weight: 900; color: #58A6FF; }
+.ram-go-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.ram-go-btn { background: #238636; border: 1px solid #2EA043; color: white;
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 9px 24px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; }
+.ram-go-btn:hover { background: #2EA043; }
+.ram-go-btn.secondary { background: #21262D; border-color: #30363D; color: #E6EDF3; }
+.ram-go-btn.secondary:hover { background: #30363D; }
+.ram-wave-toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: #161B22; border: 1px solid #388BFD; border-radius: 6px;
+  padding: 6px 20px; font-size: 12px; font-weight: 700; color: #58A6FF;
+  letter-spacing: 2px; z-index: 999; animation: ramSpawn 0.3s ease;
+  pointer-events: none;
+}
