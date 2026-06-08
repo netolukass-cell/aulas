@@ -58,22 +58,52 @@ const TEXTOS_DIGITACAO = {
     "O mouse e o teclado sao hardware. O Chrome e software.",
     "Eu uso o computador para estudar e jogar todo dia.",
     "Hardware e a parte fisica. Software e a parte digital.",
-    "O Windows e um sistema operacional muito usado.",
-    "Sem internet a gente nao consegue ver YouTube ou TikTok."
+    "O Windows e um sistema operacional muito usado no mundo.",
+    "Sem internet a gente nao consegue ver YouTube ou TikTok.",
+    "A CPU e o cerebro do computador. Ela processa todas as informacoes.",
+    "O HD guarda arquivos. A RAM e a memoria rapida e temporaria.",
+    "Monitor e hardware de saida. Teclado e hardware de entrada.",
+    "Para digitar rapido, mantenha os dedos na posicao inicial.\nOs indicadores ficam no F e no J. Tente nao olhar o teclado.",
+    "A internet conecta computadores do mundo inteiro.\nSem ela nao teria redes sociais nem streaming de videos.",
+    "O notebook e um computador portatil que funciona com bateria.\nEle e pratico para carregar para a escola ou trabalho.",
+    "Uma senha forte tem letras, numeros e simbolos misturados.\nNunca use sua data de nascimento ou nome como senha.",
+    "O SSD e muito mais rapido que o HD antigo.\nEle nao tem peca mecanica, por isso e mais duravel.",
+    "A RAM guarda os programas abertos no momento.\nQuando voce reinicia o PC, tudo que estava nela e apagado.",
+    "O teclado tem letras, numeros e teclas especiais.\nAprender a posicao dos dedos ajuda a digitar mais rapido."
   ],
   medio: [
-    "O computador e uma maquina inteligente que ajuda a gente a trabalhar, jogar e aprender. Por dentro ele tem muitas pecas que funcionam juntas.",
-    "Hardware sao as partes que voce pode tocar: o monitor, o teclado, o mouse e o gabinete. Software sao os programas que rodam dentro do computador.",
-    "Um navegador como o Chrome ou o Firefox e o programa que abre sites na internet. Sem ele, voce nao consegue acessar o Google ou o YouTube.",
+    "O computador e uma maquina que ajuda a trabalhar, jogar e aprender. Por dentro ele tem muitas pecas que funcionam juntas.",
+    "Hardware sao as partes que voce pode tocar: o monitor, o teclado, o mouse. Software sao os programas que rodam no computador.",
+    "Um navegador como o Chrome ou o Firefox e o programa que abre sites. Sem ele voce nao consegue acessar o Google ou o YouTube.",
     "O antivirus protege o computador contra virus e programas ruins. Nunca clique em links estranhos ou baixe arquivos de sites duvidosos.",
-    "Para digitar rapido, e importante usar os dois polegares para a barra de espaco e nao olhar para o teclado enquanto escreve."
+    "Para digitar rapido, e importante usar os dois polegares para a barra de espaco e nao olhar para o teclado enquanto escreve.",
+    "A memoria cache e um tipo especial de memoria muito rapida.\nFica dentro do processador para guardar dados frequentemente usados.\nQuanto maior a cache, mais agil fica o desempenho geral.",
+    "O sistema operacional gerencia a comunicacao entre hardware e software.\nSem ele, os programas nao conseguiriam funcionar corretamente.\nWindows, Linux e macOS sao os sistemas mais populares do mundo.",
+    "As linguagens de programacao sao como idiomas para o computador.\nCada uma tem sua sintaxe e seus casos de uso especificos.\nPython e facil de aprender. JavaScript roda direto nos navegadores.",
+    "O firewall e um sistema de seguranca que monitora o trafego de rede.\nEle bloqueia conexoes suspeitas e protege seus dados pessoais.\nPode ser um programa instalado ou um dispositivo fisico dedicado.",
+    "Computacao em nuvem permite acessar arquivos de qualquer dispositivo.\nNao precisa de HD grande se tudo fica em servidores remotos seguros.\nGoogle Drive, Dropbox e OneDrive sao exemplos bastante populares.",
+    "O processador trabalha em ciclos por segundo, medidos em gigahertz.\nQuanto maior a frequencia, mais calculos ele consegue fazer por segundo.\nTer mais nucleos tambem aumenta muito o desempenho em tarefas paralelas.",
+    "Resolucao de tela e medida em pixels por polegada, chamada de PPI.\nQuanto mais pixels, mais nitida e detalhada e a imagem na tela.\nTelas 4K tem quatro vezes mais pixels do que as telas Full HD.",
+    "A placa de video, ou GPU, e responsavel pelo processamento de imagens.\nEla e essencial para jogos, edicao de video e design grafico profissional.\nGPUs modernas tambem sao usadas para treinar modelos de inteligencia artificial.",
+    "Backup e a copia de seguranca dos seus arquivos importantes.\nArmazene seus dados em um HD externo ou na nuvem regularmente.\nAssim voce nao perde nada em caso de virus, roubo ou defeito.",
+    "Phishing e um golpe em que criminosos enviam mensagens falsas.\nElas imitam bancos ou lojas para roubar senhas e dados pessoais.\nSempre verifique o endereco do site antes de digitar qualquer informacao."
   ],
   dificil: [
-    "Um sistema operacional, como Windows ou Linux, gerencia todo o hardware e permite que aplicativos como Word, Photoshop e navegadores funcionem corretamente em harmonia.",
-    "A diferenca essencial entre hardware e software esta na sua natureza: o primeiro e fisico e tangivel, enquanto o segundo e abstrato, formado por instrucoes e dados que controlam o comportamento da maquina.",
-    "Phishing e uma tecnica de engenharia social na qual criminosos enviam emails ou mensagens falsas imitando empresas conhecidas para roubar senhas, dados bancarios e informacoes pessoais dos usuarios desavisados.",
-    "A memoria RAM e volatil e funciona como um espaco temporario e rapido para o processador acessar dados em uso. Quando o computador desliga, todo conteudo dela e perdido instantaneamente.",
-    "Navegadores modernos como Chrome, Edge e Firefox utilizam motores de renderizacao distintos para interpretar HTML, CSS e JavaScript. Isso afeta velocidade, consumo de memoria e compatibilidade com padroes web."
+    "Um sistema operacional como Windows ou Linux gerencia todo o hardware e permite que aplicativos como Word, Photoshop e navegadores funcionem corretamente em harmonia.",
+    "A diferenca essencial entre hardware e software esta na sua natureza: o primeiro e fisico e tangivel, enquanto o segundo e abstrato, formado por instrucoes que controlam o comportamento da maquina.",
+    "Phishing e uma tecnica de engenharia social na qual criminosos enviam emails falsos imitando empresas conhecidas para roubar senhas, dados bancarios e informacoes pessoais dos usuarios.",
+    "A memoria RAM e volatil e funciona como espaco temporario para o processador acessar dados em uso. Quando o computador desliga, todo conteudo e perdido instantaneamente.",
+    "Navegadores modernos como Chrome, Edge e Firefox utilizam motores de renderizacao distintos para interpretar HTML, CSS e JavaScript, afetando velocidade e compatibilidade com padroes web.",
+    "O protocolo TCP/IP e a base de comunicacao da internet moderna.\nO TCP garante que os pacotes de dados cheguem corretamente ao destino, retransmitindo os que forem perdidos.\nO IP define o esquema de enderecamento unico de cada dispositivo conectado a rede global.",
+    "Criptografia assimetrica utiliza um par de chaves matematicamente relacionadas: publica e privada.\nA chave publica criptografa os dados e pode ser compartilhada com qualquer pessoa livremente.\nSomente a chave privada correspondente e capaz de descriptografar a mensagem com seguranca.",
+    "Algoritmos de machine learning se dividem em categorias com abordagens bem distintas.\nNo aprendizado supervisionado, o modelo treina com dados rotulados e aprende a reconhecer padroes.\nNo nao-supervisionado, ele descobre estruturas ocultas nos dados sem qualquer rotulo pre-definido.",
+    "A virtualizacao permite executar multiplos sistemas operacionais em uma unica maquina fisica.\nO hypervisor gerencia os recursos de hardware e isola cada maquina virtual das demais.\nAmazon EC2 e Google Compute Engine sao servicos de nuvem baseados diretamente nesse principio.",
+    "Estruturas de dados como listas, filas, pilhas e arvores sao fundamentais em programacao.\nCada estrutura possui caracteristicas proprias de insercao, remocao e busca de elementos.\nEscolher a estrutura adequada e decisivo para garantir a eficiencia do algoritmo desenvolvido.",
+    "O conceito de DevOps integra desenvolvimento e operacoes de software em um ciclo continuo de melhoria.\nPraticas como integracao continua e entrega continua automatizam os processos de teste e deploy.\nIsso reduz erros humanos, acelera as entregas e aumenta a confiabilidade geral dos sistemas.",
+    "Redes neurais convolucionais sao especializadas no processamento e analise de imagens digitais.\nCamadas de convolucao extraem caracteristicas hierarquicas como bordas, formas e texturas.\nElas formam a base dos sistemas modernos de reconhecimento facial e classificacao de objetos.",
+    "O conceito de complexidade de algoritmos e medido pela notacao Big-O, que descreve crescimento.\nUm algoritmo O(n) tem tempo linear, enquanto O(n²) cresce quadraticamente com a entrada.\nEscolher o algoritmo certo pode fazer a diferenca entre segundos e horas de processamento.",
+    "Containers Docker encapsulam aplicacoes com todas as suas dependencias em um ambiente isolado.\nIsso garante que o software rode de forma identica em qualquer maquina ou servidor de producao.\nOrquestradores como Kubernetes gerenciam dezenas ou centenas de containers em clusters distribuidos.",
+    "O modelo OSI divide a comunicacao em redes em sete camadas com funcoes bem definidas.\nCada camada interage apenas com a camada imediatamente acima ou abaixo na hierarquia.\nEssa abstracao facilita o desenvolvimento de protocolos e a resolucao de problemas em redes complexas."
   ]
 };
 
@@ -100,7 +130,11 @@ let digState = {
   caracteresErrados: 0,
   inicio: 0,
   timerId: null,
-  finalizado: false
+  countdownId: null,
+  finalizado: false,
+  tempoRestante: 0,
+  tempoTotal: 0,
+  penalidade: 5
 };
 
 
@@ -134,6 +168,16 @@ function iniciarDigitacao(modo) {
   digState.inicio = 0;
   digState.finalizado = false;
   if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
+  digState.countdownId = null;
+
+  if (modo === 'ranqueado') {
+    const tempos = {facil: 90, medio: 75, dificil: 60};
+    const penalidades = {facil: 3, medio: 5, dificil: 8};
+    digState.tempoTotal = tempos[digState.dif] || 90;
+    digState.tempoRestante = digState.tempoTotal;
+    digState.penalidade = penalidades[digState.dif] || 5;
+  }
 
   document.getElementById('digTopTitle').textContent =
     (modo === 'ranqueado' ? '🏆 Ranqueado' : '🧘 Treino') + ' — ' +
@@ -153,9 +197,13 @@ function renderTextoDigitacao() {
   const html = digState.texto.split('').map((c, i) => {
     let cls = 'dig-char';
     if (c === ' ') cls += ' space';
+    if (c === '\n') cls += ' newline';
     if (i < digState.pos) cls += ' done';
     else if (i === digState.pos) cls += ' current';
-    const display = c === ' ' ? ' ' : escapeHtml(c);
+    let display;
+    if (c === ' ') display = ' ';
+    else if (c === '\n') display = '↵<br>';
+    else display = escapeHtml(c);
     return `<span class="${cls}" data-i="${i}">${display}</span>`;
   }).join('');
   const box = document.getElementById('digTextoBox');
@@ -214,18 +262,25 @@ function flashTecla(char) {
 function listenerDigitacao(e) {
   if (digState.finalizado) return;
   if (e.key === 'Escape') { sairDigitacao(); return; }
-  if (e.key.length !== 1) return; // ignora setas, F1, etc
+  const isEnter = e.key === 'Enter';
+  if (e.key.length !== 1 && !isEnter) return; // ignora setas, F1, etc
 
   if (digState.pos === 0 && !digState.inicio && digState.modo === 'ranqueado') {
     digState.inicio = Date.now();
     digState.timerId = setInterval(atualizarStatsDigitacao, 250);
+    digState.countdownId = setInterval(() => {
+      if (digState.finalizado) return;
+      digState.tempoRestante--;
+      if (digState.tempoRestante <= 0) { digState.tempoRestante = 0; falharDigitacao(); }
+      atualizarStatsDigitacao();
+    }, 1000);
   }
   if (digState.pos === 0 && !digState.inicio && digState.modo === 'treino') {
     digState.inicio = Date.now();
   }
 
   const esperado = digState.texto[digState.pos];
-  const digitado = e.key;
+  const digitado = isEnter ? '\n' : e.key;
   flashTecla(digitado);
 
   const certo = normalizarChar(esperado) === normalizarChar(digitado);
@@ -254,8 +309,32 @@ function listenerDigitacao(e) {
       spans[digState.pos].classList.add('wrong');
       setTimeout(() => spans[digState.pos]?.classList.remove('wrong'), 400);
     }
+    if (digState.modo === 'ranqueado' && digState.inicio) {
+      digState.tempoRestante = Math.max(0, digState.tempoRestante - digState.penalidade);
+      if (digState.tempoRestante <= 0) { falharDigitacao(); return; }
+    }
   }
   atualizarStatsDigitacao();
+}
+
+function falharDigitacao() {
+  if (digState.finalizado) return;
+  digState.finalizado = true;
+  if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
+  document.removeEventListener('keydown', listenerDigitacao);
+  document.getElementById('digResultado').innerHTML = `
+    <div class="dig-completo" style="background:linear-gradient(135deg,#EF4444,#B91C1C);">
+      <div style="font-size:64px; margin-bottom:8px;">⏱️</div>
+      <div style="font-size:28px; font-weight:800; margin-bottom:8px;">Tempo esgotado!</div>
+      <div style="font-size:16px; opacity:0.9; margin-bottom:16px;">
+        Chegou em ${Math.round(digState.pos/digState.texto.length*100)}% do texto · ${digState.erros} erros
+      </div>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
+        <button class="btn ghost" style="background:white;color:#EF4444;" onclick="iniciarDigitacao('ranqueado')">↻ Tentar de novo</button>
+        <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Mudar modo</button>
+      </div>
+    </div>`;
 }
 
 function normalizarChar(c) {
@@ -263,9 +342,16 @@ function normalizarChar(c) {
 }
 
 function atualizarStatsDigitacao() {
-  const tempoMs = digState.inicio ? (Date.now() - digState.inicio) : 0;
-  const tempoSeg = tempoMs / 1000;
-  document.getElementById('digTempo').textContent = Math.floor(tempoSeg) + 's';
+  const tempoEl = document.getElementById('digTempo');
+  if (digState.modo === 'ranqueado') {
+    const t = digState.tempoRestante;
+    tempoEl.textContent = t + 's';
+    tempoEl.style.color = t <= 15 ? '#EF4444' : t <= 30 ? '#FBBF24' : '';
+  } else {
+    const tempoMs = digState.inicio ? (Date.now() - digState.inicio) : 0;
+    tempoEl.textContent = Math.floor(tempoMs / 1000) + 's';
+    tempoEl.style.color = '';
+  }
 
   const palavras = digState.pos / 5; // padrão WPM = 5 chars = 1 palavra
   const wpm = tempoSeg > 0 ? Math.round((palavras / tempoSeg) * 60) : 0;
@@ -280,9 +366,19 @@ function atualizarStatsDigitacao() {
     Math.round((digState.pos / digState.texto.length) * 100) + '%';
 }
 
+function setNivelEIniciar(dif) {
+  digState.dif = dif;
+  document.querySelectorAll('#digNivelSelector .dig-nivel-btn').forEach(b => b.classList.remove('active'));
+  const map = {facil:0, medio:1, dificil:2};
+  const btns = document.querySelectorAll('#digNivelSelector .dig-nivel-btn');
+  if (btns[map[dif]]) btns[map[dif]].classList.add('active');
+  iniciarDigitacao(digState.modo);
+}
+
 function finalizarDigitacao() {
   digState.finalizado = true;
   if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
   document.removeEventListener('keydown', listenerDigitacao);
 
   const tempoSeg = (Date.now() - digState.inicio) / 1000;
@@ -319,6 +415,22 @@ function finalizarDigitacao() {
   else if (wpm >= 20) conceito = '👍 Bom ritmo!';
   else conceito = '💪 Continua treinando!';
 
+  // nivel automático
+  let levelUpHtml = '';
+  if (digState.modo === 'ranqueado' && precisao >= 85) {
+    if (digState.dif === 'facil' && wpm >= 20) {
+      levelUpHtml = `<div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px 16px;margin:12px 0;">
+        🎯 <strong>Você está pronto para o Médio!</strong> Seus ${wpm} WPM com ${precisao}% de precisão mostram que o Fácil ficou pequeno.
+        <button class="btn" style="margin-left:12px;background:white;color:#6366F1;padding:6px 14px;" onclick="setNivelEIniciar('medio')">Subir para Médio →</button>
+      </div>`;
+    } else if (digState.dif === 'medio' && wpm >= 35) {
+      levelUpHtml = `<div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px 16px;margin:12px 0;">
+        🔥 <strong>Hora do Difícil!</strong> ${wpm} WPM com ${precisao}% de precisão é resultado de craque.
+        <button class="btn" style="margin-left:12px;background:white;color:#EF4444;padding:6px 14px;" onclick="setNivelEIniciar('dificil')">Subir para Difícil →</button>
+      </div>`;
+    }
+  }
+
   document.getElementById('digResultado').innerHTML = `
     <div class="dig-completo">
       <div style="font-size:64px; margin-bottom:8px;">${digState.modo === 'ranqueado' ? '🏆' : '🎉'}</div>
@@ -327,6 +439,7 @@ function finalizarDigitacao() {
         ${wpm} palavras/min · ${precisao}% precisão · ${Math.floor(tempoSeg)}s · ${digState.erros} erros
       </div>
       ${digState.modo === 'ranqueado' ? `<div style="font-size:32px; font-weight:900;">+${pontos} ⭐</div>` : ''}
+      ${levelUpHtml}
       <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
         <button class="btn ghost" style="background:white;color:var(--green);" onclick="iniciarDigitacao('${digState.modo}')">↻ Novo texto</button>
         <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Mudar modo</button>
@@ -337,6 +450,7 @@ function finalizarDigitacao() {
 
 function sairDigitacao() {
   if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
   document.removeEventListener('keydown', listenerDigitacao);
   abrirMenuDigitacao();
 }
@@ -1185,7 +1299,9 @@ function iniciarRankeada(textoId) {
   const dif = rankeadaState.dif || 'facil';
   const cfg = RANKEADA_CONFIG[dif];
   const tempo = Math.round(cfg.tempoBase * (cfg.mult[nivel] || 1));
-  rankeadaState = { texto, pos:0, erros:0, tempoRestante:tempo, tempoTotal:tempo, timerId:null, finalizado:false, inicio:0, dif, cfg };
+  // normaliza quebras duplas para evitar duplo Enter
+  const textoNorm = {...texto, texto: texto.texto.replace(/\n+/g, '\n').trim()};
+  rankeadaState = { texto:textoNorm, pos:0, erros:0, tempoRestante:tempo, tempoTotal:tempo, timerId:null, finalizado:false, inicio:0, dif, cfg };
   document.getElementById('rankeadaTopTitle').textContent = `⏱️ ${texto.titulo}`;
   document.getElementById('rankeadaResultado').innerHTML = '';
   renderTextoRankeada();
