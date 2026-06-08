@@ -20,6 +20,21 @@ function _digSalvarAluno(aluno) {
   const idx = todos.findIndex(a => a.id === aluno.id);
   if (idx >= 0) todos[idx] = aluno; else todos.push(aluno);
   localStorage.setItem(DIG_ALUNOS_KEY, JSON.stringify(todos));
+  // sincroniza com o servidor (mesmo endpoint do index.html)
+  _digSyncPush(aluno);
+}
+
+async function _digSyncPush(aluno) {
+  try {
+    const url = localStorage.getItem('professorlusca_sync_url');
+    if (!url) return;
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'save', aluno })
+    });
+  } catch(e) {}
 }
 
 function _digSalvarPontos(pts) {
