@@ -2114,12 +2114,7 @@
         <div class="pratique-desc">Fase de plataforma pixel art. Colete dados, derrote virus, chegue ao PC Central.</div>
         <div class="pratique-arrow">→</div>
       </div>
-      <div class="pratique-card" onclick="iniciarRelampago()">
-        <div class="pratique-icon-wrap"><iconify-icon icon="ph:lightning-bold"></iconify-icon></div>
-        <div class="pratique-title">Desafio Relâmpago</div>
-        <div class="pratique-desc">60 segundos pra acertar o máximo. Vale pontos extras.</div>
-        <div class="pratique-arrow">→</div>
-      </div>
+
       <div class="pratique-card" onclick="iniciarAtiradorPalavras()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
@@ -2335,23 +2330,8 @@
 <!-- ====================== HACKER RUNNER (standalone page) ====================== -->
 <div class="screen" id="screen-caca"></div>
 
-<!-- ====================== DESAFIO RELÂMPAGO ====================== -->
-<div class="screen" id="screen-relampago">
-  <div class="container-narrow">
-    <div class="top-bar">
-      <button class="btn ghost" onclick="confirmarSairRelampago()">← Sair</button>
-      <div class="top-bar-title">⚡ Desafio Relâmpago</div>
-    </div>
-    <div class="jogo-header">
-      <div class="jogo-stat"><div class="jogo-stat-val" id="relPontos">0</div><div class="jogo-stat-label">PONTOS</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="relAcertos">0</div><div class="jogo-stat-label">ACERTOS</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="relCombo">×1</div><div class="jogo-stat-label">COMBO</div></div>
-      <div class="jogo-stat"><div class="jogo-stat-val" id="relTempo">60</div><div class="jogo-stat-label">SEGUNDOS</div></div>
-    </div>
-    <div class="timer-bar"><div class="timer-fill" id="relTimerFill" style="width:100%"></div></div>
-    <div id="relampagoContent"></div>
-  </div>
-</div>
+<!-- ====================== HACKER ALERT OVERLAY ====================== -->
+<div id="hackerAlertOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:#000;overflow:auto;"></div>
 
 <!-- ====================== MENU DIGITAÇÃO ====================== -->
 <div class="screen" id="screen-digitacao-menu">
@@ -3415,6 +3395,7 @@ function showScreen(id) {
 }
 
 function goHome() {
+  pararTimerHacker();
   alunoAtivo = null;
   localStorage.removeItem(ATIVO_KEY);
   showScreen("home");
@@ -3436,6 +3417,7 @@ function goDashboard() {
   if (!alunoAtivo) return goHome();
   renderDashboard();
   showScreen("dashboard");
+  iniciarTimerHacker();
 }
 
 // =============================================================
@@ -5069,129 +5051,215 @@ function processarResultadoJogoPendente() {
 }
 
 // =============================================================
-// DESAFIO RELÂMPAGO
+// HACKER ALERT — Desafio Surpresa a cada 30 minutos
 // =============================================================
-let relState = { pontos: 0, acertos: 0, combo: 1, tempo: 60, timerId: null, answered: false, perguntasUsadas: [] };
 
-function iniciarRelampago() {
-  relState = { pontos: 0, acertos: 0, combo: 1, tempo: 60, timerId: null, answered: false, perguntasUsadas: [] };
-  atualizarStatsRelampago();
-  document.getElementById("relTimerFill").style.width = "100%";
-  showScreen("relampago");
-  proximaPerguntaRelampago();
+const HACKER_INTERVALO = 30 * 60 * 1000;
+const HACKER_RECOMPENSA = 150;
+const HACKER_PENALIDADE = -50;
+let _hackerTimer = null;
+let _hackerState = { respondido: false, qAtual: null };
 
-  if (relState.timerId) clearInterval(relState.timerId);
-  relState.timerId = setInterval(() => {
-    relState.tempo--;
-    document.getElementById("relTempo").textContent = relState.tempo;
-    document.getElementById("relTimerFill").style.width = (relState.tempo / 60 * 100) + "%";
-    if (relState.tempo <= 0) finalizarRelampago();
-  }, 1000);
+const PERGUNTAS_HACKER = {
+  1: [
+    { q: "O teclado é um hardware ou software?", options: ["Hardware", "Software", "Os dois", "Nenhum"], correct: 0 },
+    { q: "Qual dessas coisas você pode TOCAR com a mão?", options: ["O Windows", "O Chrome", "O monitor", "A internet"], correct: 2 },
+    { q: "O que o mouse faz?", options: ["Guarda arquivos", "Move o cursor na tela", "Conecta à internet", "Liga o computador"], correct: 1 },
+    { q: "Para que serve o HD do computador?", options: ["Mostrar imagens", "Guardar arquivos", "Conectar à rede", "Processar cálculos"], correct: 1 },
+    { q: "O Chrome é um...", options: ["Hardware", "Processador", "Navegador", "Sistema operacional"], correct: 2 },
+    { q: "Qual dessas é uma ENTRADA de dados no computador?", options: ["Monitor", "Caixa de som", "Impressora", "Teclado"], correct: 3 },
+    { q: "O que é o Windows?", options: ["Um jogo", "Uma marca de monitor", "Um sistema operacional", "Um antivírus"], correct: 2 },
+    { q: "Pen drive serve para...", options: ["Imprimir documentos", "Carregar o celular", "Guardar e transferir arquivos", "Aumentar a velocidade"], correct: 2 },
+    { q: "Qual é o cérebro do computador?", options: ["HD", "RAM", "Monitor", "CPU"], correct: 3 },
+    { q: "Para que serve o antivírus?", options: ["Acelerar o Wi-Fi", "Proteger contra vírus digitais", "Melhorar a qualidade da tela", "Guardar senhas"], correct: 1 },
+    { q: "O monitor é um hardware de SAÍDA ou ENTRADA?", options: ["Entrada", "Saída", "Os dois", "Nenhum"], correct: 1 },
+    { q: "O que é a internet?", options: ["Um programa para escrever textos", "Uma rede mundial de computadores", "Um tipo de hardware", "Um antivírus"], correct: 1 },
+    { q: "Qual desses é um hardware?", options: ["Word", "Google Chrome", "Placa de vídeo", "Spotify"], correct: 2 },
+    { q: "O que a RAM faz no computador?", options: ["Guarda fotos permanentemente", "Conecta à internet", "Guarda dados temporariamente enquanto usa", "Liga a impressora"], correct: 2 },
+    { q: "O que acontece com os dados na RAM quando o computador desliga?", options: ["Ficam salvos para sempre", "Vão para o HD", "São apagados", "Vão para a nuvem"], correct: 2 },
+    { q: "Qual tecla apaga o que está à esquerda do cursor?", options: ["Delete", "Backspace", "Esc", "Enter"], correct: 1 },
+    { q: "O que é um arquivo?", options: ["Um tipo de hardware", "Um documento ou dado salvo no computador", "Uma conexão de internet", "Um vírus"], correct: 1 },
+    { q: "Para salvar um documento no Word, usa qual atalho?", options: ["Ctrl+P", "Ctrl+C", "Ctrl+S", "Ctrl+Z"], correct: 2 },
+    { q: "A impressora é um hardware de:", options: ["Entrada", "Processamento", "Saída", "Armazenamento"], correct: 2 },
+    { q: "O que é Wi-Fi?", options: ["Um tipo de vírus", "Conexão sem fio à internet", "Um programa de edição", "O nome do cabo de rede"], correct: 1 },
+    { q: "Qual desses é um software?", options: ["Impressora", "Teclado", "Minecraft", "Memória RAM"], correct: 2 },
+    { q: "Ctrl+Z serve para:", options: ["Salvar", "Fechar o programa", "Desfazer a última ação", "Copiar"], correct: 2 },
+  ],
+  2: [
+    { q: "Qual é a diferença entre RAM e HD?", options: ["RAM é mais lenta que HD", "RAM é temporária, HD é permanente", "HD é mais cara que RAM", "São a mesma coisa"], correct: 1 },
+    { q: "O que é phishing?", options: ["Um vírus que apaga arquivos", "Golpe que rouba dados fingindo ser site legítimo", "Um tipo de antivírus", "Um protocolo de rede"], correct: 1 },
+    { q: "O que significa formatar um computador?", options: ["Instalar mais RAM", "Atualizar o Windows", "Apagar tudo e reinstalar o sistema", "Conectar ao Wi-Fi"], correct: 2 },
+    { q: "TCP/IP é...", options: ["Um tipo de vírus", "Um navegador", "O protocolo base da internet", "Uma marca de hardware"], correct: 2 },
+    { q: "O que faz um firewall?", options: ["Acelera o processador", "Bloqueia conexões suspeitas na rede", "Aumenta o espaço em disco", "Melhora a qualidade da imagem"], correct: 1 },
+    { q: "O que é a nuvem em tecnologia?", options: ["Efeito visual do SO", "Armazenamento remoto em servidores", "Um tipo de vírus", "Memória interna do celular"], correct: 1 },
+    { q: "Qual é a função de um sistema operacional?", options: ["Navegar na internet", "Gerenciar hardware e software do computador", "Criar documentos", "Jogar games"], correct: 1 },
+    { q: "Um SSD é mais rápido que um HD porque...", options: ["Usa mais eletricidade", "Não tem peças mecânicas em movimento", "É maior fisicamente", "Tem mais RAM"], correct: 1 },
+    { q: "O que é um endereço IP?", options: ["Um tipo de vírus", "Um endereço único de cada dispositivo na rede", "O nome do Wi-Fi", "Um navegador"], correct: 1 },
+    { q: "Qual destes é um sistema operacional?", options: ["Chrome", "Word", "Ubuntu Linux", "Photoshop"], correct: 2 },
+    { q: "Para que serve o HTTPS nos sites?", options: ["Deixar o site mais bonito", "Criptografar a comunicação entre navegador e servidor", "Aumentar a velocidade do site", "Mostrar propaganda"], correct: 1 },
+    { q: "O que é malware?", options: ["Um tipo de hardware de entrada", "Software criado para prejudicar sistemas", "Um protocolo de rede", "Um navegador antigo"], correct: 1 },
+    { q: "Qual a função da GPU?", options: ["Guardar arquivos", "Gerenciar a rede", "Processar imagens e gráficos", "Controlar a memória RAM"], correct: 2 },
+    { q: "O que é compressão de arquivos (.zip)?", options: ["Criptografar com senha", "Reduzir o tamanho do arquivo", "Fazer backup automático", "Formatar o arquivo"], correct: 1 },
+    { q: "Qual porta padrão o HTTP usa?", options: ["21", "443", "80", "25"], correct: 2 },
+    { q: "O que é uma rede LAN?", options: ["Rede de longa distância global", "Rede local (mesma casa, escola ou empresa)", "Um tipo de vírus de rede", "Protocolo de segurança"], correct: 1 },
+    { q: "O que é resolução de tela?", options: ["Velocidade de carregamento", "Quantidade de pixels que a tela exibe", "Brilho máximo do monitor", "Frequência de atualização"], correct: 1 },
+    { q: "Qual dessas práticas mantém a senha segura?", options: ["Usar o nome completo", "Usar a data de nascimento", "Usar letras, números e símbolos misturados", "Anotar no papel na mesa"], correct: 2 },
+    { q: "O que acontece em um ataque DDoS?", options: ["Roubo de senhas", "Servidor sobrecarregado com requisições falsas", "Vírus apaga arquivos", "Hacker acessa câmera"], correct: 1 },
+    { q: "O que é um driver?", options: ["Programa para navegar na internet", "Software que permite o SO comunicar com hardware", "Vírus disfarçado", "Arquivo de configuração do Wi-Fi"], correct: 1 },
+    { q: "Qual desses armazena mais dados?", options: ["8 GB", "512 MB", "2 TB", "64 KB"], correct: 2 },
+    { q: "O que é backup?", options: ["Apagar arquivos antigos", "Cópia de segurança dos dados", "Atualização do sistema", "Limpeza do disco"], correct: 1 },
+  ],
+  3: [
+    { q: "Quantos bits tem 1 byte?", options: ["4", "16", "8", "10"], correct: 2 },
+    { q: "O que é DNS?", options: ["Um tipo de vírus", "Sistema que traduz nomes de domínio em endereços IP", "Protocolo de transferência de arquivos", "Firewall de rede"], correct: 1 },
+    { q: "PEGADINHA: O antivírus garante proteção total contra todos os vírus?", options: ["Sim, sempre", "Não — novos vírus podem não ser detectados ainda", "Sim, se for pago", "Só se atualizado ontem"], correct: 1 },
+    { q: "Qual é o valor de 1 kilobyte em bytes?", options: ["100 bytes", "1000 bytes", "1024 bytes", "512 bytes"], correct: 2 },
+    { q: "PEGADINHA: HTTPS significa que o site é confiável e seguro?", options: ["Sim, sempre", "Não — HTTPS só criptografa; o site ainda pode ser falso", "Sim, se tiver cadeado verde", "Depende do navegador"], correct: 1 },
+    { q: "O que é um ataque man-in-the-middle?", options: ["Vírus que multiplica arquivos", "Interceptação da comunicação entre duas partes", "Sobrecarga de servidor", "Roubo de arquivo físico"], correct: 1 },
+    { q: "Qual dessas linguagens roda diretamente no navegador sem instalação?", options: ["Python", "Java", "JavaScript", "C++"], correct: 2 },
+    { q: "O que é um hash (como SHA-256)?", options: ["Uma senha criptografada", "Função que transforma dados em código fixo irreversível", "Um tipo de compressão", "Protocolo de rede segura"], correct: 1 },
+    { q: "PEGADINHA: Esvaziar a lixeira apaga o arquivo do HD definitivamente?", options: ["Sim, some completamente", "Não — o espaço fica disponível mas o dado ainda existe fisicamente", "Depende do tamanho", "Sim, sempre"], correct: 1 },
+    { q: "O que é virtualização?", options: ["Aumentar RAM com software", "Executar múltiplos SOs em uma máquina física usando hypervisor", "Conectar ao servidor em nuvem", "Comprimir disco rígido"], correct: 1 },
+    { q: "Qual porta usa o HTTPS?", options: ["80", "21", "25", "443"], correct: 3 },
+    { q: "PEGADINHA: RAM com mais GHz é sempre melhor que RAM com mais GB?", options: ["Sim, velocidade é tudo", "Não — GHz é frequência, GB é capacidade; ambos importam diferente", "Sim, sempre", "GHz não existe em RAM"], correct: 1 },
+    { q: "O que é SQL Injection?", options: ["Um tipo de vírus de rede", "Ataque que insere código SQL malicioso em campos de formulário", "Protocolo de banco de dados", "Técnica de compressão"], correct: 1 },
+    { q: "Em binário, quanto vale 1010?", options: ["8", "10", "12", "6"], correct: 1 },
+    { q: "PEGADINHA: Um programa open source é necessariamente gratuito?", options: ["Sim, sempre", "Não — open source é código aberto, não gratuito necessariamente", "Sim, por lei", "Só se for Linux"], correct: 1 },
+    { q: "O que é latência em redes?", options: ["Velocidade máxima de download", "Quantidade de dados por segundo", "Tempo de atraso entre envio e recebimento", "Número de dispositivos na rede"], correct: 2 },
+    { q: "O que faz o comando git commit?", options: ["Envia código ao servidor remoto", "Cria uma nova branch", "Salva um snapshot das mudanças no repositório local", "Apaga o histórico"], correct: 2 },
+    { q: "PEGADINHA: Modo avião desliga completamente o GPS?", options: ["Sim, sempre", "Não — GPS usa satélite; alguns dispositivos mantêm GPS ativo em modo avião", "Sim, é obrigatório por lei", "Depende da operadora"], correct: 1 },
+    { q: "O que é buffer overflow?", options: ["Memória RAM cheia", "Dados excedem o espaço reservado e sobrescrevem memória adjacente", "HD fragmentado", "Cache corrompida"], correct: 1 },
+    { q: "Qual algoritmo tem complexidade O(n log n) no caso médio?", options: ["Bubble Sort", "Insertion Sort", "QuickSort", "Selection Sort"], correct: 2 },
+    { q: "PEGADINHA: IPv4 suporta mais endereços que IPv6?", options: ["Sim, é mais antigo", "Não — IPv4 tem ~4 bilhões; IPv6 tem 340 undecilhões", "Sim, tem mais bits", "São iguais"], correct: 1 },
+    { q: "O que é uma função recursiva?", options: ["Função que sempre retorna zero", "Função que se chama a si mesma", "Função sem parâmetros", "Função que roda em paralelo"], correct: 1 },
+  ]
+};
+
+function _hackerGetVistas() {
+  if (!alunoAtivo) return [];
+  return alunoAtivo.progresso?.hackerVistas || [];
 }
-
-function atualizarStatsRelampago() {
-  document.getElementById("relPontos").textContent = relState.pontos;
-  document.getElementById("relAcertos").textContent = relState.acertos;
-  document.getElementById("relCombo").textContent = "×" + relState.combo;
-  document.getElementById("relTempo").textContent = relState.tempo;
-}
-
-function sortearPerguntaRelampago() {
-  const n = alunoAtivo.nivel;
-  const todas = [];
-  ORDEM_MODULOS.forEach(m => {
-    MODULOS[m].quiz[n].forEach((q, i) => todas.push({mod: m, idx: i, q}));
-  });
-  // filtra não usadas, senão reseta
-  let disponiveis = todas.filter(p => !relState.perguntasUsadas.includes(p.mod + p.idx));
-  if (disponiveis.length === 0) { relState.perguntasUsadas = []; disponiveis = todas; }
-  const escolhida = disponiveis[Math.floor(Math.random() * disponiveis.length)];
-  relState.perguntasUsadas.push(escolhida.mod + escolhida.idx);
-  return escolhida.q;
-}
-
-function proximaPerguntaRelampago() {
-  if (relState.tempo <= 0) return;
-  const q = sortearPerguntaRelampago();
-  relState.qAtual = q;
-  relState.answered = false;
-
-  let opts = "";
-  if (q.tipo === "vf") {
-    opts = `
-      <button class="quiz-option vf-option" onclick="responderRelampago(0)">
-        <div class="quiz-option-letter" style="background:#10B981;color:white;">✓</div>
-        <div style="font-size:20px;">VERDADEIRO</div>
-      </button>
-      <button class="quiz-option vf-option" onclick="responderRelampago(1)">
-        <div class="quiz-option-letter" style="background:#EF4444;color:white;">✗</div>
-        <div style="font-size:20px;">FALSO</div>
-      </button>`;
-  } else {
-    const letters = ["A","B","C","D"];
-    opts = q.options.map((opt, i) =>
-      `<button class="quiz-option" onclick="responderRelampago(${i})">
-         <div class="quiz-option-letter">${letters[i]}</div>
-         <div>${opt}</div>
-       </button>`).join("");
-  }
-
-  document.getElementById("relampagoContent").innerHTML = `
-    <div class="relampago-pergunta">
-      <div class="quiz-q-text">${q.q}</div>
-    </div>
-    <div class="quiz-options">${opts}</div>`;
-}
-
-function responderRelampago(idx) {
-  if (relState.answered) return;
-  relState.answered = true;
-  const q = relState.qAtual;
-  let acertou;
-  if (q.tipo === "vf") {
-    acertou = (q.correct ? 0 : 1) === idx;
-  } else {
-    acertou = q.correct === idx;
-  }
-
-  if (acertou) {
-    relState.acertos++;
-    relState.pontos += 5 * relState.combo;
-    relState.combo = Math.min(5, relState.combo + 1);
-  } else {
-    relState.combo = 1;
-  }
-  atualizarStatsRelampago();
-  setTimeout(proximaPerguntaRelampago, 400);
-}
-
-function finalizarRelampago() {
-  if (relState.timerId) clearInterval(relState.timerId);
-  adicionarPontosJogo(relState.pontos);
-  if (!alunoAtivo.progresso.jogos) alunoAtivo.progresso.jogos = {};
-  alunoAtivo.progresso.jogos.relampago = Math.max(alunoAtivo.progresso.jogos.relampago || 0, relState.acertos);
+function _hackerSalvarVista(id) {
+  if (!alunoAtivo) return;
+  alunoAtivo.progresso = alunoAtivo.progresso || {};
+  alunoAtivo.progresso.hackerVistas = alunoAtivo.progresso.hackerVistas || [];
+  if (!alunoAtivo.progresso.hackerVistas.includes(id)) alunoAtivo.progresso.hackerVistas.push(id);
   salvarAluno(alunoAtivo);
-
-  document.getElementById("relampagoContent").innerHTML = `
-    <div class="result-screen">
-      <div class="result-emoji">⚡</div>
-      <div class="result-title">Tempo!</div>
-      <div style="font-size:18px;color:var(--ink-soft);margin-bottom:12px;">
-        ${relState.acertos} acertos em 60 segundos
-      </div>
-      <div class="result-score" data-n="${alunoAtivo.nivel}">+${relState.pontos} ⭐</div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn ghost" onclick="iniciarRelampago()">↻ De novo</button>
-        <button class="btn" onclick="goDashboard()">Menu</button>
-      </div>
-    </div>`;
 }
-
-function confirmarSairRelampago() {
-  if (confirm("Sair? Os pontos desta rodada serão perdidos.")) {
-    if (relState.timerId) clearInterval(relState.timerId);
-    goDashboard();
+function _hackerSortearPergunta() {
+  if (!alunoAtivo) return null;
+  const nivel = alunoAtivo.nivel || 1;
+  const banco = PERGUNTAS_HACKER[nivel] || PERGUNTAS_HACKER[1];
+  const vistas = _hackerGetVistas();
+  const chave = 'n' + nivel + '_';
+  let disponiveis = banco.map((q, i) => ({ q, id: chave + i })).filter(item => !vistas.includes(item.id));
+  if (disponiveis.length === 0) {
+    if (!alunoAtivo.progresso.hackerBancoEsgotado) { alunoAtivo.progresso.hackerBancoEsgotado = true; salvarAluno(alunoAtivo); }
+    return null;
   }
+  return disponiveis[Math.floor(Math.random() * disponiveis.length)];
+}
+function _hackerSirene() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const tocar = (f, t, d) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(f, ctx.currentTime + t);
+      o.frequency.linearRampToValueAtTime(f * 1.5, ctx.currentTime + t + d / 2);
+      o.frequency.linearRampToValueAtTime(f, ctx.currentTime + t + d);
+      g.gain.setValueAtTime(0.25, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + d);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + d);
+    };
+    for (let i = 0; i < 4; i++) tocar(400 + i * 60, i * 0.5, 0.45);
+  } catch(e) {}
+}
+function dispararHackerAlert() {
+  if (!alunoAtivo) return;
+  const item = _hackerSortearPergunta();
+  const overlay = document.getElementById('hackerAlertOverlay');
+  if (!overlay) return;
+  _hackerState = { respondido: false, qAtual: item };
+  _hackerSirene();
+  if (!item) {
+    overlay.style.display = 'block';
+    overlay.innerHTML = '<style>@keyframes hkF{0%,100%{opacity:1}50%{opacity:.6}}</style>'
+      + '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0000,#000);padding:24px;box-sizing:border-box;">'
+      + '<div style="max-width:520px;width:100%;text-align:center;">'
+      + '<div style="font-size:72px;animation:hkF .5s infinite;">⚠️</div>'
+      + '<div style="font-size:13px;font-weight:900;letter-spacing:4px;color:#ef4444;margin:8px 0;">SISTEMA INFECTADO</div>'
+      + '<div style="font-size:22px;font-weight:800;color:white;margin:16px 0;">Banco de desafios esgotado!</div>'
+      + '<div style="color:#fca5a5;font-size:15px;margin-bottom:24px;">Todas as perguntas do seu nível já foram respondidas. O professor precisa adicionar novas.</div>'
+      + '<button onclick="fecharHackerAlert()" style="padding:12px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;border:none;background:#ef4444;color:white;">Entendido</button>'
+      + '</div></div>';
+    return;
+  }
+  const { q, id } = item;
+  const letters = ['A','B','C','D'];
+  const opts = q.options.map((opt, i) =>
+    '<button class="hk-opt" data-i="' + i + '" onclick="responderHackerAlert(' + i + ')"'
+    + ' style="display:block;width:100%;margin:8px 0;background:rgba(255,255,255,0.07);color:white;border:1.5px solid rgba(255,255,255,0.2);text-align:left;padding:14px 18px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">'
+    + '<strong style="color:#ef4444;">' + letters[i] + ')</strong> ' + opt + '</button>').join('');
+  overlay.style.display = 'block';
+  overlay.innerHTML = '<style>'
+    + '@keyframes hkF{0%,100%{opacity:1}50%{opacity:.6}}'
+    + '@keyframes hkP{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}70%{box-shadow:0 0 0 20px rgba(239,68,68,0)}}'
+    + '@keyframes hkScan{from{transform:translateY(-100%)}to{transform:translateY(100vh)}}'
+    + '@keyframes hkShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}'
+    + '.hk-opt:hover{background:rgba(239,68,68,0.2)!important;border-color:#ef4444!important;}'
+    + '</style>'
+    + '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0000,#000);padding:24px;box-sizing:border-box;">'
+    + '<div style="overflow:hidden;position:fixed;inset:0;pointer-events:none;"><div style="animation:hkScan 2.5s linear infinite;height:3px;background:rgba(255,0,0,0.2);width:100%;"></div></div>'
+    + '<div style="max-width:540px;width:100%;animation:hkShake 0.5s ease;">'
+    + '<div style="text-align:center;margin-bottom:20px;">'
+    + '<div style="font-size:64px;animation:hkF .4s infinite;">☠️</div>'
+    + '<div style="font-size:11px;font-weight:900;letter-spacing:5px;color:#ef4444;margin:6px 0;">INVASÃO DETECTADA</div>'
+    + '<div style="font-size:20px;font-weight:800;color:white;margin:10px 0;animation:hkF 1s infinite;">Seus pontos estão sendo hackeados!</div>'
+    + '<div style="color:#fca5a5;font-size:14px;">Responda agora para bloquear o ataque.<br>'
+    + '<strong style="color:#fcd34d;">✅ Acertou: +' + HACKER_RECOMPENSA + ' ⭐ &nbsp;|&nbsp; ❌ Errou: ' + HACKER_PENALIDADE + ' ⭐</strong></div>'
+    + '</div>'
+    + '<div style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(239,68,68,0.5);border-radius:16px;padding:20px;animation:hkP 2s infinite;">'
+    + '<div style="font-size:17px;font-weight:700;color:white;margin-bottom:16px;line-height:1.4;">' + q.q + '</div>'
+    + '<div id="hackerOpts">' + opts + '</div>'
+    + '</div>'
+    + '<div id="hackerFeedback" style="margin-top:16px;text-align:center;min-height:48px;"></div>'
+    + '</div></div>';
+}
+function responderHackerAlert(idx) {
+  if (_hackerState.respondido || !_hackerState.qAtual) return;
+  _hackerState.respondido = true;
+  const { q, id } = _hackerState.qAtual;
+  const acertou = q.correct === idx;
+  const delta = acertou ? HACKER_RECOMPENSA : HACKER_PENALIDADE;
+  if (alunoAtivo) {
+    alunoAtivo.progresso = alunoAtivo.progresso || {};
+    alunoAtivo.progresso.pontosJogos = Math.max(0, (alunoAtivo.progresso.pontosJogos || 0) + delta);
+    _hackerSalvarVista(id);
+  }
+  document.querySelectorAll('.hk-opt').forEach((btn, i) => {
+    btn.style.pointerEvents = 'none';
+    if (i === q.correct) btn.style.background = 'rgba(16,185,129,0.35)';
+    else if (i === idx && !acertou) btn.style.background = 'rgba(239,68,68,0.35)';
+  });
+  const fb = document.getElementById('hackerFeedback');
+  if (fb) fb.innerHTML = acertou
+    ? '<div style="color:#34d399;font-size:20px;font-weight:800;">🛡️ Ataque bloqueado! +' + HACKER_RECOMPENSA + ' ⭐</div>'
+    : '<div style="color:#f87171;font-size:18px;font-weight:800;">💀 Hackeado! ' + HACKER_PENALIDADE + ' ⭐ — resposta: ' + q.options[q.correct] + '</div>';
+  setTimeout(fecharHackerAlert, 3200);
+}
+function fecharHackerAlert() {
+  const overlay = document.getElementById('hackerAlertOverlay');
+  if (overlay) overlay.style.display = 'none';
+  iniciarTimerHacker();
+}
+function iniciarTimerHacker() {
+  if (_hackerTimer) clearTimeout(_hackerTimer);
+  if (!alunoAtivo) return;
+  _hackerTimer = setTimeout(dispararHackerAlert, HACKER_INTERVALO);
+}
+function pararTimerHacker() {
+  if (_hackerTimer) { clearTimeout(_hackerTimer); _hackerTimer = null; }
 }
 
 // =============================================================
@@ -7205,6 +7273,23 @@ function renderPainelPro() {
     .filter(s=>s.prioridade>0);
 
   // ---- STATS CARDS ----
+  // ---- ALERTA BANCO HACKER ESGOTADO ----
+  const esgotadosPorNivel = {1:[], 2:[], 3:[]};
+  alunos.forEach(a => { if (a.progresso?.hackerBancoEsgotado) esgotadosPorNivel[a.nivel||1].push(a.nome); });
+  const niveisEsgotados = [1,2,3].filter(n => esgotadosPorNivel[n].length > 0);
+  if (niveisEsgotados.length > 0) {
+    const avisoHtml = niveisEsgotados.map(n => {
+      const emoji = {1:'🦊',2:'🚀',3:'⚡'}[n];
+      return '<span>' + emoji + ' <strong>Nível ' + n + ':</strong> ' + esgotadosPorNivel[n].join(', ') + '</span>';
+    }).join(' &nbsp;·&nbsp; ');
+    statsEl.insertAdjacentHTML('beforebegin',
+      '<div style="background:#FEF2F2;border:2px solid #EF4444;border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;">'
+      + '<div style="font-size:28px;flex-shrink:0;">☠️</div>'
+      + '<div><div style="font-size:14px;font-weight:800;color:#B91C1C;margin-bottom:4px;">BANCO DO HACKER ALERT ESGOTADO</div>'
+      + '<div style="font-size:13px;color:#7F1D1D;line-height:1.5;">Estes alunos já responderam todas as perguntas. Adicione novas em <code>PERGUNTAS_HACKER</code>.<br>'
+      + '<span style="margin-top:6px;display:block;">' + avisoHtml + '</span></div></div></div>');
+  }
+
   statsEl.innerHTML = `
     ${ppStatCard(totalAlunos, "Alunos", "#6366F1")}
     ${ppStatCard(precisamAtencao, "Precisam de atenção", precisamAtencao? "#EF4444":"#10B981")}
