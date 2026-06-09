@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hand Lab</title>
+<style>
+  body { margin:0; background:#0F172A; font-family:'Segoe UI',system-ui,sans-serif; color:#E2E8F0; padding:40px; }
+  .row { display:flex; gap:48px; align-items:flex-end; justify-content:center; }
+  .col { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .lbl { font-size:11px; letter-spacing:1px; color:#64748B; text-transform:uppercase; font-weight:700; }
+  h2 { text-align:center; font-weight:800; }
+</style>
+</head>
+<body>
+<h2>Hand Lab — guia de dedos</h2>
+<div class="row" id="stage"></div>
+
+<script>
+// fingers: 1 pinky, 2 ring, 3 middle, 4 index, 5 thumb
+const cores = ['', '#A78BFA', '#60A5FA', '#34D399', '#FBBF24', '#F87171'];
+const nomes = ['', 'Mínimo', 'Anelar', 'Médio', 'Indicador', 'Polegar'];
+const ativos = new Set([3,4]); // test highlight middle + index
+
+function hand(side) {
+  // Design on a RIGHT hand, palm-down, back view, fingers up. Mirror for left.
+  // viewBox 0 0 200 250. Wrist bottom-center, knuckles ~y115, fingertips vary.
+  // Finger geometry: {cx of base, baseY, tipY, width}
+  // For right hand: index leftmost(4) ... pinky rightmost(1), thumb(5) off to left & low.
+  const fingers = {
+    4: { cx: 72,  tipY: 44, w: 26 },  // index
+    3: { cx: 104, tipY: 30, w: 27 },  // middle (longest)
+    2: { cx: 135, tipY: 46, w: 26 },  // ring
+    1: { cx: 162, tipY: 66, w: 23 },  // pinky (shortest)
+  };
+  const knuckleY = 118;
+  const thumb = { bx: 58, by: 150, tx: 22, ty: 188, w: 30 };
+
+  let shapes = '';
+  const labels = []; // {x,y,txt} in right-hand coords
+  // palm: rounded shape from wrist up to knuckle line, fanning out
+  const palm = `M58,150
+    C 48,128 50,118 60,114
+    L 168,114
+    C 178,118 180,130 174,150
+    C 172,196 150,224 116,228
+    C 86,231 64,214 58,184 Z`;
+  shapes += `<path d="${palm}" fill="var(--skin)" stroke="var(--skinEdge)" stroke-width="2"/>`;
+
+  // each finger as a capsule from knuckle to tip
+  for (const f of [4,3,2,1]) {
+    const fg = fingers[f];
+    const on = ativos.has(f);
+    const col = on ? cores[f] : 'var(--skin)';
+    const edge = on ? col : 'var(--skinEdge)';
+    const half = fg.w/2;
+    const top = fg.tipY;
+    const bot = knuckleY + 6;
+    shapes += `<rect x="${fg.cx-half}" y="${top}" width="${fg.w}" height="${bot-top}" rx="${half}"
+      fill="${col}" stroke="${edge}" stroke-width="2"/>`;
+    // knuckle crease line
+    shapes += `<line x1="${fg.cx-half+4}" y1="${knuckleY}" x2="${fg.cx+half-4}" y2="${knuckleY}" stroke="var(--crease)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>`;
+    if (on) labels.push({ x: fg.cx, y: top+19, txt: f });
+  }
+  // thumb capsule (rotated)
+  {
+    const f = 5; const on = ativos.has(f);
+    const col = on ? cores[f] : 'var(--skin)';
+    const edge = on ? col : 'var(--skinEdge)';
+    const dx = thumb.tx-thumb.bx, dy = thumb.ty-thumb.by;
+    const len = Math.hypot(dx,dy);
+    const ang = Math.atan2(dy,dx)*180/Math.PI;
+    shapes += `<g transform="translate(${thumb.bx},${thumb.by}) rotate(${ang})">
+      <rect x="0" y="${-thumb.w/2}" width="${len}" height="${thumb.w}" rx="${thumb.w/2}" fill="${col}" stroke="${edge}" stroke-width="2"/>
+    </g>`;
+    if (on) labels.push({ x: (thumb.bx+thumb.tx)/2, y: (thumb.by+thumb.ty)/2+5, txt: 5 });
+  }
+
+  const flip = side==='left';
+  const shapeTransform = flip ? 'scale(-1,1) translate(-200,0)' : '';
+  // labels drawn upright; mirror only their x position for the left hand
+  const labelSvg = labels.map(l => {
+    const x = flip ? 200 - l.x : l.x;
+    return `<text x="${x}" y="${l.y}" text-anchor="middle" fill="#0F172A" font-size="15" font-weight="900" font-family="system-ui">${l.txt}</text>`;
+  }).join('');
+
+  return `<svg width="170" height="220" viewBox="0 0 200 250"
+    style="--skin:#334155;--skinEdge:#475569;--crease:#1E293B;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))">
+    <g transform="${shapeTransform}">${shapes}</g>
+    ${labelSvg}
+  </svg>`;
+}
+
+document.getElementById('stage').innerHTML = `
+  <div class="col"><span class="lbl">Esquerda</span>${hand('left')}</div>
+  <div class="col"><span class="lbl">Direita</span>${hand('right')}</div>
+`;
+</script>
+</body>
+</html>

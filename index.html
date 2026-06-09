@@ -66,8 +66,13 @@
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='none'/%3E%3Ccircle cx='40' cy='40' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='0' cy='0' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='80' cy='0' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='0' cy='80' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Ccircle cx='80' cy='80' r='2' fill='%23CBD5E1' opacity='0.5'/%3E%3Cline x1='0' y1='0' x2='40' y2='40' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Cline x1='80' y1='0' x2='40' y2='40' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Cline x1='40' y1='40' x2='80' y2='80' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Cline x1='40' y1='40' x2='0' y2='80' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.4'/%3E%3Crect x='16' y='36' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3Crect x='56' y='36' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3Crect x='36' y='16' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3Crect x='36' y='56' width='8' height='8' rx='1' fill='none' stroke='%23E2E8F0' stroke-width='0.8' opacity='0.35'/%3E%3C/svg%3E");
+    background-color: #F4F6FB;
+    background-image:
+      radial-gradient(900px 620px at 8% -8%, rgba(99,102,241,0.12), transparent 60%),
+      radial-gradient(820px 600px at 102% 4%, rgba(249,115,22,0.10), transparent 55%),
+      radial-gradient(760px 720px at 50% 118%, rgba(20,184,166,0.09), transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--ink);
     min-height: 100vh;
     overflow-x: hidden;
@@ -318,6 +323,46 @@
   .nivel-preview-title { font-size: 18px; font-weight: 800; margin-bottom: 2px; font-family: 'Plus Jakarta Sans', sans-serif; }
   .nivel-preview-desc { color: var(--ink-soft); font-size: 13px; }
 
+  /* ===== Seletor de avatar ===== */
+  .avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px; }
+  .avatar-opt {
+    padding: 3px; border: 2px solid var(--line); border-radius: 14px;
+    background: var(--bg-2); cursor: pointer; aspect-ratio: 1;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .avatar-opt img { width: 100%; height: 100%; border-radius: 11px; display: block; background: #EEF2FF; }
+  .avatar-opt:hover { border-color: var(--ink-mute); transform: translateY(-2px); }
+  .avatar-opt.sel { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+  .dash-avatar-edit {
+    position: absolute; right: -2px; bottom: -2px; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+
+  /* ===== Impressão do feedback do aluno (pros pais) ===== */
+  #fichaPrintArea { display: none; }
+  @media print {
+    body.printing-ficha * { visibility: hidden !important; }
+    body.printing-ficha #fichaPrintArea, body.printing-ficha #fichaPrintArea * { visibility: visible !important; }
+    body.printing-ficha #fichaPrintArea {
+      display: block !important; position: absolute; inset: 0; padding: 0 10px;
+      font-family: 'Inter', sans-serif; color: #0F172A;
+    }
+    body.printing-ficha #fichaPrintArea h1 { font-size: 26px; margin: 4px 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body.printing-ficha #fichaPrintArea h2 { font-size: 16px; margin: 0 0 6px; color: #4F46E5; }
+    body.printing-ficha .print-head { border-bottom: 3px solid #4F46E5; padding-bottom: 14px; margin-bottom: 22px; }
+    body.printing-ficha .print-school { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #6366F1; margin-bottom: 4px; }
+    body.printing-ficha .print-sub { color: #64748B; font-size: 13px; }
+    body.printing-ficha .print-section { margin-bottom: 18px; }
+    body.printing-ficha .print-section p { font-size: 14px; line-height: 1.6; color: #334155; }
+    body.printing-ficha .print-section ul { margin: 6px 0 0 18px; }
+    body.printing-ficha .print-section li { font-size: 14px; line-height: 1.7; color: #334155; }
+    body.printing-ficha .print-tips { background: #EEF2FF; border-radius: 12px; padding: 14px 16px; }
+    body.printing-ficha .print-foot { margin-top: 30px; font-size: 11px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 10px; }
+    @page { margin: 1.5cm; }
+  }
+
   /* ============================
      DASHBOARD
      ============================ */
@@ -428,10 +473,12 @@
   }
   .modulo-card-icon-wrap {
     width: 52px; height: 52px; border-radius: 16px;
-    background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.22); backdrop-filter: blur(10px);
     display: flex; align-items: center; justify-content: center;
-    border: 1px solid rgba(255,255,255,0.3); font-size: 26px;
+    border: 1px solid rgba(255,255,255,0.35); font-size: 28px;
+    color: #fff;
   }
+  .modulo-card-icon-wrap iconify-icon { color: #fff; }
   .modulo-card-status {
     background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.3); border-radius: var(--radius-pill);
@@ -648,7 +695,7 @@
   .story-location::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
   .story-hero-emoji {
     font-size: 72px; margin-bottom: 24px; display: block; text-align: center;
-    filter: drop-shadow(0 0 32px rgba(99,102,241,0.4));
+    filter: drop-shadow(0 0 32px rgba(99,102,241,0.4)); color: #A5B4FC;
   }
   .story-hero-items {
     display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
@@ -660,7 +707,7 @@
     transition: all 0.2s;
   }
   .story-hero-item:hover { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.4); }
-  .story-hero-item-icon { font-size: 30px; }
+  .story-hero-item-icon { font-size: 30px; color: #C7D2FE; }
   .story-hero-item-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); }
   .story-titulo {
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1945,6 +1992,11 @@
         <input type="number" class="form-input" id="inputIdade" placeholder="Ex: 8, 10, 15..." min="5" max="99">
       </div>
 
+      <div class="form-group">
+        <label class="form-label">ESCOLHA SEU AVATAR</label>
+        <div class="avatar-grid" id="cadastroAvatarGrid"></div>
+      </div>
+
       <div class="nivel-preview" id="nivelPreview">
         <div class="nivel-preview-label">SEU NÍVEL SERÁ</div>
         <div class="nivel-preview-title" id="nivelPreviewTitle">Digite sua idade...</div>
@@ -1968,8 +2020,9 @@
     </div>
 
     <div class="dash-header">
-      <div class="dash-avatar-wrap" id="dashAvatarWrap">
+      <div class="dash-avatar-wrap" id="dashAvatarWrap" onclick="abrirModalAvatar()" title="Trocar avatar" style="cursor:pointer;position:relative;">
         <img class="dash-avatar-img" id="dashAvatarImg" src="" alt="">
+        <span class="dash-avatar-edit"><iconify-icon icon="ph:pencil-simple-fill"></iconify-icon></span>
       </div>
       <div>
         <div class="dash-greeting">OLÁ,</div>
@@ -2061,6 +2114,12 @@
         <div class="pratique-desc">Fase de plataforma pixel art. Colete dados, derrote virus, chegue ao PC Central.</div>
         <div class="pratique-arrow">→</div>
       </div>
+      <div class="pratique-card" onclick="iniciarRelampago()">
+        <div class="pratique-icon-wrap"><iconify-icon icon="ph:lightning-bold"></iconify-icon></div>
+        <div class="pratique-title">Desafio Relâmpago</div>
+        <div class="pratique-desc">60 segundos pra acertar o máximo. Vale pontos extras.</div>
+        <div class="pratique-arrow">→</div>
+      </div>
       <div class="pratique-card" onclick="iniciarAtiradorPalavras()">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:shooting-star-bold"></iconify-icon></div>
         <div class="pratique-title">Atirador de Palavras</div>
@@ -2149,6 +2208,33 @@
     <div id="syncMsgModal" style="margin-top:12px;font-size:13px;min-height:20px;"></div>
   </div>
 </div>
+
+<!-- ====================== MODAL ESCOLHER AVATAR ====================== -->
+<div id="modalAvatar" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:24px;padding:28px;max-width:520px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;">
+    <h2 style="font-size:22px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:4px;">Escolha seu avatar</h2>
+    <p style="color:#64748B;font-size:14px;margin-bottom:18px;">Toque no personagem que mais combina com você.</p>
+    <div class="avatar-grid" id="modalAvatarGrid"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn ghost" style="flex:1;" onclick="document.getElementById('modalAvatar').style.display='none'">Cancelar</button>
+      <button class="btn lg" style="flex:1;" onclick="salvarAvatarEscolhido()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== FICHA INDIVIDUAL DO ALUNO ====================== -->
+<div id="modalFichaAluno" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10001;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#F8FAFC;border-radius:24px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.3);">
+    <div style="background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:18px 24px;border-radius:24px 24px 0 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;">
+      <div style="color:#fff;font-size:16px;font-weight:800;">Ficha do Aluno</div>
+      <button onclick="fecharFichaAluno()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:10px;padding:6px 14px;font-weight:700;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:24px;" id="fichaAlunoBody"></div>
+  </div>
+</div>
+
+<!-- área de impressão (feedback pros pais) -->
+<div id="fichaPrintArea"></div>
 
 <!-- ====================== AULA ====================== -->
 <div class="screen story-mode" id="screen-aula">
@@ -2249,8 +2335,23 @@
 <!-- ====================== HACKER RUNNER (standalone page) ====================== -->
 <div class="screen" id="screen-caca"></div>
 
-<!-- ====================== HACKER ALERT OVERLAY ====================== -->
-<div id="hackerAlertOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:#000;overflow:auto;"></div>
+<!-- ====================== DESAFIO RELÂMPAGO ====================== -->
+<div class="screen" id="screen-relampago">
+  <div class="container-narrow">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="confirmarSairRelampago()">← Sair</button>
+      <div class="top-bar-title">⚡ Desafio Relâmpago</div>
+    </div>
+    <div class="jogo-header">
+      <div class="jogo-stat"><div class="jogo-stat-val" id="relPontos">0</div><div class="jogo-stat-label">PONTOS</div></div>
+      <div class="jogo-stat"><div class="jogo-stat-val" id="relAcertos">0</div><div class="jogo-stat-label">ACERTOS</div></div>
+      <div class="jogo-stat"><div class="jogo-stat-val" id="relCombo">×1</div><div class="jogo-stat-label">COMBO</div></div>
+      <div class="jogo-stat"><div class="jogo-stat-val" id="relTempo">60</div><div class="jogo-stat-label">SEGUNDOS</div></div>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="relTimerFill" style="width:100%"></div></div>
+    <div id="relampagoContent"></div>
+  </div>
+</div>
 
 <!-- ====================== MENU DIGITAÇÃO ====================== -->
 <div class="screen" id="screen-digitacao-menu">
@@ -3314,7 +3415,6 @@ function showScreen(id) {
 }
 
 function goHome() {
-  pararTimerHacker();
   alunoAtivo = null;
   localStorage.removeItem(ATIVO_KEY);
   showScreen("home");
@@ -3327,6 +3427,7 @@ function goCadastro() {
   document.getElementById("nivelPreview").className = "nivel-preview";
   document.getElementById("nivelPreviewTitle").textContent = "Digite sua idade...";
   document.getElementById("nivelPreviewDesc").textContent = "A gente libera o nível certo de acordo com sua idade.";
+  initAvatarCadastro();
   showScreen("cadastro");
   setTimeout(() => document.getElementById("inputNome").focus(), 100);
 }
@@ -3335,7 +3436,6 @@ function goDashboard() {
   if (!alunoAtivo) return goHome();
   renderDashboard();
   showScreen("dashboard");
-  iniciarTimerHacker();
 }
 
 // =============================================================
@@ -3346,6 +3446,82 @@ function dicebearUrl(seed, nivel) {
   const bgPalette = { 1: 'ffdfbf,fed7aa', 2: 'b6e3f4,bae6fd', 3: 'c0aede,ddd6fe' };
   const bg = bgPalette[nivel] || 'e5e7eb';
   return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg}`;
+}
+
+// ---- AVATAR ESCOLHÍVEL PELO ALUNO ----
+const AVATAR_PRESETS = [
+  { style:'adventurer',      seed:'Felix' },
+  { style:'adventurer',      seed:'Aneka' },
+  { style:'adventurer',      seed:'Leo' },
+  { style:'adventurer',      seed:'Mia' },
+  { style:'big-smile',       seed:'Buddy' },
+  { style:'big-smile',       seed:'Sunny' },
+  { style:'micah',           seed:'Max' },
+  { style:'micah',           seed:'Bella' },
+  { style:'bottts',          seed:'RoboX' },
+  { style:'bottts',          seed:'Sparky' },
+  { style:'fun-emoji',       seed:'Happy' },
+  { style:'fun-emoji',       seed:'Cool' },
+  { style:'lorelei',         seed:'Luna' },
+  { style:'open-peeps',      seed:'Sam' },
+  { style:'personas',        seed:'Nova' },
+  { style:'pixel-art',       seed:'Pixel' },
+  { style:'thumbs',          seed:'Toby' },
+  { style:'croodles',        seed:'Doodle' }
+];
+function avatarBg(nivel){ return ({1:'ffdfbf,fed7aa',2:'b6e3f4,bae6fd',3:'c0aede,ddd6fe'})[nivel] || 'e5e7eb'; }
+// URL do avatar de um aluno (usa o escolhido; senão cai no determinístico)
+function avatarUrl(a){
+  const bg = avatarBg(a && a.nivel);
+  let style = 'adventurer', seed = ((a && a.nome) || '') + ((a && a.id) || '');
+  if (a && a.avatar && a.avatar.style){ style = a.avatar.style; seed = a.avatar.seed; }
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg}`;
+}
+function avatarPresetUrl(p, nivel){
+  return `https://api.dicebear.com/9.x/${p.style}/svg?seed=${encodeURIComponent(p.seed)}&backgroundColor=${avatarBg(nivel)}`;
+}
+function renderAvatarGrid(containerId, nivel, selIndex, onclickName){
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = AVATAR_PRESETS.map((p,i)=>
+    `<button type="button" class="avatar-opt${i===selIndex?' sel':''}" data-i="${i}" onclick="${onclickName}(${i})" aria-label="Avatar ${i+1}">
+      <img src="${avatarPresetUrl(p,nivel)}" alt="" loading="lazy">
+    </button>`).join('');
+}
+
+// seleção durante o cadastro
+let cadastroAvatarSel = 0;
+function initAvatarCadastro(){
+  cadastroAvatarSel = Math.floor(Math.random()*AVATAR_PRESETS.length);
+  const idade = parseInt(document.getElementById('inputIdade').value) || 8;
+  renderAvatarGrid('cadastroAvatarGrid', calcularNivel(idade), cadastroAvatarSel, 'selecionarAvatarCadastro');
+}
+function selecionarAvatarCadastro(i){
+  cadastroAvatarSel = i;
+  document.querySelectorAll('#cadastroAvatarGrid .avatar-opt').forEach(el=>
+    el.classList.toggle('sel', +el.dataset.i === i));
+}
+
+// troca de avatar a partir do dashboard
+let modalAvatarSel = 0;
+function abrirModalAvatar(){
+  if (!alunoAtivo) return;
+  const idx = AVATAR_PRESETS.findIndex(p => alunoAtivo.avatar && p.style===alunoAtivo.avatar.style && p.seed===alunoAtivo.avatar.seed);
+  modalAvatarSel = idx >= 0 ? idx : 0;
+  renderAvatarGrid('modalAvatarGrid', alunoAtivo.nivel, modalAvatarSel, 'selecionarAvatarModal');
+  document.getElementById('modalAvatar').style.display = 'flex';
+}
+function selecionarAvatarModal(i){
+  modalAvatarSel = i;
+  document.querySelectorAll('#modalAvatarGrid .avatar-opt').forEach(el=>
+    el.classList.toggle('sel', +el.dataset.i === i));
+}
+function salvarAvatarEscolhido(){
+  if (!alunoAtivo) return;
+  alunoAtivo.avatar = { ...AVATAR_PRESETS[modalAvatarSel] };
+  salvarAluno(alunoAtivo);
+  document.getElementById('modalAvatar').style.display = 'none';
+  renderDashboard();
 }
 
 function renderHome() {
@@ -3382,7 +3558,7 @@ function renderHome() {
           </span>
         </div>
         <div class="aluno-avatar-wrap">
-          <img class="aluno-avatar-img" src="${dicebearUrl(a.nome + a.id, n)}" alt="">
+          <img class="aluno-avatar-img" src="${avatarUrl(a)}" alt="">
         </div>
         <div class="aluno-body">
           <div class="aluno-nome">${escapeHtml(a.nome)}</div>
@@ -3457,6 +3633,7 @@ function finalizarCadastro() {
     nome,
     idade,
     nivel: calcularNivel(idade),
+    avatar: { ...AVATAR_PRESETS[cadastroAvatarSel] },
     progresso: {},
     criado: new Date().toISOString()
   };
@@ -3484,7 +3661,7 @@ function renderDashboard() {
   if (!a) return goHome();
   const n = a.nivel;
 
-  document.getElementById("dashAvatarImg").src = dicebearUrl(a.nome + a.id, n);
+  document.getElementById("dashAvatarImg").src = avatarUrl(a);
   document.getElementById("dashAvatarWrap").setAttribute("data-n", n);
   document.querySelector(".dash-header").setAttribute("data-n", n);
   document.getElementById("dashName").textContent = a.nome.toUpperCase();
@@ -3660,6 +3837,40 @@ function iniciarModulo(moduloId) {
   showScreen("aula");
 }
 
+// ---- Mapa emoji -> ícone vetorial (Phosphor) para o conteúdo das aulas ----
+const EMOJI_ICON = {
+  '🖥️':'ph:desktop','💻':'ph:laptop','⌨️':'ph:keyboard','🖱️':'ph:mouse','🖨️':'ph:printer',
+  '📷':'ph:camera','📱':'ph:device-mobile','📺':'ph:television-simple','🎮':'ph:game-controller','🎧':'ph:headphones',
+  '🎤':'ph:microphone','🎙️':'ph:microphone-stage','🔊':'ph:speaker-high','🧠':'ph:brain','💾':'ph:floppy-disk',
+  '💿':'ph:disc','🔌':'ph:plug','⚡':'ph:lightning','📡':'ph:broadcast','🔲':'ph:computer-tower',
+  '🖼️':'ph:image','🗄️':'ph:file-archive','🗂️':'ph:folders','📁':'ph:folder','📂':'ph:folder-open',
+  '📄':'ph:file','📝':'ph:note-pencil','✏️':'ph:pencil','✍️':'ph:pencil-line','📋':'ph:clipboard-text',
+  '📑':'ph:files','📊':'ph:chart-bar','📈':'ph:chart-line-up','📐':'ph:ruler','📏':'ph:ruler',
+  '🔍':'ph:magnifying-glass','🌐':'ph:globe','🧭':'ph:compass','🔗':'ph:link','☁️':'ph:cloud',
+  '🔄':'ph:arrows-clockwise','🔧':'ph:wrench','⚙️':'ph:gear','🧩':'ph:puzzle-piece','🛡️':'ph:shield-check',
+  '🔒':'ph:lock','🔐':'ph:lock-key','🔑':'ph:key','🦠':'ph:virus','😈':'ph:bug',
+  '💀':'ph:skull','🔥':'ph:fire','⚠️':{icon:'ph:warning-fill',color:'#F59E0B'},'❌':{icon:'ph:x-circle-fill',color:'#EF4444'},
+  '✅':{icon:'ph:check-circle-fill',color:'#10B981'},'💡':{icon:'ph:lightbulb-fill',color:'#F59E0B'},'🎯':'ph:target',
+  '🚀':'ph:rocket-launch','🏆':{icon:'ph:trophy-fill',color:'#F59E0B'},'🥇':{icon:'ph:medal-fill',color:'#F59E0B'},
+  '🥈':{icon:'ph:medal-fill',color:'#94A3B8'},'🥉':{icon:'ph:medal-fill',color:'#B45309'},'🎖️':'ph:medal-military',
+  '⭐':{icon:'ph:star-fill',color:'#F59E0B'},'🌟':{icon:'ph:star-four-fill',color:'#F59E0B'},'👑':{icon:'ph:crown-fill',color:'#F59E0B'},
+  '🎓':'ph:graduation-cap','🎉':'ph:confetti','💪':'ph:barbell','👍':'ph:thumbs-up','🏠':'ph:house',
+  '👥':'ph:users-three','📧':'ph:envelope','💬':'ph:chat-circle','📚':'ph:books','📜':'ph:scroll',
+  '🔤':'ph:text-aa','🔡':'ph:text-aa','🔢':'ph:hash','🕶️':'ph:sunglasses','👁️':'ph:eye',
+  '⚖️':'ph:scales','⏱️':'ph:timer','⏰':'ph:alarm','🔬':'ph:microscope','🎵':'ph:music-note',
+  '🎬':'ph:film-slate','🏫':'ph:chalkboard','🏁':'ph:flag-checkered','🃏':'ph:cards','➕':'ph:plus',
+  '📦':'ph:package','📥':'ph:tray-arrow-down','🔎':'ph:magnifying-glass',
+  '🔴':{icon:'ph:circle-fill',color:'#EF4444'},'🟢':{icon:'ph:circle-fill',color:'#10B981'},'🟡':{icon:'ph:circle-fill',color:'#F59E0B'},
+  '🔵':{icon:'ph:circle-fill',color:'#3B82F6'},'🟠':{icon:'ph:circle-fill',color:'#F97316'},'🟣':{icon:'ph:circle-fill',color:'#8B5CF6'}
+};
+function emj(e){
+  if(!e) return '';
+  let m = EMOJI_ICON[e];
+  if(!m) return e; // sem mapeamento: mantém o emoji original
+  if(typeof m === 'string') m = { icon: m };
+  return `<iconify-icon icon="${m.icon}"${m.color?` style="color:${m.color};"`:''}></iconify-icon>`;
+}
+
 function renderAula() {
   const m = aulaState.modulo;
   const n = alunoAtivo.nivel;
@@ -3695,11 +3906,11 @@ function renderAula() {
   // hero
   let heroHtml = "";
   if (pag.tipo === "hero" || pag.tipo === "callout") {
-    heroHtml = `<span class="story-hero-emoji">${pag.emoji}</span>`;
+    heroHtml = `<span class="story-hero-emoji">${emj(pag.emoji)}</span>`;
   } else if (pag.tipo === "items") {
     heroHtml = `<div class="story-hero-items">${pag.items.map(it =>
       `<div class="story-hero-item">
-        <div class="story-hero-item-icon">${it.icone}</div>
+        <div class="story-hero-item-icon">${emj(it.icone)}</div>
         <div class="story-hero-item-label">${it.label}</div>
       </div>`).join("")}</div>`;
   }
@@ -4705,7 +4916,7 @@ function renderRanking() {
       <div class="ranking-item ${isMe ? 'me' : ''}">
         <div class="ranking-pos ${posClass}">${posIcon}</div>
         <div class="ranking-avatar" data-n="${a.nivel}">
-          <img src="${dicebearUrl(a.nome + a.id, a.nivel)}" alt="">
+          <img src="${avatarUrl(a)}" alt="">
         </div>
         <div class="ranking-nome">${escapeHtml(a.nome)} ${isMe ? '<span style="color:var(--ink-soft);font-weight:500;">(você)</span>' : ''}</div>
         <div class="ranking-pts">
@@ -4858,273 +5069,129 @@ function processarResultadoJogoPendente() {
 }
 
 // =============================================================
-// HACKER ALERT — Desafio Surpresa a cada 30 minutos
+// DESAFIO RELÂMPAGO
 // =============================================================
+let relState = { pontos: 0, acertos: 0, combo: 1, tempo: 60, timerId: null, answered: false, perguntasUsadas: [] };
 
-const HACKER_INTERVALO = 30 * 60 * 1000; // 30 min
-const HACKER_RECOMPENSA = 150;
-const HACKER_PENALIDADE = -50;
-let _hackerTimer = null;
-let _hackerSirenAudio = null;
-let _hackerState = { respondido: false, qAtual: null };
+function iniciarRelampago() {
+  relState = { pontos: 0, acertos: 0, combo: 1, tempo: 60, timerId: null, answered: false, perguntasUsadas: [] };
+  atualizarStatsRelampago();
+  document.getElementById("relTimerFill").style.width = "100%";
+  showScreen("relampago");
+  proximaPerguntaRelampago();
 
-// Banco de perguntas exclusivo do Hacker Alert — NÃO usa o banco dos módulos
-const PERGUNTAS_HACKER = {
-  1: [ // Nível 1 — Aprendiz (≤10 anos), linguagem simples, direto ao ponto
-    { q: "O teclado é um hardware ou software?", options: ["Hardware", "Software", "Os dois", "Nenhum"], correct: 0 },
-    { q: "Qual dessas coisas você pode TOCAR com a mão?", options: ["O Windows", "O Chrome", "O monitor", "A internet"], correct: 2 },
-    { q: "O que o mouse faz?", options: ["Guarda arquivos", "Move o cursor na tela", "Conecta à internet", "Liga o computador"], correct: 1 },
-    { q: "Para que serve o HD (HD do computador)?", options: ["Mostrar imagens", "Guardar arquivos", "Conectar à rede", "Processar cálculos"], correct: 1 },
-    { q: "O Chrome é um...", options: ["Hardware", "Processador", "Navegador", "Sistema operacional"], correct: 2 },
-    { q: "Qual dessas é uma ENTRADA de dados no computador?", options: ["Monitor", "Caixa de som", "Impressora", "Teclado"], correct: 3 },
-    { q: "O que é o Windows?", options: ["Um jogo", "Uma marca de monitor", "Um sistema operacional", "Um antivírus"], correct: 2 },
-    { q: "Pen drive serve para...", options: ["Imprimir documentos", "Carregar o celular", "Guardar e transferir arquivos", "Aumentar a velocidade"], correct: 2 },
-    { q: "Qual é o 'cérebro' do computador?", options: ["HD", "RAM", "Monitor", "CPU"], correct: 3 },
-    { q: "Para que serve o antivírus?", options: ["Acelerar o Wi-Fi", "Proteger contra vírus digitais", "Melhorar a qualidade da tela", "Guardar senhas"], correct: 1 },
-    { q: "O monitor é um hardware de SAÍDA ou ENTRADA?", options: ["Entrada", "Saída", "Os dois", "Nenhum"], correct: 1 },
-    { q: "O que é a internet?", options: ["Um programa para escrever textos", "Uma rede mundial de computadores", "Um tipo de hardware", "Um antivírus"], correct: 1 },
-    { q: "Qual desses é um hardware?", options: ["Word", "Google Chrome", "Placa de vídeo", "Spotify"], correct: 2 },
-    { q: "O que a RAM faz no computador?", options: ["Guarda fotos permanentemente", "Conecta à internet", "Guarda dados temporariamente enquanto usa", "Liga a impressora"], correct: 2 },
-    { q: "Clicar duas vezes rápido no mouse se chama:", options: ["Arrastar", "Duplo clique", "Scroll", "Selecionar"], correct: 1 },
-    { q: "O Wi-Fi serve para...", options: ["Imprimir documentos", "Conectar sem fio à internet", "Salvar arquivos", "Ligar o computador"], correct: 1 },
-    { q: "Qual desses é um software?", options: ["Impressora", "Teclado", "Minecraft", "Memória RAM"], correct: 2 },
-    { q: "O que acontece com os dados na RAM quando o computador desliga?", options: ["Ficam salvos para sempre", "Vão para o HD", "São apagados", "Vão para a nuvem"], correct: 2 },
-    { q: "Qual tecla apaga o que está à esquerda do cursor?", options: ["Delete", "Backspace", "Esc", "Enter"], correct: 1 },
-    { q: "O que é um arquivo?", options: ["Um tipo de hardware", "Um documento ou dado salvo no computador", "Uma conexão de internet", "Um vírus"], correct: 1 },
-    { q: "Para salvar um documento no Word, usa qual atalho?", options: ["Ctrl+P", "Ctrl+C", "Ctrl+S", "Ctrl+Z"], correct: 2 },
-    { q: "A impressora é um hardware de:", options: ["Entrada", "Processamento", "Saída", "Armazenamento"], correct: 2 },
-  ],
-  2: [ // Nível 2 — Intermediário (11–14 anos)
-    { q: "Qual é a diferença entre RAM e HD?", options: ["RAM é mais lenta que HD", "RAM é temporária, HD é permanente", "HD é mais cara que RAM", "São a mesma coisa"], correct: 1 },
-    { q: "O que é phishing?", options: ["Um vírus que apaga arquivos", "Golpe que rouba dados fingindo ser site legítimo", "Um tipo de antivírus", "Um protocolo de rede"], correct: 1 },
-    { q: "O que significa 'formatar' um computador?", options: ["Instalar mais RAM", "Atualizar o Windows", "Apagar tudo e reinstalar o sistema", "Conectar ao Wi-Fi"], correct: 2 },
-    { q: "TCP/IP é...", options: ["Um tipo de vírus", "Um navegador", "O protocolo base da internet", "Uma marca de hardware"], correct: 2 },
-    { q: "O que faz um firewall?", options: ["Acelera o processador", "Bloqueia conexões suspeitas na rede", "Aumenta o espaço em disco", "Melhora a qualidade da imagem"], correct: 1 },
-    { q: "O que é a 'nuvem' em tecnologia?", options: ["Efeito visual do sistema operacional", "Armazenamento remoto em servidores", "Um tipo de vírus", "Memória interna do celular"], correct: 1 },
-    { q: "Qual é a função de um sistema operacional?", options: ["Navegar na internet", "Gerenciar hardware e software do computador", "Criar documentos", "Jogar games"], correct: 1 },
-    { q: "Um SSD é mais rápido que um HD porque...", options: ["Usa eletricidade", "Não tem peças mecânicas em movimento", "É maior fisicamente", "Tem mais RAM"], correct: 1 },
-    { q: "O que é um IP?", options: ["Um tipo de vírus", "Um endereço único de cada dispositivo na rede", "O nome do Wi-Fi", "Um navegador"], correct: 1 },
-    { q: "Qual destes é um sistema operacional?", options: ["Chrome", "Word", "Ubuntu Linux", "Photoshop"], correct: 2 },
-    { q: "Para que serve o HTTPS nos sites?", options: ["Deixar o site mais bonito", "Criptografar a comunicação entre navegador e servidor", "Aumentar a velocidade do site", "Mostrar propaganda"], correct: 1 },
-    { q: "O que é malware?", options: ["Um tipo de hardware de entrada", "Software criado para prejudicar sistemas", "Um protocolo de rede", "Um navegador antigo"], correct: 1 },
-    { q: "Qual a função da GPU?", options: ["Guardar arquivos", "Gerenciar a rede", "Processar imagens e gráficos", "Controlar a memória RAM"], correct: 2 },
-    { q: "O que é compressão de arquivos (como .zip)?", options: ["Criptografar o arquivo com senha", "Reduzir o tamanho do arquivo", "Fazer backup automático", "Formatar o arquivo"], correct: 1 },
-    { q: "Qual porta padrão o HTTP usa?", options: ["21", "443", "80", "25"], correct: 2 },
-    { q: "O que é uma rede LAN?", options: ["Rede de longa distância global", "Rede local (mesma casa, escola ou empresa)", "Um tipo de vírus de rede", "Protocolo de segurança"], correct: 1 },
-    { q: "O que é resolução de tela?", options: ["Velocidade de carregamento", "Quantidade de pixels que a tela exibe", "Brilho máximo do monitor", "Frequência de atualização"], correct: 1 },
-    { q: "Qual dessas práticas ajuda a manter senha segura?", options: ["Usar o nome completo", "Usar a data de nascimento", "Usar letras, números e símbolos misturados", "Anotar no papel na mesa"], correct: 2 },
-    { q: "O que acontece em um ataque DDoS?", options: ["Roubo de senhas", "Servidor é sobrecarregado com muitas requisições falsas", "Vírus apaga arquivos", "Hacker acessa câmera"], correct: 1 },
-    { q: "Ctrl+Z no computador serve para:", options: ["Salvar", "Fechar o programa", "Desfazer a última ação", "Copiar"], correct: 2 },
-    { q: "O que é um driver?", options: ["Programa para navegar na internet", "Software que permite o SO comunicar com hardware", "Vírus disfarçado", "Arquivo de configuração do Wi-Fi"], correct: 1 },
-    { q: "Qual desses armazena mais dados?", options: ["8 GB", "512 MB", "2 TB", "64 KB"], correct: 2 },
-  ],
-  3: [ // Nível 3 — Avançado (15+) com pegadinhas
-    { q: "Quantos bits tem 1 byte?", options: ["4", "16", "8", "10"], correct: 2 },
-    { q: "O que é DNS?", options: ["Um tipo de vírus", "Sistema que traduz nomes de domínio em endereços IP", "Protocolo de transferência de arquivos", "Firewall de rede"], correct: 1 },
-    { q: "PEGADINHA: O antivírus instalado garante proteção total contra todos os vírus?", options: ["Sim, sempre", "Não, novos vírus podem não ser detectados", "Sim, se for pago", "Só se estiver atualizado ontem"], correct: 1 },
-    { q: "Qual é o valor de 1 kilobyte em bytes?", options: ["100 bytes", "1000 bytes", "1024 bytes", "512 bytes"], correct: 2 },
-    { q: "PEGADINHA: HTTPS significa que o site é confiável e seguro?", options: ["Sim, sempre", "Não necessariamente — HTTPS só criptografa; o site pode ser falso", "Sim, se tiver cadeado verde", "Depende do navegador"], correct: 1 },
-    { q: "O que é um ataque man-in-the-middle?", options: ["Vírus que multiplica arquivos", "Interceptação da comunicação entre duas partes", "Sobrecarga de servidor", "Roubo de arquivo físico"], correct: 1 },
-    { q: "Qual dessas linguagens é executada diretamente no navegador, sem instalação?", options: ["Python", "Java", "JavaScript", "C++"], correct: 2 },
-    { q: "O que é um hash (como SHA-256)?", options: ["Uma senha criptografada", "Função que transforma dados em código de tamanho fixo irreversível", "Um tipo de compressão de arquivo", "Protocolo de rede segura"], correct: 1 },
-    { q: "PEGADINHA: Deletar um arquivo manda ele para a lixeira e some do HD?", options: ["Sim, some completamente", "Não, o espaço é marcado como disponível mas o dado ainda existe", "Depende do tamanho", "Sim, se esvaziar a lixeira"], correct: 1 },
-    { q: "O que é virtualização?", options: ["Aumentar RAM com software", "Executar múltiplos SOs em uma máquina física usando hypervisor", "Conectar ao servidor em nuvem", "Comprimir disco rígido"], correct: 1 },
-    { q: "Qual porta usa o HTTPS?", options: ["80", "21", "25", "443"], correct: 3 },
-    { q: "PEGADINHA: RAM com mais GHz processa mais rápido que RAM com mais GB?", options: ["Sim, velocidade é mais importante", "Não — GHz é frequência, GB é capacidade; ambos importam por motivos diferentes", "Sim, sempre", "GHz não existe em RAM"], correct: 1 },
-    { q: "O que é SQL Injection?", options: ["Um tipo de vírus de rede", "Ataque que insere código SQL malicioso em campos de formulário", "Protocolo de banco de dados", "Técnica de compressão"], correct: 1 },
-    { q: "Em binário, quanto vale 1010?", options: ["8", "10", "12", "6"], correct: 1 },
-    { q: "PEGADINHA: Um programa open source é necessariamente gratuito?", options: ["Sim, sempre", "Não — open source se refere ao código aberto, não ao preço", "Sim, por lei", "Só se for Linux"], correct: 1 },
-    { q: "O que é latência em redes?", options: ["Velocidade máxima de download", "Quantidade de dados transferidos por segundo", "Tempo de atraso entre envio e recebimento de dados", "Número de dispositivos na rede"], correct: 2 },
-    { q: "O que faz o comando git commit?", options: ["Envia código para o servidor remoto", "Cria uma nova branch", "Salva um snapshot das mudanças no repositório local", "Apaga o histórico"], correct: 2 },
-    { q: "PEGADINHA: Modo avião no celular desliga completamente o GPS?", options: ["Sim, sempre", "Não — GPS usa satélite; alguns dispositivos mantêm GPS ativo mesmo no modo avião", "Sim, é obrigatório por lei", "Depende da operadora"], correct: 1 },
-    { q: "O que é overflow de buffer?", options: ["Memória RAM cheia", "Dados excedem o espaço reservado e sobrescrevem memória adjacente", "HD fragmentado", "Cache corrompida"], correct: 1 },
-    { q: "Qual algoritmo de ordenação tem complexidade O(n log n) no caso médio?", options: ["Bubble Sort", "Insertion Sort", "QuickSort", "Selection Sort"], correct: 2 },
-    { q: "PEGADINHA: IPv4 suporta mais endereços que IPv6?", options: ["Sim, é mais antigo", "Não — IPv4 tem ~4 bilhões de endereços; IPv6 tem 340 undecilhões", "Sim, tem mais bits", "São iguais"], correct: 1 },
-    { q: "O que é uma função recursiva?", options: ["Função que sempre retorna zero", "Função que se chama a si mesma", "Função sem parâmetros", "Função que roda em paralelo"], correct: 1 },
-  ]
-};
-
-function _hackerGetVistas() {
-  if (!alunoAtivo) return [];
-  return alunoAtivo.progresso?.hackerVistas || [];
+  if (relState.timerId) clearInterval(relState.timerId);
+  relState.timerId = setInterval(() => {
+    relState.tempo--;
+    document.getElementById("relTempo").textContent = relState.tempo;
+    document.getElementById("relTimerFill").style.width = (relState.tempo / 60 * 100) + "%";
+    if (relState.tempo <= 0) finalizarRelampago();
+  }, 1000);
 }
 
-function _hackerSalvarVista(id) {
-  if (!alunoAtivo) return;
-  alunoAtivo.progresso = alunoAtivo.progresso || {};
-  alunoAtivo.progresso.hackerVistas = alunoAtivo.progresso.hackerVistas || [];
-  if (!alunoAtivo.progresso.hackerVistas.includes(id)) {
-    alunoAtivo.progresso.hackerVistas.push(id);
+function atualizarStatsRelampago() {
+  document.getElementById("relPontos").textContent = relState.pontos;
+  document.getElementById("relAcertos").textContent = relState.acertos;
+  document.getElementById("relCombo").textContent = "×" + relState.combo;
+  document.getElementById("relTempo").textContent = relState.tempo;
+}
+
+function sortearPerguntaRelampago() {
+  const n = alunoAtivo.nivel;
+  const todas = [];
+  ORDEM_MODULOS.forEach(m => {
+    MODULOS[m].quiz[n].forEach((q, i) => todas.push({mod: m, idx: i, q}));
+  });
+  // filtra não usadas, senão reseta
+  let disponiveis = todas.filter(p => !relState.perguntasUsadas.includes(p.mod + p.idx));
+  if (disponiveis.length === 0) { relState.perguntasUsadas = []; disponiveis = todas; }
+  const escolhida = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+  relState.perguntasUsadas.push(escolhida.mod + escolhida.idx);
+  return escolhida.q;
+}
+
+function proximaPerguntaRelampago() {
+  if (relState.tempo <= 0) return;
+  const q = sortearPerguntaRelampago();
+  relState.qAtual = q;
+  relState.answered = false;
+
+  let opts = "";
+  if (q.tipo === "vf") {
+    opts = `
+      <button class="quiz-option vf-option" onclick="responderRelampago(0)">
+        <div class="quiz-option-letter" style="background:#10B981;color:white;">✓</div>
+        <div style="font-size:20px;">VERDADEIRO</div>
+      </button>
+      <button class="quiz-option vf-option" onclick="responderRelampago(1)">
+        <div class="quiz-option-letter" style="background:#EF4444;color:white;">✗</div>
+        <div style="font-size:20px;">FALSO</div>
+      </button>`;
+  } else {
+    const letters = ["A","B","C","D"];
+    opts = q.options.map((opt, i) =>
+      `<button class="quiz-option" onclick="responderRelampago(${i})">
+         <div class="quiz-option-letter">${letters[i]}</div>
+         <div>${opt}</div>
+       </button>`).join("");
   }
+
+  document.getElementById("relampagoContent").innerHTML = `
+    <div class="relampago-pergunta">
+      <div class="quiz-q-text">${q.q}</div>
+    </div>
+    <div class="quiz-options">${opts}</div>`;
+}
+
+function responderRelampago(idx) {
+  if (relState.answered) return;
+  relState.answered = true;
+  const q = relState.qAtual;
+  let acertou;
+  if (q.tipo === "vf") {
+    acertou = (q.correct ? 0 : 1) === idx;
+  } else {
+    acertou = q.correct === idx;
+  }
+
+  if (acertou) {
+    relState.acertos++;
+    relState.pontos += 5 * relState.combo;
+    relState.combo = Math.min(5, relState.combo + 1);
+  } else {
+    relState.combo = 1;
+  }
+  atualizarStatsRelampago();
+  setTimeout(proximaPerguntaRelampago, 400);
+}
+
+function finalizarRelampago() {
+  if (relState.timerId) clearInterval(relState.timerId);
+  adicionarPontosJogo(relState.pontos);
+  if (!alunoAtivo.progresso.jogos) alunoAtivo.progresso.jogos = {};
+  alunoAtivo.progresso.jogos.relampago = Math.max(alunoAtivo.progresso.jogos.relampago || 0, relState.acertos);
   salvarAluno(alunoAtivo);
-}
 
-function _hackerSortearPergunta() {
-  if (!alunoAtivo) return null;
-  const nivel = alunoAtivo.nivel || 1;
-  const banco = PERGUNTAS_HACKER[nivel] || PERGUNTAS_HACKER[1];
-  const vistas = _hackerGetVistas();
-  const chaveNivel = `n${nivel}_`;
-
-  let disponiveis = banco.map((q, i) => ({ q, id: chaveNivel + i }))
-    .filter(item => !vistas.includes(item.id));
-
-  if (disponiveis.length === 0) {
-    // banco esgotado — marca e retorna null
-    if (!alunoAtivo.progresso.hackerBancoEsgotado) {
-      alunoAtivo.progresso.hackerBancoEsgotado = true;
-      salvarAluno(alunoAtivo);
-    }
-    return null;
-  }
-
-  const escolhido = disponiveis[Math.floor(Math.random() * disponiveis.length)];
-  return escolhido;
-}
-
-function _hackerTocarSirene() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const tocar = (freq, inicio, dur) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + inicio);
-      osc.frequency.linearRampToValueAtTime(freq * 1.5, ctx.currentTime + inicio + dur / 2);
-      osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + inicio + dur);
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + inicio);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + inicio + dur);
-      osc.start(ctx.currentTime + inicio);
-      osc.stop(ctx.currentTime + inicio + dur);
-    };
-    for (let i = 0; i < 4; i++) tocar(440 + i * 50, i * 0.5, 0.45);
-  } catch(e) {}
-}
-
-function dispararHackerAlert() {
-  if (!alunoAtivo) return;
-  const item = _hackerSortearPergunta();
-  const overlay = document.getElementById('hackerAlertOverlay');
-  if (!overlay) return;
-
-  _hackerState = { respondido: false, qAtual: item };
-  _hackerTocarSirene();
-
-  if (!item) {
-    // banco esgotado — mostra mensagem diferente
-    overlay.style.display = 'block';
-    overlay.innerHTML = `
-      <style>
-        @keyframes hkFlicker { 0%,100%{opacity:1} 50%{opacity:.7} }
-        @keyframes hkScan { from{transform:translateY(-100%)} to{transform:translateY(100vh)} }
-        .hk-btn { display:inline-block;padding:12px 28px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;border:none; }
-      </style>
-      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0000 0%,#000 70%);padding:24px;box-sizing:border-box;">
-        <div style="overflow:hidden;position:fixed;inset:0;pointer-events:none;">
-          <div style="animation:hkScan 3s linear infinite;height:4px;background:rgba(255,0,0,0.15);width:100%;"></div>
-        </div>
-        <div style="max-width:520px;width:100%;text-align:center;">
-          <div style="font-size:72px;animation:hkFlicker 0.5s infinite;">⚠️</div>
-          <div style="font-size:13px;font-weight:900;letter-spacing:4px;color:#ef4444;margin:8px 0;">SISTEMA INFECTADO</div>
-          <div style="font-size:22px;font-weight:800;color:white;margin:16px 0;">Banco de desafios esgotado!</div>
-          <div style="color:#fca5a5;font-size:15px;margin-bottom:24px;">Todas as perguntas do seu nível já foram respondidas. O professor precisa adicionar novas.</div>
-          <button class="hk-btn" style="background:#ef4444;color:white;" onclick="fecharHackerAlert()">Entendido</button>
-        </div>
-      </div>`;
-    return;
-  }
-
-  const { q, id } = item;
-  const letters = ['A','B','C','D'];
-  const opts = q.options.map((opt, i) =>
-    `<button class="hk-btn hk-opt" data-i="${i}" onclick="responderHackerAlert(${i})"
-      style="display:block;width:100%;margin:8px 0;background:rgba(255,255,255,0.07);color:white;border:1.5px solid rgba(255,255,255,0.2);text-align:left;padding:14px 18px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s;">
-      <strong style="color:#ef4444;">${letters[i]})</strong> ${opt}
-    </button>`
-  ).join('');
-
-  overlay.style.display = 'block';
-  overlay.innerHTML = `
-    <style>
-      @keyframes hkFlicker { 0%,100%{opacity:1} 50%{opacity:.6} }
-      @keyframes hkPulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)} 70%{box-shadow:0 0 0 20px rgba(239,68,68,0)} }
-      @keyframes hkScan { from{transform:translateY(-100%)} to{transform:translateY(100vh)} }
-      @keyframes hkShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-      .hk-btn { cursor:pointer;border:none; }
-      .hk-opt:hover { background:rgba(239,68,68,0.2) !important; border-color:#ef4444 !important; }
-    </style>
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0000 0%,#000 70%);padding:24px;box-sizing:border-box;">
-      <div style="overflow:hidden;position:fixed;inset:0;pointer-events:none;">
-        <div style="animation:hkScan 2.5s linear infinite;height:3px;background:rgba(255,0,0,0.2);width:100%;"></div>
+  document.getElementById("relampagoContent").innerHTML = `
+    <div class="result-screen">
+      <div class="result-emoji">⚡</div>
+      <div class="result-title">Tempo!</div>
+      <div style="font-size:18px;color:var(--ink-soft);margin-bottom:12px;">
+        ${relState.acertos} acertos em 60 segundos
       </div>
-      <div style="max-width:540px;width:100%;animation:hkShake 0.5s ease;">
-        <div style="text-align:center;margin-bottom:20px;">
-          <div style="font-size:64px;animation:hkFlicker 0.4s infinite;">☠️</div>
-          <div style="font-size:11px;font-weight:900;letter-spacing:5px;color:#ef4444;margin:6px 0;">INVASÃO DETECTADA</div>
-          <div style="font-size:20px;font-weight:800;color:white;margin:10px 0;animation:hkFlicker 1s infinite;">
-            Seus pontos estão sendo hackeados!
-          </div>
-          <div style="color:#fca5a5;font-size:14px;margin-bottom:4px;">
-            Responda a pergunta de segurança agora para bloquear o ataque.<br>
-            <strong style="color:#fcd34d;">✅ Acertou: +${HACKER_RECOMPENSA} ⭐ &nbsp;|&nbsp; ❌ Errou: ${HACKER_PENALIDADE} ⭐</strong>
-          </div>
-        </div>
-        <div style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(239,68,68,0.5);border-radius:16px;padding:20px;animation:hkPulse 2s infinite;">
-          <div style="font-size:17px;font-weight:700;color:white;margin-bottom:16px;line-height:1.4;">${q.q}</div>
-          <div id="hackerOpts">${opts}</div>
-        </div>
-        <div id="hackerFeedback" style="margin-top:16px;text-align:center;min-height:48px;"></div>
+      <div class="result-score" data-n="${alunoAtivo.nivel}">+${relState.pontos} ⭐</div>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn ghost" onclick="iniciarRelampago()">↻ De novo</button>
+        <button class="btn" onclick="goDashboard()">Menu</button>
       </div>
     </div>`;
 }
 
-function responderHackerAlert(idx) {
-  if (_hackerState.respondido || !_hackerState.qAtual) return;
-  _hackerState.respondido = true;
-
-  const { q, id } = _hackerState.qAtual;
-  const acertou = q.correct === idx;
-  const delta = acertou ? HACKER_RECOMPENSA : HACKER_PENALIDADE;
-
-  // aplica pontos
-  if (alunoAtivo) {
-    alunoAtivo.progresso = alunoAtivo.progresso || {};
-    alunoAtivo.progresso.pontosJogos = Math.max(0, (alunoAtivo.progresso.pontosJogos || 0) + delta);
-    _hackerSalvarVista(id);
+function confirmarSairRelampago() {
+  if (confirm("Sair? Os pontos desta rodada serão perdidos.")) {
+    if (relState.timerId) clearInterval(relState.timerId);
+    goDashboard();
   }
-
-  // desabilita botões
-  document.querySelectorAll('.hk-opt').forEach((btn, i) => {
-    btn.style.pointerEvents = 'none';
-    if (i === q.correct) btn.style.background = 'rgba(16,185,129,0.35)';
-    else if (i === idx && !acertou) btn.style.background = 'rgba(239,68,68,0.35)';
-  });
-
-  const fb = document.getElementById('hackerFeedback');
-  if (fb) {
-    fb.innerHTML = acertou
-      ? `<div style="color:#34d399;font-size:20px;font-weight:800;">🛡️ Ataque bloqueado! +${HACKER_RECOMPENSA} ⭐</div>`
-      : `<div style="color:#f87171;font-size:18px;font-weight:800;">💀 Hackeado! ${HACKER_PENALIDADE} ⭐ — a resposta era: ${q.options[q.correct]}</div>`;
-  }
-
-  setTimeout(fecharHackerAlert, 3200);
-}
-
-function fecharHackerAlert() {
-  const overlay = document.getElementById('hackerAlertOverlay');
-  if (overlay) overlay.style.display = 'none';
-  // reagenda próximo disparo
-  iniciarTimerHacker();
-}
-
-function iniciarTimerHacker() {
-  if (_hackerTimer) clearTimeout(_hackerTimer);
-  if (!alunoAtivo) return;
-  _hackerTimer = setTimeout(dispararHackerAlert, HACKER_INTERVALO);
-}
-
-function pararTimerHacker() {
-  if (_hackerTimer) { clearTimeout(_hackerTimer); _hackerTimer = null; }
 }
 
 // =============================================================
@@ -5513,7 +5580,7 @@ const FILEIRAS = [
         id: 'm2', num: 2, tipo: 'TREINO', titulo: 'Adicionar D e K',
         teclas: ['f','j','d','k'],
         instrucao: 'Agora adicione <strong>D</strong> (dedo médio esquerdo) e <strong>K</strong> (dedo médio direito).',
-        dica: '🖕 Médio esquerdo = D · Médio direito = K',
+        dica: 'Médio esquerdo = D · Médio direito = K',
         texto: 'dk fd kj fk dj kf jd df kd fj dk fd fk jd dk fj jk df kd fj'
       },
       {
@@ -5567,7 +5634,7 @@ const FILEIRAS = [
         id: 's2', num: 2, tipo: 'TREINO', titulo: 'Adicionar E e I',
         teclas: ['r','u','e','i'],
         instrucao: '<strong>E</strong> (médio esquerdo sobe) e <strong>I</strong> (médio direito sobe). Vai devagar!',
-        dica: '🖕 Médio esquerdo sobe = E · Médio direito sobe = I',
+        dica: 'Médio esquerdo sobe = E · Médio direito sobe = I',
         texto: 'ei ru ue ir ei ru re ui ei ru ue ir re ui ei ru ue ir re ui ei'
       },
       {
@@ -5621,7 +5688,7 @@ const FILEIRAS = [
         id: 'i2', num: 2, tipo: 'TREINO', titulo: 'Adicionar C e M',
         teclas: ['c','m','v','n'],
         instrucao: '<strong>C</strong> (médio esquerdo desce) e <strong>M</strong> (indicador direito estica).',
-        dica: '🖕 Médio esquerdo desce = C · Direita M',
+        dica: 'Médio esquerdo desce = C · Direita M',
         texto: 'cm vn mc nv cm vn mc nv cm mv cn nv vn cm mc cn vn cm nv mc cn'
       },
       {
@@ -5869,60 +5936,58 @@ function renderGuiaMao() {
   const cores = ['', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 
   function buildHand(side) {
-    // Detailed hand SVG with dark theme, 120x160 viewBox
-    // fingers: 1(pinky), 2(ring), 3(middle), 4(index), 5(thumb)
-    let fingerPos, fingerLen;
-    if (side === 'left') {
-      // [tipX, tipY, baseX, baseY] for each finger
-      fingerPos = {
-        1:{tx:88,ty:75, bx:84,by:108}, // pinky
-        2:{tx:70,ty:55, bx:68,by:105}, // ring
-        3:{tx:52,ty:46, bx:52,by:105}, // middle
-        4:{tx:34,ty:53, bx:36,by:105}, // index
-        5:{tx:14,ty:108,bx:28,by:120}  // thumb
-      };
-    } else {
-      fingerPos = {
-        1:{tx:32,ty:75, bx:36,by:108}, // pinky
-        2:{tx:50,ty:55, bx:52,by:105}, // ring
-        3:{tx:68,ty:46, bx:68,by:105}, // middle
-        4:{tx:86,ty:53, bx:84,by:105}, // index
-        5:{tx:106,ty:108,bx:92,by:120} // thumb
-      };
+    // Friendly top-down hand (palm-down, back view). Designed as a RIGHT hand,
+    // mirrored for the left. fingers: 1 pinky, 2 ring, 3 middle, 4 index, 5 thumb.
+    // viewBox 0 0 200 250 — wrist bottom-center, fingers pointing up.
+    const fingers = {
+      4: { cx: 72,  tipY: 44, w: 26 },  // index
+      3: { cx: 104, tipY: 30, w: 27 },  // middle (longest)
+      2: { cx: 135, tipY: 46, w: 26 },  // ring
+      1: { cx: 162, tipY: 66, w: 23 },  // pinky (shortest)
+    };
+    const knuckleY = 118;
+    const thumb = { bx: 58, by: 150, tx: 22, ty: 188, w: 30 };
+
+    let shapes = '';
+    const labels = []; // {x,y,txt} in right-hand coords (drawn upright)
+
+    // palm — rounded shape fanning from wrist up to the knuckle line
+    const palm = `M58,150 C48,128 50,118 60,114 L168,114 C178,118 180,130 174,150
+      C172,196 150,224 116,228 C86,231 64,214 58,184 Z`;
+    shapes += `<path d="${palm}" fill="#334155" stroke="#475569" stroke-width="2"/>`;
+
+    // four fingers as rounded capsules from the knuckle line to the tip
+    for (const f of [4,3,2,1]) {
+      const fg = fingers[f];
+      const on = dedosNecessarios.has(f);
+      const col = on ? cores[f] : '#334155';
+      const edge = on ? col : '#475569';
+      const half = fg.w/2, top = fg.tipY, bot = knuckleY + 6;
+      shapes += `<rect x="${fg.cx-half}" y="${top}" width="${fg.w}" height="${bot-top}" rx="${half}" fill="${col}" stroke="${edge}" stroke-width="2"/>`;
+      shapes += `<line x1="${fg.cx-half+4}" y1="${knuckleY}" x2="${fg.cx+half-4}" y2="${knuckleY}" stroke="#1E293B" stroke-width="2" stroke-linecap="round" opacity="0.5"/>`;
+      if (on) labels.push({ x: fg.cx, y: top+19, txt: f });
     }
-    const palmPath = side === 'left'
-      ? `M22,128 Q18,100 22,85 L36,112 L52,112 L68,112 L84,112 L90,90 Q95,105 92,128 Q78,136 52,136 Q28,136 22,128 Z`
-      : `M98,128 Q102,100 98,85 L84,112 L68,112 L52,112 L36,112 L30,90 Q25,105 28,128 Q42,136 68,136 Q92,136 98,128 Z`;
-    // finger rectangles with rounded caps
-    let fingers = '';
-    for (let f = 1; f <= 5; f++) {
-      const p = fingerPos[f];
-      const ativo = dedosNecessarios.has(f);
-      const col = ativo ? cores[f] : '#334155';
-      const glowId = `glow-${side}-${f}`;
-      // draw finger as rounded rect from base to tip
-      const dx = p.tx - p.bx, dy = p.ty - p.by;
-      const len = Math.sqrt(dx*dx+dy*dy);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      const w = f === 5 ? 14 : 12; // thumb wider
-      fingers += `<g transform="translate(${p.bx},${p.by}) rotate(${angle})">
-        <rect x="${-w/2}" y="${-len}" width="${w}" height="${len}" rx="${w/2}" fill="${col}" opacity="${ativo ? 1 : 0.6}"/>
-        ${ativo ? `<rect x="${-w/2}" y="${-len}" width="${w}" height="${len}" rx="${w/2}" fill="url(#${glowId})" opacity="0.5"/>` : ''}
-      </g>`;
-      if (ativo) {
-        fingers = `<defs><radialGradient id="${glowId}"><stop offset="0%" stop-color="${col}" stop-opacity="0.8"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient></defs>` + fingers;
-      }
-      // fingertip circle with number
-      fingers += `<circle cx="${p.tx}" cy="${p.ty}" r="${f===5?9:8}" fill="${col}" opacity="${ativo?1:0.7}"/>`;
-      if (ativo) {
-        fingers += `<circle cx="${p.tx}" cy="${p.ty}" r="${f===5?13:12}" fill="none" stroke="${col}" stroke-width="2" opacity="0.4" class="guia-pulse-${side}-${f}"/>`;
-      }
-      fingers += `<text x="${p.tx}" y="${p.ty+4}" text-anchor="middle" fill="white" font-size="8" font-weight="800" font-family="sans-serif">${f}</text>`;
+    // thumb — angled capsule off the side
+    {
+      const on = dedosNecessarios.has(5);
+      const col = on ? cores[5] : '#334155';
+      const edge = on ? col : '#475569';
+      const dx = thumb.tx-thumb.bx, dy = thumb.ty-thumb.by;
+      const len = Math.hypot(dx,dy), ang = Math.atan2(dy,dx)*180/Math.PI;
+      shapes += `<g transform="translate(${thumb.bx},${thumb.by}) rotate(${ang})"><rect x="0" y="${-thumb.w/2}" width="${len}" height="${thumb.w}" rx="${thumb.w/2}" fill="${col}" stroke="${edge}" stroke-width="2"/></g>`;
+      if (on) labels.push({ x: (thumb.bx+thumb.tx)/2, y: (thumb.by+thumb.ty)/2+5, txt: 5 });
     }
-    const svgW = side === 'left' ? 120 : 120;
-    return `<svg width="${svgW}" height="145" viewBox="0 0 120 145" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))">
-      <path d="${palmPath}" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
-      ${fingers}
+
+    const flip = side === 'left';
+    const shapeTransform = flip ? 'scale(-1,1) translate(-200,0)' : '';
+    const labelSvg = labels.map(l => {
+      const x = flip ? 200 - l.x : l.x;
+      return `<text x="${x}" y="${l.y}" text-anchor="middle" fill="#0F172A" font-size="15" font-weight="900" font-family="system-ui">${l.txt}</text>`;
+    }).join('');
+
+    return `<svg width="132" height="165" viewBox="0 0 200 250" style="filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5))">
+      <g transform="${shapeTransform}">${shapes}</g>
+      ${labelSvg}
     </svg>`;
   }
 
@@ -7063,173 +7128,340 @@ async function painelRefresh() {
   renderPainelPro();
 }
 
+// ---- Helpers do diagnóstico ----
+const PP_NOME_MOD = { hardware:'Hardware', software:'Word', navegadores:'Navegadores', antivirus:'Antivírus', memoria:'Memória' };
+const PP_WPM_BAIXO = 15;
+
+function ppBestWpm(a){
+  let best = 0;
+  (a.progresso?.digitacao||[]).forEach(d=>{ if((d.wpm||0)>best) best=d.wpm; });
+  if (a.digitacao?.melhorWpm && a.digitacao.melhorWpm>best) best = a.digitacao.melhorWpm;
+  return best;
+}
+function ppModuloPct(a,m){ const p=a.progresso?.[m]; if(!p?.quizDone||!p.quizTotal) return null; return Math.round((p.quizScore/p.quizTotal)*100); }
+function ppUltimaAtividade(a){
+  const ds=[];
+  ORDEM_MODULOS.forEach(m=>{ const u=a.progresso?.[m]?.ultimoQuiz; if(u) ds.push(u); });
+  if(a.progresso?.prova?.data) ds.push(a.progresso.prova.data);
+  (a.progresso?.digitacao||[]).forEach(d=>{ if(d.data) ds.push(d.data); });
+  return ds.length ? ds.sort().pop() : null;
+}
+function ppDiasDesde(iso){ if(!iso) return null; return Math.floor((Date.now()-new Date(iso))/86400000); }
+
+function ppDiagnostico(a){
+  const itens=[];
+  ORDEM_MODULOS.forEach(m=>{
+    const p=a.progresso?.[m]; const pct=ppModuloPct(a,m);
+    const erros=(p?.erros||[]).length;
+    if(!p?.quizDone){ itens.push({materia:PP_NOME_MOD[m], motivo:'Ainda não fez o quiz', sev:3, tag:'não feito', cor:'#94A3B8'}); }
+    else if(pct<60){ itens.push({materia:PP_NOME_MOD[m], motivo:'Acerto baixo no quiz', sev:3, tag:pct+'%', cor:'#EF4444'}); }
+    else if(pct<80){ itens.push({materia:PP_NOME_MOD[m], motivo:'Dá pra melhorar'+(erros?` · ${erros} erros`:''), sev:2, tag:pct+'%', cor:'#F59E0B'}); }
+    else if(erros>=3){ itens.push({materia:PP_NOME_MOD[m], motivo:`Bom, mas errou ${erros} questões`, sev:1, tag:pct+'%', cor:'#F59E0B'}); }
+  });
+  const wpm=ppBestWpm(a); const fez=(a.progresso?.digitacao||[]).length>0;
+  if(!fez){ itens.push({materia:'Digitação', motivo:'Ainda não treinou', sev:2, tag:'—', cor:'#94A3B8'}); }
+  else if(wpm<PP_WPM_BAIXO){ itens.push({materia:'Digitação', motivo:'Velocidade baixa', sev:2, tag:wpm+' WPM', cor:'#F59E0B'}); }
+  itens.sort((x,y)=>y.sev-x.sev);
+  return itens;
+}
+function ppSeveridade(a){ return ppDiagnostico(a).reduce((s,i)=>s+i.sev,0); }
+
+function ppIsoWeek(dt){ const d=new Date(dt); d.setHours(0,0,0,0); d.setDate(d.getDate()+3-((d.getDay()+6)%7)); const w1=new Date(d.getFullYear(),0,4); const w=1+Math.round(((d-w1)/864e5-3+((w1.getDay()+6)%7))/7); return d.getFullYear()+'-S'+String(w).padStart(2,'0'); }
+function ppSnap(a){ const done=ORDEM_MODULOS.filter(m=>a.progresso?.[m]?.quizDone).length; const pcts=ORDEM_MODULOS.map(m=>ppModuloPct(a,m)).filter(x=>x!=null); const avg=pcts.length?Math.round(pcts.reduce((s,x)=>s+x,0)/pcts.length):0; return {pontos:calcularPontos(a), done, avg, wpm:ppBestWpm(a)}; }
+function ppHistGet(){ try{ return JSON.parse(localStorage.getItem('professorlusca_hist')||'{}'); }catch(e){ return {}; } }
+function ppRegistrarSemana(alunos){ const h=ppHistGet(); const wk=ppIsoWeek(new Date()); alunos.forEach(a=>{ if(!h[a.id]) h[a.id]={}; h[a.id][wk]=ppSnap(a); }); localStorage.setItem('professorlusca_hist', JSON.stringify(h)); return wk; }
+function ppEvolucao(a){ const h=ppHistGet(); const reg=h[a.id]||{}; const wks=Object.keys(reg).sort(); const wk=ppIsoWeek(new Date()); const curr=reg[wk]||ppSnap(a); const prevKey=wks.filter(k=>k<wk).pop(); const prev=prevKey?reg[prevKey]:null; return {curr,prev,prevKey}; }
+
 function renderPainelPro() {
   const alunos = getAlunos();
   const statsEl = document.getElementById("painelStats");
   const alunosEl = document.getElementById("painelAlunos");
-  const nomeModulo = { hardware:"Hardware", software:"Word", navegadores:"Navegadores", antivirus:"Antivírus" };
-  const corNivel = { 1:"#FB923C", 2:"#6366F1", 3:"#8B5CF6" };
   const syncUrl = getSyncUrl();
+  document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizar";
+
+  // registra snapshot desta semana (constrói histórico daqui pra frente)
+  const semanaAtual = ppRegistrarSemana(alunos);
 
   // ---- STATS GERAIS ----
   const totalAlunos = alunos.length;
-  const totalModulos = alunos.reduce((s,a) => s + ORDEM_MODULOS.filter(m=>a.progresso?.[m]?.quizDone).length, 0);
+  const totalModulos = alunos.reduce((s,a)=> s + ORDEM_MODULOS.filter(m=>a.progresso?.[m]?.quizDone).length, 0);
   const mediaScore = totalAlunos ? Math.round(alunos.reduce((s,a)=>s+calcularPontos(a),0)/totalAlunos) : 0;
-  const mediaWpm = (() => { const c=alunos.filter(a=>a.digitacao?.melhorWpm); return c.length?Math.round(c.reduce((s,a)=>s+a.digitacao.melhorWpm,0)/c.length):0; })();
+  const wpms = alunos.map(ppBestWpm).filter(w=>w>0);
+  const mediaWpm = wpms.length ? Math.round(wpms.reduce((s,w)=>s+w,0)/wpms.length) : 0;
+  const precisamAtencao = alunos.filter(a=>ppSeveridade(a) >= 5).length;
 
-  // ---- DEFICIÊNCIAS DA TURMA ----
-  const defModulo = ORDEM_MODULOS.map(m => {
+  // ---- MÉDIA POR MÓDULO (turma) ----
+  const modStats = ORDEM_MODULOS.map(m=>{
     const feitos = alunos.filter(a=>a.progresso?.[m]?.quizDone);
-    if (!feitos.length) return { m, media: null, label: nomeModulo[m] };
-    const media = Math.round(feitos.reduce((s,a)=>s+(a.progresso[m].quizScore/a.progresso[m].quizTotal)*100,0)/feitos.length);
-    return { m, media, label: nomeModulo[m] };
-  }).filter(x=>x.media!==null).sort((a,b)=>a.media-b.media);
-
-  // questões mais erradas (agregado)
-  const errosAgg = {};
-  alunos.forEach(a => {
-    ORDEM_MODULOS.forEach(m => {
-      (a.progresso?.[m]?.erros||[]).forEach(e => {
-        const key = e.q.slice(0,60);
-        errosAgg[key] = (errosAgg[key]||0)+1;
-      });
-    });
+    const naoFeito = totalAlunos - feitos.length;
+    const media = feitos.length ? Math.round(feitos.reduce((s,a)=>s+ppModuloPct(a,m),0)/feitos.length) : null;
+    return { m, label: PP_NOME_MOD[m], media, feitos: feitos.length, naoFeito };
   });
-  const topErros = Object.entries(errosAgg).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  // foco da semana: módulos com menor média OU mais "não feito"
+  const foco = [...modStats]
+    .map(s=>({ ...s, prioridade: (s.media===null?100:(100-s.media)) + s.naoFeito*8 }))
+    .sort((a,b)=>b.prioridade-a.prioridade)
+    .slice(0,2)
+    .filter(s=>s.prioridade>0);
 
-  // ---- ALERTA BANCO HACKER ESGOTADO ----
-  const esgotadosPorNivel = {1:[], 2:[], 3:[]};
-  alunos.forEach(a => {
-    if (a.progresso?.hackerBancoEsgotado) {
-      const n = a.nivel || 1;
-      esgotadosPorNivel[n].push(a.nome);
-    }
-  });
-  const niveisEsgotados = [1,2,3].filter(n => esgotadosPorNivel[n].length > 0);
-  if (niveisEsgotados.length > 0) {
-    const avisoHtml = niveisEsgotados.map(n => {
-      const nomes = esgotadosPorNivel[n].join(', ');
-      const emoji = {1:'🦊',2:'🚀',3:'⚡'}[n];
-      return `<span>${emoji} <strong>Nível ${n}:</strong> ${nomes}</span>`;
-    }).join(' &nbsp;·&nbsp; ');
-    statsEl.insertAdjacentHTML('beforebegin', `
-      <div style="background:#FEF2F2;border:2px solid #EF4444;border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;">
-        <div style="font-size:28px;flex-shrink:0;">☠️</div>
-        <div>
-          <div style="font-size:14px;font-weight:800;color:#B91C1C;margin-bottom:4px;">BANCO DO HACKER ALERT ESGOTADO</div>
-          <div style="font-size:13px;color:#7F1D1D;line-height:1.5;">
-            Os alunos abaixo já responderam todas as perguntas do banco. Adicione novas perguntas em <code>PERGUNTAS_HACKER</code> para que o desafio continue aparecendo.<br>
-            <span style="margin-top:6px;display:block;">${avisoHtml}</span>
-          </div>
-        </div>
-      </div>`);
-  }
-
+  // ---- STATS CARDS ----
   statsEl.innerHTML = `
-    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-      <div style="font-size:28px;font-weight:900;color:#6366F1;">${totalAlunos}</div>
-      <div style="font-size:12px;color:#64748B;font-weight:600;">Alunos</div>
-    </div>
-    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-      <div style="font-size:28px;font-weight:900;color:#10B981;">${totalModulos}</div>
-      <div style="font-size:12px;color:#64748B;font-weight:600;">Módulos completos</div>
-    </div>
-    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-      <div style="font-size:28px;font-weight:900;color:#F59E0B;">${mediaScore}</div>
-      <div style="font-size:12px;color:#64748B;font-weight:600;">Pontos (média)</div>
-    </div>
-    <div style="background:white;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-      <div style="font-size:28px;font-weight:900;color:#3B82F6;">${mediaWpm||"—"}</div>
-      <div style="font-size:12px;color:#64748B;font-weight:600;">WPM médio</div>
-    </div>
-    <div style="background:${syncUrl?'#ECFDF5':'#FEF2F2'};border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-      <div style="font-size:22px;font-weight:900;color:${syncUrl?'#10B981':'#EF4444'};">${syncUrl?'✅':'❌'}</div>
-      <div style="font-size:12px;color:#64748B;font-weight:600;">Sync Google</div>
-    </div>
+    ${ppStatCard(totalAlunos, "Alunos", "#6366F1")}
+    ${ppStatCard(precisamAtencao, "Precisam de atenção", precisamAtencao? "#EF4444":"#10B981")}
+    ${ppStatCard(totalModulos, "Módulos completos", "#10B981")}
+    ${ppStatCard(mediaScore, "Pontos (média)", "#F59E0B")}
+    ${ppStatCard(mediaWpm||"—", "WPM médio", "#3B82F6")}
   `;
 
-  document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizar";
-
-  // ---- DEFICIÊNCIAS ----
-  let defHtml = "";
-  if (defModulo.length > 0) {
-    defHtml = `
-    <div style="margin-bottom:24px;">
-      <div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:10px;">⚠️ DEFICIÊNCIAS DA TURMA</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
-        ${defModulo.map(d=>{
-          const cor = d.media>=80?"#10B981":d.media>=60?"#F59E0B":"#EF4444";
-          const bg = d.media>=80?"#ECFDF5":d.media>=60?"#FFFBEB":"#FEF2F2";
-          return `<div style="background:${bg};border-radius:12px;padding:14px;border-left:4px solid ${cor};">
-            <div style="font-weight:800;font-size:14px;">${d.label}</div>
-            <div style="font-size:24px;font-weight:900;color:${cor};">${d.media}%</div>
-            <div style="font-size:11px;color:#64748B;">média de acerto</div>
-          </div>`;
-        }).join("")}
+  // ---- BANNER: FOCO DA SEMANA ----
+  let focoHtml = "";
+  if (foco.length) {
+    focoHtml = `
+    <div style="background:linear-gradient(135deg,#312E81,#4F46E5);border-radius:18px;padding:20px 24px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.35),transparent 65%);"></div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.6);margin-bottom:10px;position:relative;">FOCO DA SEMANA — A TURMA PRECISA DE</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;position:relative;">
+        ${foco.map(f=>`
+          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:12px 16px;min-width:160px;">
+            <div style="font-size:17px;font-weight:800;">${f.label}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.75);">${f.media===null?'Ninguém fez ainda':`Média ${f.media}%`}${f.naoFeito?` · ${f.naoFeito} não fez`:''}</div>
+          </div>`).join("")}
       </div>
-      ${topErros.length?`
-      <div style="margin-top:14px;background:#FFF7ED;border-radius:12px;padding:14px;border-left:4px solid #F97316;">
-        <div style="font-size:12px;font-weight:700;color:#C2410C;margin-bottom:8px;">🔴 QUESTÕES MAIS ERRADAS</div>
-        ${topErros.map(([q,n])=>`<div style="font-size:13px;color:#7C3AED;margin-bottom:4px;">• "${q}..." <span style="font-weight:700;color:#EF4444;">${n}x errada</span></div>`).join("")}
-      </div>`:""}
     </div>`;
   }
 
-  if (alunos.length === 0) {
-    alunosEl.innerHTML = defHtml + `<div style="text-align:center;color:#94A3B8;padding:40px;">Nenhum aluno cadastrado ainda.</div>`;
+  // ---- BARRAS POR MÓDULO ----
+  const barras = `
+    <div style="background:#fff;border-radius:16px;padding:18px 20px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+      <div style="font-size:12px;font-weight:800;color:#64748B;letter-spacing:1px;margin-bottom:14px;">DESEMPENHO POR MATÉRIA (TURMA)</div>
+      ${modStats.map(s=>{
+        const v = s.media===null?0:s.media;
+        const cor = s.media===null?'#CBD5E1': s.media>=80?'#10B981': s.media>=60?'#F59E0B':'#EF4444';
+        return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <div style="width:96px;font-size:13px;font-weight:700;color:#334155;flex-shrink:0;">${s.label}</div>
+          <div style="flex:1;height:12px;background:#F1F5F9;border-radius:6px;overflow:hidden;">
+            <div style="height:100%;width:${v}%;background:${cor};border-radius:6px;transition:width .6s ease;"></div>
+          </div>
+          <div style="width:108px;text-align:right;font-size:12px;color:#64748B;flex-shrink:0;">${s.media===null?'sem dados':`<b style="color:${cor};">${s.media}%</b> · ${s.feitos}/${totalAlunos} fizeram`}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+
+  if (totalAlunos === 0) {
+    alunosEl.innerHTML = focoHtml + `<div style="text-align:center;color:#94A3B8;padding:40px;">Nenhum aluno cadastrado ainda.</div>`;
     return;
   }
 
-  // ---- LISTA DE ALUNOS DETALHADA ----
-  const ordenados = [...alunos].sort((a,b)=>calcularPontos(b)-calcularPontos(a));
-
-  const alunosHtml = ordenados.map((a,i)=>{
-    const pontos = calcularPontos(a);
+  // ---- LISTA DE ALUNOS (resumida, clicável) ----
+  const ordenados = [...alunos].sort((a,b)=>ppSeveridade(b)-ppSeveridade(a)); // mais críticos primeiro
+  const linhas = ordenados.map(a=>{
     const nivel = a.nivel || calcularNivel(a.idade);
-    const wpm = a.digitacao?.melhorWpm || 0;
-    const provaFeita = a.provaFinal;
-
-    const modulosHtml = ORDEM_MODULOS.map(m=>{
-      const p = a.progresso?.[m];
-      if (!p?.quizDone) return `<div style="background:#F1F5F9;border-radius:8px;padding:8px 10px;font-size:12px;color:#94A3B8;">
-        <div style="font-weight:700;">${nomeModulo[m]}</div><div>Não feito</div></div>`;
-      const pct = Math.round((p.quizScore/p.quizTotal)*100);
-      const cor = pct>=80?"#10B981":pct>=60?"#F59E0B":"#EF4444";
-      const bg = pct>=80?"#ECFDF5":pct>=60?"#FFFBEB":"#FEF2F2";
-      const errosN = (p.erros||[]).length;
-      const data = p.ultimoQuiz ? new Date(p.ultimoQuiz).toLocaleDateString("pt-BR") : "";
-      return `<div style="background:${bg};border-radius:8px;padding:8px 10px;border-top:3px solid ${cor};">
-        <div style="font-size:11px;font-weight:700;color:#475569;">${nomeModulo[m]}</div>
-        <div style="font-size:20px;font-weight:900;color:${cor};">${pct}%</div>
-        <div style="font-size:11px;color:#64748B;">${p.quizScore}/${p.quizTotal} corretas</div>
-        ${errosN?`<div style="font-size:11px;color:#EF4444;">${errosN} erro${errosN>1?"s":""}</div>`:"<div style='font-size:11px;color:#10B981;'>Sem erros!</div>"}
-        ${data?`<div style="font-size:10px;color:#94A3B8;">${data}</div>`:""}
-      </div>`;
+    const sev = ppSeveridade(a);
+    const diag = ppDiagnostico(a);
+    const plano = diag.slice(0,3);
+    const statusCor = sev===0?'#10B981': sev>=5?'#EF4444':'#F59E0B';
+    const statusBg  = sev===0?'#ECFDF5': sev>=5?'#FEF2F2':'#FFFBEB';
+    const statusTxt = sev===0?'Em dia': sev>=5?'Precisa de atenção':'Acompanhar';
+    const dias = ppDiasDesde(ppUltimaAtividade(a));
+    const inativo = dias!==null && dias>=7;
+    // health dots por módulo
+    const dots = ORDEM_MODULOS.map(m=>{
+      const pct = ppModuloPct(a,m);
+      const cor = pct===null?'#E2E8F0': pct>=80?'#10B981': pct>=60?'#F59E0B':'#EF4444';
+      return `<span title="${PP_NOME_MOD[m]}${pct===null?': não feito':': '+pct+'%'}" style="width:14px;height:14px;border-radius:50%;background:${cor};display:inline-block;"></span>`;
     }).join("");
-
-    const medalhas = ["🥉","🥈","🥇","👑"];
-    const badge = pontos>=500?"👑":pontos>=200?"🥇":pontos>=100?"🥈":pontos>=50?"🥉":"";
-
+    const planoTxt = plano.length
+      ? plano.map(p=>`<span style="background:${statusBg};color:${p.cor};border:1px solid ${p.cor}55;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">${p.materia}</span>`).join("")
+      : `<span style="color:#10B981;font-size:12px;font-weight:700;">Tudo em dia! 🎉</span>`;
     return `
-    <div style="background:white;border-radius:16px;padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div style="font-size:18px;font-weight:900;color:#CBD5E1;min-width:24px;">${i+1}</div>
-        <img src="${dicebearUrl(a.nome + a.id, nivel)}" style="width:40px;height:40px;border-radius:50%;background:#EEF2FF;" onerror="this.style.display='none'">
-        <div style="flex:1;">
-          <div style="font-weight:800;font-size:16px;">${a.nome} ${badge}</div>
-          <div style="font-size:12px;color:#64748B;">${a.idade} anos · <span style="color:${corNivel[nivel]};font-weight:700;">Nível ${nivel}</span>${wpm?` · ⌨️ ${wpm} WPM`:""}${provaFeita?` · 🎓 Prova: ${Math.round((provaFeita.score/provaFeita.total)*100)}%`:""}</div>
+    <button type="button" onclick="abrirFichaAluno('${a.id}')" style="all:unset;cursor:pointer;display:block;width:100%;background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:5px solid ${statusCor};transition:transform .12s ease, box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.05)'">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <img src="${avatarUrl(a)}" style="width:46px;height:46px;border-radius:50%;background:#EEF2FF;flex-shrink:0;" onerror="this.style.visibility='hidden'">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-weight:800;font-size:16px;color:#0F172A;">${escapeHtml(a.nome)}</span>
+            <span style="font-size:11px;color:#64748B;">${a.idade} anos · Nível ${nivel}</span>
+            ${inativo?`<span style="font-size:10px;font-weight:800;color:#B45309;background:#FEF3C7;border-radius:20px;padding:2px 8px;">${dias}d sem atividade</span>`:''}
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;">${dots} <span style="margin-left:6px;display:inline-flex;gap:6px;flex-wrap:wrap;">${planoTxt}</span></div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:20px;font-weight:900;color:#6366F1;">★ ${pontos}</div>
-          <div style="font-size:11px;color:#94A3B8;">pontos</div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.5px;color:${statusCor};background:${statusBg};border-radius:20px;padding:3px 10px;">${statusTxt}</div>
+          <div style="font-size:12px;color:#94A3B8;margin-top:6px;">Ver ficha →</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">${modulosHtml}</div>
+    </button>`;
+  }).join("");
+
+  alunosEl.innerHTML = focoHtml + barras +
+    `<div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:1px;margin:4px 0 12px;">ALUNOS (${ordenados.length}) · ordenados por prioridade</div>` +
+    linhas;
+}
+
+function ppStatCard(valor, label, cor){
+  return `<div style="background:#fff;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+    <div style="font-size:28px;font-weight:900;color:${cor};">${valor}</div>
+    <div style="font-size:12px;color:#64748B;font-weight:600;">${label}</div>
+  </div>`;
+}
+
+// ============ FICHA INDIVIDUAL ============
+function abrirFichaAluno(id){
+  const a = getAlunos().find(x=>x.id===id);
+  if(!a) return;
+  const nivel = a.nivel || calcularNivel(a.idade);
+  const diag = ppDiagnostico(a);
+  const plano = diag.slice(0,3);
+  const evo = ppEvolucao(a);
+  const wpm = ppBestWpm(a);
+  const dias = ppDiasDesde(ppUltimaAtividade(a));
+
+  // módulos
+  const modulosHtml = ORDEM_MODULOS.map(m=>{
+    const p = a.progresso?.[m];
+    const pct = ppModuloPct(a,m);
+    const erros = (p?.erros||[]).length;
+    const cor = pct===null?'#94A3B8': pct>=80?'#10B981': pct>=60?'#F59E0B':'#EF4444';
+    const bg  = pct===null?'#F8FAFC': pct>=80?'#ECFDF5': pct>=60?'#FFFBEB':'#FEF2F2';
+    return `<div style="background:${bg};border-radius:12px;padding:12px;border-top:3px solid ${cor};">
+      <div style="font-size:12px;font-weight:700;color:#475569;">${PP_NOME_MOD[m]}</div>
+      <div style="font-size:22px;font-weight:900;color:${cor};">${pct===null?'—':pct+'%'}</div>
+      <div style="font-size:11px;color:#64748B;">${pct===null?'não fez':`${p.quizScore}/${p.quizTotal}${erros?` · ${erros} erro${erros>1?'s':''}`:' · sem erros'}`}</div>
     </div>`;
   }).join("");
 
-  alunosEl.innerHTML = defHtml + `<div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:12px;">ALUNOS (${ordenados.length})</div>` + alunosHtml;
+  // erros detalhados (o que revisar)
+  let errosHtml = "";
+  ORDEM_MODULOS.forEach(m=>{
+    const errs = a.progresso?.[m]?.erros || [];
+    if(errs.length){
+      errosHtml += `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:800;color:#334155;margin-bottom:4px;">${PP_NOME_MOD[m]}</div>` +
+        errs.map(e=>`<div style="font-size:12px;color:#64748B;padding:4px 0;border-bottom:1px solid #F1F5F9;">• ${escapeHtml(e.q)}</div>`).join("") + `</div>`;
+    }
+  });
+
+  // evolução vs semana anterior
+  function delta(cur,prev,suf=''){
+    if(prev==null) return `<span style="color:#94A3B8;font-size:12px;">primeira semana registrada</span>`;
+    const d = cur-prev;
+    const cor = d>0?'#10B981':d<0?'#EF4444':'#94A3B8';
+    const sig = d>0?'▲ +':d<0?'▼ ':'= ';
+    return `<span style="color:${cor};font-weight:800;font-size:12px;">${sig}${d===0?'sem mudança':Math.abs(d)+suf}</span>`;
+  }
+  const evoHtml = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="background:#F8FAFC;border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:11px;color:#64748B;font-weight:700;">PONTOS</div>
+        <div style="font-size:20px;font-weight:900;color:#6366F1;">${evo.curr.pontos}</div>
+        ${delta(evo.curr.pontos, evo.prev?.pontos)}
+      </div>
+      <div style="background:#F8FAFC;border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:11px;color:#64748B;font-weight:700;">MÉDIA QUIZ</div>
+        <div style="font-size:20px;font-weight:900;color:#10B981;">${evo.curr.avg}%</div>
+        ${delta(evo.curr.avg, evo.prev?.avg, '%')}
+      </div>
+      <div style="background:#F8FAFC;border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:11px;color:#64748B;font-weight:700;">WPM</div>
+        <div style="font-size:20px;font-weight:900;color:#3B82F6;">${evo.curr.wpm||'—'}</div>
+        ${delta(evo.curr.wpm, evo.prev?.wpm, ' wpm')}
+      </div>
+    </div>`;
+
+  // plano da semana
+  const planoHtml = plano.length
+    ? plano.map((p,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F5F9;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${p.cor};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;">${i+1}</div>
+        <div style="flex:1;"><b style="color:#0F172A;">${p.materia}</b> <span style="color:#64748B;font-size:13px;">— ${p.motivo}</span></div>
+        <div style="font-size:12px;font-weight:800;color:${p.cor};">${p.tag}</div>
+      </div>`).join("")
+    : `<div style="color:#10B981;font-weight:700;padding:8px 0;">🎉 Está tudo em dia! Continue incentivando.</div>`;
+
+  document.getElementById("fichaAlunoBody").innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <img src="${avatarUrl(a)}" style="width:64px;height:64px;border-radius:50%;background:#EEF2FF;" onerror="this.style.visibility='hidden'">
+      <div style="flex:1;">
+        <div style="font-size:24px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;">${escapeHtml(a.nome)}</div>
+        <div style="font-size:13px;color:#64748B;">${a.idade} anos · Nível ${nivel} · ★ ${calcularPontos(a)} pts${dias!==null?` · última atividade há ${dias} dia${dias!==1?'s':''}`:' · sem atividade'}</div>
+      </div>
+      <button onclick="imprimirFichaAluno('${a.id}')" style="background:#6366F1;color:#fff;border:none;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;">🖨 Imprimir p/ pais</button>
+    </div>
+
+    <div style="background:#EEF2FF;border-radius:16px;padding:16px 18px;margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:800;color:#4F46E5;letter-spacing:1px;margin-bottom:6px;">📋 PLANO DESTA SEMANA — REFORÇAR</div>
+      ${planoHtml}
+    </div>
+
+    <div style="font-size:12px;font-weight:800;color:#64748B;letter-spacing:1px;margin-bottom:10px;">DESEMPENHO POR MÓDULO</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px;">${modulosHtml}</div>
+
+    <div style="font-size:12px;font-weight:800;color:#64748B;letter-spacing:1px;margin-bottom:10px;">EVOLUÇÃO vs SEMANA ANTERIOR</div>
+    <div style="margin-bottom:20px;">${evoHtml}</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div style="background:#F8FAFC;border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:800;color:#64748B;margin-bottom:6px;">⌨️ DIGITAÇÃO</div>
+        <div style="font-size:13px;color:#334155;">Melhor: <b>${wpm||0} WPM</b> · ${(a.progresso?.digitacao||[]).length} treino(s)</div>
+      </div>
+      <div style="background:#F8FAFC;border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:800;color:#64748B;margin-bottom:6px;">🎓 PROVA FINAL</div>
+        <div style="font-size:13px;color:#334155;">${a.progresso?.prova?.done?`<b>${Math.round((a.progresso.prova.score/a.progresso.prova.total)*100)}%</b> (${a.progresso.prova.score}/${a.progresso.prova.total})`:'Ainda não fez'}</div>
+      </div>
+    </div>
+
+    ${errosHtml?`<div style="margin-top:20px;"><div style="font-size:12px;font-weight:800;color:#64748B;letter-spacing:1px;margin-bottom:10px;">❓ QUESTÕES QUE ERROU (revisar com o aluno)</div><div style="background:#FFF7ED;border-radius:12px;padding:14px;">${errosHtml}</div></div>`:''}
+  `;
+  document.getElementById("modalFichaAluno").style.display = "flex";
 }
+
+function fecharFichaAluno(){
+  document.getElementById("modalFichaAluno").style.display = "none";
+}
+
+// ============ IMPRESSÃO — FEEDBACK PARA OS PAIS ============
+function imprimirFichaAluno(id){
+  const a = getAlunos().find(x=>x.id===id);
+  if(!a) return;
+  const nivel = a.nivel || calcularNivel(a.idade);
+  const diag = ppDiagnostico(a);
+  const plano = diag.slice(0,3);
+  const fortes = ORDEM_MODULOS.filter(m=>{ const p=ppModuloPct(a,m); return p!==null && p>=80; }).map(m=>PP_NOME_MOD[m]);
+  const hoje = new Date().toLocaleDateString("pt-BR", {day:'2-digit', month:'long', year:'numeric'});
+  const wpm = ppBestWpm(a);
+  const concluidos = ORDEM_MODULOS.filter(m=>a.progresso?.[m]?.quizDone).length;
+
+  document.getElementById("fichaPrintArea").innerHTML = `
+    <div class="print-head">
+      <div>
+        <div class="print-school">PROFESSOR LUSCA · AULAS DE INFORMÁTICA</div>
+        <h1>Relatório semanal de ${escapeHtml(a.nome)}</h1>
+        <div class="print-sub">${a.idade} anos · Nível ${nivel} · ${hoje}</div>
+      </div>
+    </div>
+
+    <div class="print-section">
+      <h2>Resumo</h2>
+      <p>${escapeHtml(a.nome)} concluiu <b>${concluidos} de ${ORDEM_MODULOS.length}</b> módulos da matéria. ${wpm?`Na digitação, alcançou <b>${wpm} palavras por minuto</b>.`:'Ainda não treinou digitação.'} ${a.progresso?.prova?.done?`Fez a prova final com <b>${Math.round((a.progresso.prova.score/a.progresso.prova.total)*100)}%</b>.`:'Ainda não fez a prova final.'}</p>
+    </div>
+
+    ${fortes.length?`<div class="print-section"><h2>Pontos fortes</h2><p>Foi muito bem em: <b>${fortes.join(", ")}</b>. Parabéns! 👏</p></div>`:''}
+
+    <div class="print-section">
+      <h2>O que vamos reforçar esta semana</h2>
+      ${plano.length? `<ul>${plano.map(p=>`<li><b>${p.materia}</b> — ${p.motivo}</li>`).join("")}</ul>` : `<p>Está com tudo em dia! Vamos manter o ritmo. 🎉</p>`}
+    </div>
+
+    <div class="print-section print-tips">
+      <h2>Como ajudar em casa</h2>
+      <p>Incentive 15 minutos por dia na plataforma, reforçando as matérias acima. Pratique a digitação com calma — qualidade antes de velocidade.</p>
+    </div>
+
+    <div class="print-foot">Gerado automaticamente pela plataforma do Professor Lusca · ${hoje}</div>
+  `;
+  document.body.classList.add("printing-ficha");
+  window.print();
+  setTimeout(()=>document.body.classList.remove("printing-ficha"), 400);
+}
+
 
 // =============================================================
 // SYNC UI FUNCTIONS
