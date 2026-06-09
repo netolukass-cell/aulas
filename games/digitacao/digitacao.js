@@ -179,6 +179,17 @@ function _digDifRecomendada(mmr) {
   return 'dificil';
 }
 
+// Dificuldade mínima permitida (bloqueia fases fáceis para jogadores fortes)
+function _digDifMinima(mmr) {
+  if (mmr >= 1200) return 'dificil';
+  if (mmr >= 1100) return 'medio';
+  return 'facil';
+}
+const DIF_ORDER = ['facil', 'medio', 'dificil'];
+function _digDifPermitida(dif, mmr) {
+  return DIF_ORDER.indexOf(dif) >= DIF_ORDER.indexOf(_digDifMinima(mmr));
+}
+
 // resultado: 1=vitória, 0.5=empate, 0=derrota
 function _digResultadoMMR(wpm, precisao, completou) {
   const velNorm = Math.min(1, wpm / 40); // 40 WPM = velocidade máxima
@@ -278,6 +289,25 @@ function abrirMenuDigitacao() {
   const btns = document.querySelectorAll('#digNivelSelector .dig-nivel-btn');
   if (btns[map[difRec]]) btns[map[difRec]].classList.add('active');
 
+  // Bloqueia dificuldades abaixo do mínimo para o MMR do aluno
+  const difMinima = _digDifMinima(ranking.mmr);
+  const difLabels = ['facil', 'medio', 'dificil'];
+  btns.forEach((btn, i) => {
+    const d = difLabels[i];
+    if (d && !_digDifPermitida(d, ranking.mmr)) {
+      btn.disabled = true;
+      btn.style.opacity = '0.35';
+      btn.style.cursor = 'not-allowed';
+      btn.title = 'Seu MMR é alto demais para esta dificuldade';
+      if (!btn.textContent.includes('🔒')) btn.textContent += ' 🔒';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      btn.title = '';
+    }
+  });
+
   // mostra badge de rank no menu
   const badgeContainer = document.getElementById('digRankBadge');
   if (badgeContainer && alunoAtivo) {
@@ -292,16 +322,31 @@ function abrirMenuDigitacao() {
 }
 
 function setDifDig(d, el) {
+  const ranking = _digGetRanking();
+  if (!_digDifPermitida(d, ranking.mmr)) {
+    const minLabel = {facil:'🟢 Fácil', medio:'🟡 Médio', dificil:'🔴 Difícil'}[_digDifMinima(ranking.mmr)];
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1E293B;color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.4);white-space:nowrap;';
+    toast.textContent = `🔒 MMR alto demais! Mínimo para você: ${minLabel}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+    return;
+  }
   digState.dif = d;
   document.querySelectorAll('#digNivelSelector .dig-nivel-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
 }
 
-function iniciarDigitacao(modo) {
+function iniciarDigitacao(modo, progressao) {
   digState.modo = modo;
-  // no ranqueado, dificuldade é definida pelo MMR do aluno
+  // no ranqueado, dificuldade é definida pelo MMR (ou progressão de fase)
   if (modo === 'ranqueado') {
-    digState.dif = _digDifRecomendada(_digGetRanking().mmr);
+    if (progressao && digState._proximaDif) {
+      digState.dif = digState._proximaDif;
+      digState._proximaDif = null;
+    } else {
+      digState.dif = _digDifRecomendada(_digGetRanking().mmr);
+    }
   }
   // sorteia texto da dificuldade
   const textos = TEXTOS_DIGITACAO[digState.dif];
@@ -408,6 +453,7 @@ function listenerDigitacao(e) {
   if (e.key === 'Escape') { sairDigitacao(); return; }
   const isEnter = e.key === 'Enter';
   if (e.key.length !== 1 && !isEnter) return; // ignora setas, F1, etc
+  e.preventDefault();
 
   if (digState.pos === 0 && !digState.inicio && digState.modo === 'ranqueado') {
     digState.inicio = Date.now();
@@ -467,16 +513,42 @@ function falharDigitacao() {
   if (digState.timerId) clearInterval(digState.timerId);
   if (digState.countdownId) clearInterval(digState.countdownId);
   document.removeEventListener('keydown', listenerDigitacao);
+
+  let mmrPenalidadeHtml = '';
+  if (digState.modo === 'ranqueado' && alunoAtivo) {
+    const tSeg = digState.inicio ? (Date.now() - digState.inicio) / 1000 : 0;
+    const wpmAtual = tSeg > 0 ? Math.round((digState.pos / 5 / tSeg) * 60) : 0;
+    const total = digState.pos + digState.caracteresErrados;
+    const precAtual = total > 0 ? Math.round(digState.pos / total * 100) : 0;
+    const mmrRes = _digAtualizarMMR(wpmAtual, precAtual, false, digState.dif);
+    const { novoRanking, lpDelta } = mmrRes;
+    const tier = RANK_TIERS[novoRanking.tier] || RANK_TIERS[0];
+    const lpSinal = lpDelta >= 0 ? `+${lpDelta}` : `${lpDelta}`;
+    mmrPenalidadeHtml = `
+      <div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px 16px;margin:10px 0;text-align:center;">
+        <div style="font-size:12px;font-weight:700;opacity:0.8;margin-bottom:6px;">💀 DERROTA RANQUEADA</div>
+        <div style="display:flex;justify-content:center;gap:20px;align-items:center;">
+          <div>
+            <div style="font-size:22px;font-weight:900;color:#EF4444;">${lpSinal} LP</div>
+            <div style="font-size:10px;opacity:0.7;">LIGA</div>
+          </div>
+          <div style="font-size:20px;opacity:0.4;">|</div>
+          <div>${_digRankBadgeHtml(novoRanking, true)}</div>
+        </div>
+      </div>`;
+  }
+
   document.getElementById('digResultado').innerHTML = `
     <div class="dig-completo" style="background:linear-gradient(135deg,#EF4444,#B91C1C);">
       <div style="font-size:64px; margin-bottom:8px;">⏱️</div>
       <div style="font-size:28px; font-weight:800; margin-bottom:8px;">Tempo esgotado!</div>
-      <div style="font-size:16px; opacity:0.9; margin-bottom:16px;">
+      <div style="font-size:16px; opacity:0.9; margin-bottom:8px;">
         Chegou em ${Math.round(digState.pos/digState.texto.length*100)}% do texto · ${digState.erros} erros
       </div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
+      ${mmrPenalidadeHtml}
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
         <button class="btn ghost" style="background:white;color:#EF4444;" onclick="iniciarDigitacao('ranqueado')">↻ Tentar de novo</button>
-        <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Mudar modo</button>
+        <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Menu</button>
       </div>
     </div>`;
 }
@@ -498,6 +570,7 @@ function atualizarStatsDigitacao() {
   }
 
   const palavras = digState.pos / 5; // padrão WPM = 5 chars = 1 palavra
+  const tempoSeg = digState.inicio ? (Date.now() - digState.inicio) / 1000 : 0;
   const wpm = tempoSeg > 0 ? Math.round((palavras / tempoSeg) * 60) : 0;
   document.getElementById('digWpm').textContent = wpm;
 
@@ -586,6 +659,47 @@ function finalizarDigitacao() {
       alunoAtivo.progresso.digitacao = alunoAtivo.progresso.digitacao.slice(0, 20);
     }
     _digSalvarAluno(alunoAtivo);
+  }
+
+  // Auto-progressão de fases no modo ranqueado
+  if (digState.modo === 'ranqueado' && resultado === 1) {
+    const nextDif = { facil: 'medio', medio: 'dificil' }[digState.dif];
+    if (nextDif) {
+      const nextLabel = { medio: '🟡 Médio', dificil: '🔴 Difícil' }[nextDif];
+      digState._proximaDif = nextDif;
+      document.getElementById('digResultado').innerHTML = `
+        <div class="dig-completo" style="background:linear-gradient(135deg,#10B981,#065F46);">
+          <div style="font-size:64px;margin-bottom:8px;">🎯</div>
+          <div style="font-size:28px;font-weight:800;margin-bottom:8px;">Fase vencida!</div>
+          <div style="font-size:16px;opacity:0.9;margin-bottom:6px;">${wpm} palavras/min · ${precisao}% precisão</div>
+          ${mmrHtml}
+          <div style="font-size:20px;font-weight:800;margin:14px 0;">Próxima: ${nextLabel}</div>
+          <div style="font-size:13px;opacity:0.7;margin-bottom:12px;">Avançando em 3 segundos...</div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn" style="background:white;color:#065F46;font-weight:800;" onclick="clearTimeout(window._progTimer);iniciarDigitacao('ranqueado',true)">Ir agora →</button>
+            <button class="btn ghost" style="background:rgba(255,255,255,0.2);color:white;" onclick="clearTimeout(window._progTimer);abrirMenuDigitacao()">Menu</button>
+          </div>
+        </div>`;
+      window._progTimer = setTimeout(() => iniciarDigitacao('ranqueado', true), 3000);
+      return;
+    } else if (digState.dif === 'dificil') {
+      // Venceu as 3 fases — vitória total!
+      _digSalvarPontos(pontos * 2); // bônus extra (já salvou 1x acima, total = 3x)
+      document.getElementById('digResultado').innerHTML = `
+        <div class="dig-completo" style="background:linear-gradient(135deg,#7C3AED,#4C1D95);">
+          <div style="font-size:64px;margin-bottom:8px;">🏆</div>
+          <div style="font-size:28px;font-weight:800;margin-bottom:8px;">CAMPEÃO! Dominou as 3 fases!</div>
+          <div style="font-size:16px;opacity:0.9;margin-bottom:6px;">${wpm} palavras/min · ${precisao}% precisão</div>
+          ${mmrHtml}
+          <div style="font-size:30px;font-weight:900;margin:14px 0;">+${pontos * 3} ⭐ BÔNUS TOTAL!</div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+            <button class="btn" style="background:white;color:#7C3AED;font-weight:800;" onclick="iniciarDigitacao('ranqueado')">Jogar novamente</button>
+            <button class="btn ghost" style="background:rgba(255,255,255,0.2);color:white;" onclick="abrirMenuDigitacao()">Menu</button>
+            <button class="btn" style="background:rgba(0,0,0,0.2);color:white;" onclick="voltarPlataforma()">Início</button>
+          </div>
+        </div>`;
+      return;
+    }
   }
 
   let conceito = '';
