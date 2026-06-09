@@ -3253,30 +3253,33 @@ function toggleConteudoEnsinado(turmaKey, modulo) {
 }
 
 // pré-carrega as turmas fixas se ainda não atribuídas
-(function seedTurmas() {
-  const t = getTurmas();
-  const alunos = getAlunos ? getAlunos() : [];
-  // Apenas faz seed se há alunos cadastrados e turmas ainda vazias
-  const totalAtribuidos = Object.values(t).reduce((s,v)=>s+(v.ids||[]).length,0);
-  if (totalAtribuidos > 0) return; // já foram atribuídos manualmente
-  const seed = {
+// Roda toda vez que renderHome é chamado — atribui apenas alunos ainda sem turma
+function _seedTurmasAuto() {
+  const SEED = {
     T1: ['miguel','pedro'],
     T2: ['diego','theo','gabriel'],
-    T3: ['guilherme','joão','joao','luiz'],
+    T3: ['guilherme','joao','luiz'],
   };
+  const t = getTurmas();
+  const alunos = getAlunos();
+  const atribuidos = new Set(Object.values(t).flatMap(v => v.ids || []));
   let changed = false;
   alunos.forEach(a => {
-    const nomeLower = (a.nome||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-    for (const [tk, nomes] of Object.entries(seed)) {
+    if (atribuidos.has(a.id)) return; // já tem turma
+    const nomeLower = (a.nome || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    for (const [tk, nomes] of Object.entries(SEED)) {
       if (nomes.some(n => nomeLower.includes(n))) {
-        if (!t[tk]) t[tk] = {ids:[]};
-        if (!t[tk].ids.includes(a.id)) { t[tk].ids.push(a.id); changed = true; }
+        if (!t[tk]) t[tk] = { ids: [] };
+        t[tk].ids.push(a.id);
+        atribuidos.add(a.id);
+        changed = true;
         break;
       }
     }
+    // "professor" ou "lusca" não recebe turma — fica em sem turma propositalmente
   });
   if (changed) saveTurmas(t);
-})();
+}
 
 // =============================================================
 // PROVA FINAL — 10 questões mistas por nível
@@ -3593,6 +3596,7 @@ let _homeTurma = null; // null = mostrar cards de turma; 'T1'/'T2'/'T3' = alunos
 let _cadastroTurma = null; // turma pré-selecionada para novo cadastro
 
 function renderHome() {
+  _seedTurmasAuto(); // garante que alunos conhecidos estejam na turma certa
   const grid = document.getElementById("alunosGrid");
   const alunos = getAlunos();
 
