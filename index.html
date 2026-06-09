@@ -3375,12 +3375,34 @@ const MISSOES_CATALOGO = {
 
 // Plano semanal por turma — professor atualiza aqui conforme o andamento da turma.
 // Cada array lista missaoIds em ordem de execução.
+// Turma é o plano base. Nível adapta o conteúdo dentro da turma.
 const PLANO_SEMANA = {
-  T1: ['dig-fileiras', 'quiz-hw', 'quiz-sw', 'jogo-memoria', 'dig-rank'],
-  T2: ['dig-fileiras', 'quiz-nav', 'quiz-av', 'jogo-rede', 'dig-rank'],
-  T3: ['dig-treino', 'quiz-mem', 'quiz-hw', 'jogo-atirador', 'dig-rank'],
-  SEM_TURMA: ['dig-fileiras', 'quiz-hw', 'jogo-memoria', 'dig-rank'],
+  T1:       ['dig-fileiras', 'quiz-hw',  'quiz-sw',  'jogo-memoria',  'dig-rank'],
+  T2:       ['dig-fileiras', 'quiz-nav', 'quiz-av',  'jogo-rede',     'dig-rank'],
+  T3:       ['dig-treino',   'quiz-mem', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
+  SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-memoria', 'dig-rank'],
 };
+
+// Plano adaptado por nível — sobrescreve o plano da turma quando o nível não bate.
+// Nível 1 (≤10 anos): foco em fileiras e quizzes básicos, sem cronômetro.
+// Nível 2 (11-13): mix — alguns quizzes e jogo com ranqueado opcional.
+// Nível 3 (14+): desafios avançados, cronômetro, puzzles de rede.
+const PLANO_NIVEL = {
+  1: ['dig-fileiras', 'quiz-hw',  'jogo-memoria',  'dig-treino'],
+  2: ['dig-treino',   'quiz-sw',  'quiz-nav',       'jogo-rede',     'dig-rank'],
+  3: ['dig-rank',     'quiz-av',  'quiz-mem',       'jogo-atirador', 'jogo-ram'],
+};
+
+// Retorna o plano certo para o aluno: turma+nível específico > nível > turma
+function _getMissoesPlan(turmaKey, nivel) {
+  // 1. turma + nível específico (professor pode definir T1_n2, etc.)
+  const especifico = PLANO_SEMANA[turmaKey + '_n' + nivel];
+  if (especifico) return especifico;
+  // 2. plano por nível (adapta automaticamente)
+  if (PLANO_NIVEL[nivel]) return PLANO_NIVEL[nivel];
+  // 3. fallback: plano da turma geral
+  return PLANO_SEMANA[turmaKey] || PLANO_SEMANA['SEM_TURMA'];
+}
 
 function _semanaISO() {
   const d = new Date();
@@ -3485,7 +3507,8 @@ function renderAulaHoje() {
   if (!el || !alunoAtivo) return;
 
   const turmaKey = getTurmaDeAluno(alunoAtivo.id) || 'SEM_TURMA';
-  const missaoIds = (PLANO_SEMANA[turmaKey] || PLANO_SEMANA['SEM_TURMA']).filter(id => MISSOES_CATALOGO[id]);
+  const nivel = alunoAtivo.nivel || 1;
+  const missaoIds = _getMissoesPlan(turmaKey, nivel).filter(id => MISSOES_CATALOGO[id]);
   const completasIds = _missoesConcluidasNaSemana(alunoAtivo.id);
   const totalCompletas = missaoIds.filter(id => completasIds.includes(id)).length;
   const pct = missaoIds.length ? Math.round(totalCompletas / missaoIds.length * 100) : 0;
