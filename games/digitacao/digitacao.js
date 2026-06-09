@@ -20,6 +20,21 @@ function _digSalvarAluno(aluno) {
   const idx = todos.findIndex(a => a.id === aluno.id);
   if (idx >= 0) todos[idx] = aluno; else todos.push(aluno);
   localStorage.setItem(DIG_ALUNOS_KEY, JSON.stringify(todos));
+  // sincroniza com o servidor (mesmo endpoint do index.html)
+  _digSyncPush(aluno);
+}
+
+async function _digSyncPush(aluno) {
+  try {
+    const url = localStorage.getItem('professorlusca_sync_url');
+    if (!url) return;
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'save', aluno })
+    });
+  } catch(e) {}
 }
 
 function _digSalvarPontos(pts) {
@@ -58,22 +73,52 @@ const TEXTOS_DIGITACAO = {
     "O mouse e o teclado sao hardware. O Chrome e software.",
     "Eu uso o computador para estudar e jogar todo dia.",
     "Hardware e a parte fisica. Software e a parte digital.",
-    "O Windows e um sistema operacional muito usado.",
-    "Sem internet a gente nao consegue ver YouTube ou TikTok."
+    "O Windows e um sistema operacional muito usado no mundo.",
+    "Sem internet a gente nao consegue ver YouTube ou TikTok.",
+    "A CPU e o cerebro do computador. Ela processa todas as informacoes.",
+    "O HD guarda arquivos. A RAM e a memoria rapida e temporaria.",
+    "Monitor e hardware de saida. Teclado e hardware de entrada.",
+    "Para digitar rapido, mantenha os dedos na posicao inicial.\nOs indicadores ficam no F e no J. Tente nao olhar o teclado.",
+    "A internet conecta computadores do mundo inteiro.\nSem ela nao teria redes sociais nem streaming de videos.",
+    "O notebook e um computador portatil que funciona com bateria.\nEle e pratico para carregar para a escola ou trabalho.",
+    "Uma senha forte tem letras, numeros e simbolos misturados.\nNunca use sua data de nascimento ou nome como senha.",
+    "O SSD e muito mais rapido que o HD antigo.\nEle nao tem peca mecanica, por isso e mais duravel.",
+    "A RAM guarda os programas abertos no momento.\nQuando voce reinicia o PC, tudo que estava nela e apagado.",
+    "O teclado tem letras, numeros e teclas especiais.\nAprender a posicao dos dedos ajuda a digitar mais rapido."
   ],
   medio: [
-    "O computador e uma maquina inteligente que ajuda a gente a trabalhar, jogar e aprender. Por dentro ele tem muitas pecas que funcionam juntas.",
-    "Hardware sao as partes que voce pode tocar: o monitor, o teclado, o mouse e o gabinete. Software sao os programas que rodam dentro do computador.",
-    "Um navegador como o Chrome ou o Firefox e o programa que abre sites na internet. Sem ele, voce nao consegue acessar o Google ou o YouTube.",
+    "O computador e uma maquina que ajuda a trabalhar, jogar e aprender. Por dentro ele tem muitas pecas que funcionam juntas.",
+    "Hardware sao as partes que voce pode tocar: o monitor, o teclado, o mouse. Software sao os programas que rodam no computador.",
+    "Um navegador como o Chrome ou o Firefox e o programa que abre sites. Sem ele voce nao consegue acessar o Google ou o YouTube.",
     "O antivirus protege o computador contra virus e programas ruins. Nunca clique em links estranhos ou baixe arquivos de sites duvidosos.",
-    "Para digitar rapido, e importante usar os dois polegares para a barra de espaco e nao olhar para o teclado enquanto escreve."
+    "Para digitar rapido, e importante usar os dois polegares para a barra de espaco e nao olhar para o teclado enquanto escreve.",
+    "A memoria cache e um tipo especial de memoria muito rapida.\nFica dentro do processador para guardar dados frequentemente usados.\nQuanto maior a cache, mais agil fica o desempenho geral.",
+    "O sistema operacional gerencia a comunicacao entre hardware e software.\nSem ele, os programas nao conseguiriam funcionar corretamente.\nWindows, Linux e macOS sao os sistemas mais populares do mundo.",
+    "As linguagens de programacao sao como idiomas para o computador.\nCada uma tem sua sintaxe e seus casos de uso especificos.\nPython e facil de aprender. JavaScript roda direto nos navegadores.",
+    "O firewall e um sistema de seguranca que monitora o trafego de rede.\nEle bloqueia conexoes suspeitas e protege seus dados pessoais.\nPode ser um programa instalado ou um dispositivo fisico dedicado.",
+    "Computacao em nuvem permite acessar arquivos de qualquer dispositivo.\nNao precisa de HD grande se tudo fica em servidores remotos seguros.\nGoogle Drive, Dropbox e OneDrive sao exemplos bastante populares.",
+    "O processador trabalha em ciclos por segundo, medidos em gigahertz.\nQuanto maior a frequencia, mais calculos ele consegue fazer por segundo.\nTer mais nucleos tambem aumenta muito o desempenho em tarefas paralelas.",
+    "Resolucao de tela e medida em pixels por polegada, chamada de PPI.\nQuanto mais pixels, mais nitida e detalhada e a imagem na tela.\nTelas 4K tem quatro vezes mais pixels do que as telas Full HD.",
+    "A placa de video, ou GPU, e responsavel pelo processamento de imagens.\nEla e essencial para jogos, edicao de video e design grafico profissional.\nGPUs modernas tambem sao usadas para treinar modelos de inteligencia artificial.",
+    "Backup e a copia de seguranca dos seus arquivos importantes.\nArmazene seus dados em um HD externo ou na nuvem regularmente.\nAssim voce nao perde nada em caso de virus, roubo ou defeito.",
+    "Phishing e um golpe em que criminosos enviam mensagens falsas.\nElas imitam bancos ou lojas para roubar senhas e dados pessoais.\nSempre verifique o endereco do site antes de digitar qualquer informacao."
   ],
   dificil: [
-    "Um sistema operacional, como Windows ou Linux, gerencia todo o hardware e permite que aplicativos como Word, Photoshop e navegadores funcionem corretamente em harmonia.",
-    "A diferenca essencial entre hardware e software esta na sua natureza: o primeiro e fisico e tangivel, enquanto o segundo e abstrato, formado por instrucoes e dados que controlam o comportamento da maquina.",
-    "Phishing e uma tecnica de engenharia social na qual criminosos enviam emails ou mensagens falsas imitando empresas conhecidas para roubar senhas, dados bancarios e informacoes pessoais dos usuarios desavisados.",
-    "A memoria RAM e volatil e funciona como um espaco temporario e rapido para o processador acessar dados em uso. Quando o computador desliga, todo conteudo dela e perdido instantaneamente.",
-    "Navegadores modernos como Chrome, Edge e Firefox utilizam motores de renderizacao distintos para interpretar HTML, CSS e JavaScript. Isso afeta velocidade, consumo de memoria e compatibilidade com padroes web."
+    "Um sistema operacional como Windows ou Linux gerencia todo o hardware e permite que aplicativos como Word, Photoshop e navegadores funcionem corretamente em harmonia.",
+    "A diferenca essencial entre hardware e software esta na sua natureza: o primeiro e fisico e tangivel, enquanto o segundo e abstrato, formado por instrucoes que controlam o comportamento da maquina.",
+    "Phishing e uma tecnica de engenharia social na qual criminosos enviam emails falsos imitando empresas conhecidas para roubar senhas, dados bancarios e informacoes pessoais dos usuarios.",
+    "A memoria RAM e volatil e funciona como espaco temporario para o processador acessar dados em uso. Quando o computador desliga, todo conteudo e perdido instantaneamente.",
+    "Navegadores modernos como Chrome, Edge e Firefox utilizam motores de renderizacao distintos para interpretar HTML, CSS e JavaScript, afetando velocidade e compatibilidade com padroes web.",
+    "O protocolo TCP/IP e a base de comunicacao da internet moderna.\nO TCP garante que os pacotes de dados cheguem corretamente ao destino, retransmitindo os que forem perdidos.\nO IP define o esquema de enderecamento unico de cada dispositivo conectado a rede global.",
+    "Criptografia assimetrica utiliza um par de chaves matematicamente relacionadas: publica e privada.\nA chave publica criptografa os dados e pode ser compartilhada com qualquer pessoa livremente.\nSomente a chave privada correspondente e capaz de descriptografar a mensagem com seguranca.",
+    "Algoritmos de machine learning se dividem em categorias com abordagens bem distintas.\nNo aprendizado supervisionado, o modelo treina com dados rotulados e aprende a reconhecer padroes.\nNo nao-supervisionado, ele descobre estruturas ocultas nos dados sem qualquer rotulo pre-definido.",
+    "A virtualizacao permite executar multiplos sistemas operacionais em uma unica maquina fisica.\nO hypervisor gerencia os recursos de hardware e isola cada maquina virtual das demais.\nAmazon EC2 e Google Compute Engine sao servicos de nuvem baseados diretamente nesse principio.",
+    "Estruturas de dados como listas, filas, pilhas e arvores sao fundamentais em programacao.\nCada estrutura possui caracteristicas proprias de insercao, remocao e busca de elementos.\nEscolher a estrutura adequada e decisivo para garantir a eficiencia do algoritmo desenvolvido.",
+    "O conceito de DevOps integra desenvolvimento e operacoes de software em um ciclo continuo de melhoria.\nPraticas como integracao continua e entrega continua automatizam os processos de teste e deploy.\nIsso reduz erros humanos, acelera as entregas e aumenta a confiabilidade geral dos sistemas.",
+    "Redes neurais convolucionais sao especializadas no processamento e analise de imagens digitais.\nCamadas de convolucao extraem caracteristicas hierarquicas como bordas, formas e texturas.\nElas formam a base dos sistemas modernos de reconhecimento facial e classificacao de objetos.",
+    "O conceito de complexidade de algoritmos e medido pela notacao Big-O, que descreve crescimento.\nUm algoritmo O(n) tem tempo linear, enquanto O(n²) cresce quadraticamente com a entrada.\nEscolher o algoritmo certo pode fazer a diferenca entre segundos e horas de processamento.",
+    "Containers Docker encapsulam aplicacoes com todas as suas dependencias em um ambiente isolado.\nIsso garante que o software rode de forma identica em qualquer maquina ou servidor de producao.\nOrquestradores como Kubernetes gerenciam dezenas ou centenas de containers em clusters distribuidos.",
+    "O modelo OSI divide a comunicacao em redes em sete camadas com funcoes bem definidas.\nCada camada interage apenas com a camada imediatamente acima ou abaixo na hierarquia.\nEssa abstracao facilita o desenvolvimento de protocolos e a resolucao de problemas em redes complexas."
   ]
 };
 
@@ -91,6 +136,120 @@ const FINGER_MAP = {
   ' ':5
 };
 
+// =============================================================
+// MMR — Sistema de Ranking Oculto
+// =============================================================
+const RANK_TIERS = [
+  { nome: 'Aprendiz',             emoji: '🌱', cor: '#94A3B8', mmrMin: 0    },
+  { nome: 'Explorador',           emoji: '🔍', cor: '#10B981', mmrMin: 900  },
+  { nome: 'Técnico',              emoji: '⚙️',  cor: '#3B82F6', mmrMin: 1050 },
+  { nome: 'Especialista',         emoji: '💡', cor: '#8B5CF6', mmrMin: 1200 },
+  { nome: 'Hacker do Bem',        emoji: '🖥️',  cor: '#F59E0B', mmrMin: 1350 },
+  { nome: 'Mestre Digital',       emoji: '🏅', cor: '#EF4444', mmrMin: 1500 },
+  { nome: 'Lenda da Informática', emoji: '🏆', cor: '#EC4899', mmrMin: 1700 },
+];
+// MMR implícito de cada dificuldade (o "oponente")
+const DIF_MMR = { facil: 900, medio: 1075, dificil: 1250 };
+
+function _digGetRanking() {
+  if (!alunoAtivo) return { mmr:1000, lp:0, tier:0, partidas:0, vitorias:0, derrotas:0, sequencia:0 };
+  const r = alunoAtivo.progresso?.ranking;
+  if (r) return r;
+  return { mmr:1000, lp:0, tier:0, partidas:0, vitorias:0, derrotas:0, sequencia:0 };
+}
+
+function _digSalvarRanking(r) {
+  if (!alunoAtivo) return;
+  alunoAtivo.progresso = alunoAtivo.progresso || {};
+  alunoAtivo.progresso.ranking = r;
+  _digSalvarAluno(alunoAtivo);
+}
+
+function _digTierFromMMR(mmr) {
+  for (let i = RANK_TIERS.length - 1; i >= 0; i--) {
+    if (mmr >= RANK_TIERS[i].mmrMin) return i;
+  }
+  return 0;
+}
+
+// Dificuldade recomendada com base no MMR atual
+function _digDifRecomendada(mmr) {
+  if (mmr < 1030) return 'facil';
+  if (mmr < 1200) return 'medio';
+  return 'dificil';
+}
+
+// resultado: 1=vitória, 0.5=empate, 0=derrota
+function _digResultadoMMR(wpm, precisao, completou) {
+  const velNorm = Math.min(1, wpm / 40); // 40 WPM = velocidade máxima
+  const score = (precisao / 100) * 0.6 + velNorm * 0.3 + (completou ? 0.1 : 0);
+  if (score >= 0.82) return 1;
+  if (score >= 0.60) return 0.5;
+  return 0;
+}
+
+function _digAtualizarMMR(wpm, precisao, completou, dif) {
+  const ranking = _digGetRanking();
+  const difMMR  = DIF_MMR[dif] || 1000;
+  const K       = ranking.partidas < 10 ? 32 : ranking.partidas < 30 ? 24 : 16;
+
+  const chance    = 1 / (1 + Math.pow(10, (difMMR - ranking.mmr) / 400));
+  const resultado = _digResultadoMMR(wpm, precisao, completou);
+  const deltaMmr  = Math.round(K * (resultado - chance));
+  const novoMMR   = Math.max(200, ranking.mmr + deltaMmr);
+
+  // LP: base + bônus/penalidade conforme MMR vs rank visível
+  const tierMMRMin = RANK_TIERS[ranking.tier]?.mmrMin || 0;
+  const mmrAdv     = novoMMR - tierMMRMin;
+  const lpMult     = mmrAdv > 150 ? 1.35 : mmrAdv < -100 ? 0.65 : 1.0;
+  const lpBase     = resultado === 1 ? 22 : resultado === 0.5 ? 5 : -18;
+  const lpDelta    = Math.round(lpBase * lpMult);
+
+  let novoLP   = ranking.lp + lpDelta;
+  let novoTier = ranking.tier;
+
+  if (novoLP >= 100) {
+    novoLP -= 100;
+    novoTier = Math.min(RANK_TIERS.length - 1, novoTier + 1);
+  }
+  if (novoLP < 0 && novoTier > 0) {
+    novoTier--;
+    novoLP = Math.max(10, 75 + novoLP); // pouso suave
+  }
+  if (novoLP < 0) novoLP = 0;
+
+  const novoRanking = {
+    mmr:       novoMMR,
+    lp:        novoLP,
+    tier:      novoTier,
+    partidas:  ranking.partidas + 1,
+    vitorias:  ranking.vitorias + (resultado === 1 ? 1 : 0),
+    derrotas:  ranking.derrotas + (resultado === 0 ? 1 : 0),
+    sequencia: resultado === 1 ? (ranking.sequencia + 1) : 0,
+  };
+  _digSalvarRanking(novoRanking);
+  return { novoRanking, deltaMmr, lpDelta, resultado };
+}
+
+function _digRankBadgeHtml(ranking, pequeno) {
+  const tier = RANK_TIERS[ranking.tier] || RANK_TIERS[0];
+  if (pequeno) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;background:${tier.cor}22;border:1.5px solid ${tier.cor};border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:${tier.cor};">
+      ${tier.emoji} ${tier.nome} · ${ranking.lp} LP
+    </span>`;
+  }
+  return `<div style="display:inline-flex;align-items:center;gap:10px;background:${tier.cor}22;border:2px solid ${tier.cor};border-radius:16px;padding:10px 18px;">
+    <span style="font-size:32px;">${tier.emoji}</span>
+    <div>
+      <div style="font-size:18px;font-weight:800;color:${tier.cor};">${tier.nome}</div>
+      <div style="font-size:12px;color:var(--ink-soft);">${ranking.lp} LP · ${ranking.partidas} partidas · MMR ${ranking.mmr}</div>
+      <div style="margin-top:4px;height:6px;background:var(--bg-soft);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${ranking.lp}%;background:${tier.cor};border-radius:3px;transition:width 0.5s;"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
 let digState = {
   modo: 'treino',
   dif: 'facil',
@@ -100,18 +259,33 @@ let digState = {
   caracteresErrados: 0,
   inicio: 0,
   timerId: null,
-  finalizado: false
+  countdownId: null,
+  finalizado: false,
+  tempoRestante: 0,
+  tempoTotal: 0,
+  penalidade: 5
 };
 
 
 function abrirMenuDigitacao() {
-  digState.dif = digState.dif || 'facil';
-  // marca dificuldade no selector
+  // ajusta dificuldade recomendada conforme MMR do aluno
+  const ranking = _digGetRanking();
+  const difRec = _digDifRecomendada(ranking.mmr);
+  digState.dif = difRec;
+
   document.querySelectorAll('#digNivelSelector .dig-nivel-btn').forEach(b => b.classList.remove('active'));
   const map = {facil:0, medio:1, dificil:2};
-  const idx = map[digState.dif] || 0;
   const btns = document.querySelectorAll('#digNivelSelector .dig-nivel-btn');
-  if (btns[idx]) btns[idx].classList.add('active');
+  if (btns[map[difRec]]) btns[map[difRec]].classList.add('active');
+
+  // mostra badge de rank no menu
+  const badgeContainer = document.getElementById('digRankBadge');
+  if (badgeContainer && alunoAtivo) {
+    badgeContainer.innerHTML = _digRankBadgeHtml(ranking, false);
+    badgeContainer.style.display = 'flex';
+    badgeContainer.style.justifyContent = 'center';
+    badgeContainer.style.marginBottom = '16px';
+  }
 
   renderHistoricoDigitacao();
   mostrarTela('screen-digitacao-menu');
@@ -125,6 +299,10 @@ function setDifDig(d, el) {
 
 function iniciarDigitacao(modo) {
   digState.modo = modo;
+  // no ranqueado, dificuldade é definida pelo MMR do aluno
+  if (modo === 'ranqueado') {
+    digState.dif = _digDifRecomendada(_digGetRanking().mmr);
+  }
   // sorteia texto da dificuldade
   const textos = TEXTOS_DIGITACAO[digState.dif];
   digState.texto = textos[Math.floor(Math.random() * textos.length)];
@@ -134,6 +312,16 @@ function iniciarDigitacao(modo) {
   digState.inicio = 0;
   digState.finalizado = false;
   if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
+  digState.countdownId = null;
+
+  if (modo === 'ranqueado') {
+    const tempos = {facil: 90, medio: 75, dificil: 60};
+    const penalidades = {facil: 3, medio: 5, dificil: 8};
+    digState.tempoTotal = tempos[digState.dif] || 90;
+    digState.tempoRestante = digState.tempoTotal;
+    digState.penalidade = penalidades[digState.dif] || 5;
+  }
 
   document.getElementById('digTopTitle').textContent =
     (modo === 'ranqueado' ? '🏆 Ranqueado' : '🧘 Treino') + ' — ' +
@@ -153,9 +341,13 @@ function renderTextoDigitacao() {
   const html = digState.texto.split('').map((c, i) => {
     let cls = 'dig-char';
     if (c === ' ') cls += ' space';
+    if (c === '\n') cls += ' newline';
     if (i < digState.pos) cls += ' done';
     else if (i === digState.pos) cls += ' current';
-    const display = c === ' ' ? ' ' : escapeHtml(c);
+    let display;
+    if (c === ' ') display = ' ';
+    else if (c === '\n') display = '↵<br>';
+    else display = escapeHtml(c);
     return `<span class="${cls}" data-i="${i}">${display}</span>`;
   }).join('');
   const box = document.getElementById('digTextoBox');
@@ -214,18 +406,25 @@ function flashTecla(char) {
 function listenerDigitacao(e) {
   if (digState.finalizado) return;
   if (e.key === 'Escape') { sairDigitacao(); return; }
-  if (e.key.length !== 1) return; // ignora setas, F1, etc
+  const isEnter = e.key === 'Enter';
+  if (e.key.length !== 1 && !isEnter) return; // ignora setas, F1, etc
 
   if (digState.pos === 0 && !digState.inicio && digState.modo === 'ranqueado') {
     digState.inicio = Date.now();
     digState.timerId = setInterval(atualizarStatsDigitacao, 250);
+    digState.countdownId = setInterval(() => {
+      if (digState.finalizado) return;
+      digState.tempoRestante--;
+      if (digState.tempoRestante <= 0) { digState.tempoRestante = 0; falharDigitacao(); }
+      atualizarStatsDigitacao();
+    }, 1000);
   }
   if (digState.pos === 0 && !digState.inicio && digState.modo === 'treino') {
     digState.inicio = Date.now();
   }
 
   const esperado = digState.texto[digState.pos];
-  const digitado = e.key;
+  const digitado = isEnter ? '\n' : e.key;
   flashTecla(digitado);
 
   const certo = normalizarChar(esperado) === normalizarChar(digitado);
@@ -254,8 +453,32 @@ function listenerDigitacao(e) {
       spans[digState.pos].classList.add('wrong');
       setTimeout(() => spans[digState.pos]?.classList.remove('wrong'), 400);
     }
+    if (digState.modo === 'ranqueado' && digState.inicio) {
+      digState.tempoRestante = Math.max(0, digState.tempoRestante - digState.penalidade);
+      if (digState.tempoRestante <= 0) { falharDigitacao(); return; }
+    }
   }
   atualizarStatsDigitacao();
+}
+
+function falharDigitacao() {
+  if (digState.finalizado) return;
+  digState.finalizado = true;
+  if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
+  document.removeEventListener('keydown', listenerDigitacao);
+  document.getElementById('digResultado').innerHTML = `
+    <div class="dig-completo" style="background:linear-gradient(135deg,#EF4444,#B91C1C);">
+      <div style="font-size:64px; margin-bottom:8px;">⏱️</div>
+      <div style="font-size:28px; font-weight:800; margin-bottom:8px;">Tempo esgotado!</div>
+      <div style="font-size:16px; opacity:0.9; margin-bottom:16px;">
+        Chegou em ${Math.round(digState.pos/digState.texto.length*100)}% do texto · ${digState.erros} erros
+      </div>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
+        <button class="btn ghost" style="background:white;color:#EF4444;" onclick="iniciarDigitacao('ranqueado')">↻ Tentar de novo</button>
+        <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Mudar modo</button>
+      </div>
+    </div>`;
 }
 
 function normalizarChar(c) {
@@ -263,9 +486,16 @@ function normalizarChar(c) {
 }
 
 function atualizarStatsDigitacao() {
-  const tempoMs = digState.inicio ? (Date.now() - digState.inicio) : 0;
-  const tempoSeg = tempoMs / 1000;
-  document.getElementById('digTempo').textContent = Math.floor(tempoSeg) + 's';
+  const tempoEl = document.getElementById('digTempo');
+  if (digState.modo === 'ranqueado') {
+    const t = digState.tempoRestante;
+    tempoEl.textContent = t + 's';
+    tempoEl.style.color = t <= 15 ? '#EF4444' : t <= 30 ? '#FBBF24' : '';
+  } else {
+    const tempoMs = digState.inicio ? (Date.now() - digState.inicio) : 0;
+    tempoEl.textContent = Math.floor(tempoMs / 1000) + 's';
+    tempoEl.style.color = '';
+  }
 
   const palavras = digState.pos / 5; // padrão WPM = 5 chars = 1 palavra
   const wpm = tempoSeg > 0 ? Math.round((palavras / tempoSeg) * 60) : 0;
@@ -280,9 +510,19 @@ function atualizarStatsDigitacao() {
     Math.round((digState.pos / digState.texto.length) * 100) + '%';
 }
 
+function setNivelEIniciar(dif) {
+  digState.dif = dif;
+  document.querySelectorAll('#digNivelSelector .dig-nivel-btn').forEach(b => b.classList.remove('active'));
+  const map = {facil:0, medio:1, dificil:2};
+  const btns = document.querySelectorAll('#digNivelSelector .dig-nivel-btn');
+  if (btns[map[dif]]) btns[map[dif]].classList.add('active');
+  iniciarDigitacao(digState.modo);
+}
+
 function finalizarDigitacao() {
   digState.finalizado = true;
   if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
   document.removeEventListener('keydown', listenerDigitacao);
 
   const tempoSeg = (Date.now() - digState.inicio) / 1000;
@@ -293,11 +533,46 @@ function finalizarDigitacao() {
 
   // Calcula pontos (só ranqueado)
   let pontos = 0;
+  let mmrHtml = '';
+
   if (digState.modo === 'ranqueado') {
     const baseDif = {facil: 1, medio: 1.5, dificil: 2}[digState.dif] || 1;
     pontos = Math.round((wpm + precisao - 50) * baseDif);
     pontos = Math.max(5, pontos);
     _digSalvarPontos(pontos);
+
+    // atualiza MMR
+    const mmrRes = _digAtualizarMMR(wpm, precisao, true, digState.dif);
+    const { novoRanking, deltaMmr, lpDelta, resultado } = mmrRes;
+    const tier = RANK_TIERS[novoRanking.tier];
+    const resultadoLabel = resultado === 1 ? '🏅 Vitória' : resultado === 0.5 ? '🤝 Empate técnico' : '💀 Derrota';
+    const lpSinal = lpDelta >= 0 ? `+${lpDelta}` : `${lpDelta}`;
+    const mmrSinal = deltaMmr >= 0 ? `+${deltaMmr}` : `${deltaMmr}`;
+    const lpColor = lpDelta >= 0 ? '#10B981' : '#EF4444';
+
+    mmrHtml = `
+      <div style="background:rgba(0,0,0,0.25);border-radius:14px;padding:14px 18px;margin:12px 0;text-align:center;">
+        <div style="font-size:13px;font-weight:700;opacity:0.8;margin-bottom:6px;">${resultadoLabel} RANQUEADA</div>
+        <div style="display:flex;justify-content:center;gap:20px;align-items:center;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:22px;font-weight:900;color:${lpColor};">${lpSinal} LP</div>
+            <div style="font-size:10px;opacity:0.7;">LIGA</div>
+          </div>
+          <div style="font-size:20px;opacity:0.4;">|</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;opacity:0.85;">${mmrSinal} MMR</div>
+            <div style="font-size:10px;opacity:0.7;">OCULTO</div>
+          </div>
+          <div style="font-size:20px;opacity:0.4;">|</div>
+          <div>
+            ${_digRankBadgeHtml(novoRanking, true)}
+            <div style="font-size:10px;opacity:0.7;margin-top:2px;text-align:center;">${novoRanking.lp}/100 LP</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${novoRanking.lp}%;background:${tier?.cor || '#10B981'};border-radius:3px;transition:width 0.8s;"></div>
+        </div>
+      </div>`;
 
     // salva histórico
     if (!alunoAtivo.progresso.digitacao) alunoAtivo.progresso.digitacao = [];
@@ -326,7 +601,8 @@ function finalizarDigitacao() {
       <div style="font-size:16px; opacity:0.9; margin-bottom:16px;">
         ${wpm} palavras/min · ${precisao}% precisão · ${Math.floor(tempoSeg)}s · ${digState.erros} erros
       </div>
-      ${digState.modo === 'ranqueado' ? `<div style="font-size:32px; font-weight:900;">+${pontos} ⭐</div>` : ''}
+      ${digState.modo === 'ranqueado' ? `<div style="font-size:28px; font-weight:900;">+${pontos} ⭐</div>` : ''}
+      ${mmrHtml}
       <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
         <button class="btn ghost" style="background:white;color:var(--green);" onclick="iniciarDigitacao('${digState.modo}')">↻ Novo texto</button>
         <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Mudar modo</button>
@@ -337,6 +613,7 @@ function finalizarDigitacao() {
 
 function sairDigitacao() {
   if (digState.timerId) clearInterval(digState.timerId);
+  if (digState.countdownId) clearInterval(digState.countdownId);
   document.removeEventListener('keydown', listenerDigitacao);
   abrirMenuDigitacao();
 }
@@ -345,34 +622,35 @@ function renderHistoricoDigitacao() {
   const container = document.getElementById('digHistorico');
   if (!container || !alunoAtivo) return;
 
-  // Ranking de WPM (melhor de cada aluno cadastrado)
+  // Ranking por MMR oculto
   const alunos = _digGetAlunos();
-  const ranking = [];
+  const rankingMMR = [];
   alunos.forEach(a => {
-    const hist = a.progresso?.digitacao || [];
-    const ranqueados = hist.filter(r => r.modo === 'ranqueado');
-    if (ranqueados.length > 0) {
-      const melhor = ranqueados.reduce((m, r) => r.wpm > m.wpm ? r : m, ranqueados[0]);
-      ranking.push({nome: a.nome, id: a.id, wpm: melhor.wpm, precisao: melhor.precisao, dif: melhor.dif});
+    const r = a.progresso?.ranking;
+    if (r && r.partidas > 0) {
+      rankingMMR.push({ nome: a.nome, id: a.id, mmr: r.mmr, lp: r.lp, tier: r.tier, partidas: r.partidas });
     }
   });
-  ranking.sort((a, b) => b.wpm - a.wpm);
+  rankingMMR.sort((a, b) => b.mmr - a.mmr || b.lp - a.lp);
 
   let html = '';
-  if (ranking.length > 0) {
-    html += `<div class="section-titulo"><iconify-icon icon="ph:trophy-bold"></iconify-icon> RANKING DE DIGITAÇÃO (MELHOR WPM)</div>
+  if (rankingMMR.length > 0) {
+    html += `<div class="section-titulo"><iconify-icon icon="ph:trophy-bold"></iconify-icon> RANKING RANQUEADO</div>
     <div class="dig-ranking-table">
       <table>
-        <thead><tr><th>POS</th><th>ALUNO</th><th>WPM</th><th>PRECISÃO</th><th>NÍVEL</th></tr></thead>
+        <thead><tr><th>POS</th><th>ALUNO</th><th>RANK</th><th>LP</th><th>MMR</th><th>PARTIDAS</th></tr></thead>
         <tbody>
-          ${ranking.map((r, i) => `
-            <tr class="${r.id === alunoAtivo.id ? 'me' : ''}">
+          ${rankingMMR.map((r, i) => {
+            const tier = RANK_TIERS[r.tier] || RANK_TIERS[0];
+            return `<tr class="${r.id === alunoAtivo.id ? 'me' : ''}">
               <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1) + 'º'}</td>
               <td>${escapeHtml(r.nome)}${r.id === alunoAtivo.id ? ' (você)' : ''}</td>
-              <td><strong>${r.wpm}</strong></td>
-              <td>${r.precisao}%</td>
-              <td>${r.dif === 'facil' ? '🟢' : r.dif === 'medio' ? '🟡' : '🔴'} ${r.dif}</td>
-            </tr>`).join('')}
+              <td style="color:${tier.cor};font-weight:700;">${tier.emoji} ${tier.nome}</td>
+              <td>${r.lp}</td>
+              <td style="font-size:11px;opacity:0.7;">${r.mmr}</td>
+              <td>${r.partidas}</td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
     </div>`;
@@ -1106,10 +1384,10 @@ A tecnologia 5G, com velocidades ate cem vezes maiores que o 4G, vai viabilizar 
 ];
 
 const RANKEADA_CONFIG = {
-  facil:   { tempoBase: 600, penalidade: 1,  bonus: 0.3, mult: {1:1.5, 2:1.2, 3:1.0} },
-  medio:   { tempoBase: 420, penalidade: 3,  bonus: 0.2, mult: {1:1.3, 2:1.0, 3:0.85} },
-  dificil: { tempoBase: 270, penalidade: 6,  bonus: 0.1, mult: {1:1.2, 2:1.0, 3:0.75} },
-  elite:   { tempoBase: 150, penalidade: 10, bonus: 0,   mult: {1:1.1, 2:1.0, 3:0.65} }
+  facil:   { tempoBase: 180, penalidade: 3,  bonus: 0,   mult: {1:1.4, 2:1.1, 3:1.0} },
+  medio:   { tempoBase: 150, penalidade: 5,  bonus: 0,   mult: {1:1.3, 2:1.0, 3:0.85} },
+  dificil: { tempoBase: 120, penalidade: 8,  bonus: 0,   mult: {1:1.2, 2:1.0, 3:0.75} },
+  elite:   { tempoBase: 90,  penalidade: 12, bonus: 0,   mult: {1:1.1, 2:1.0, 3:0.65} }
 };
 
 let rankeadaState = { texto:null, pos:0, erros:0, tempoRestante:0, tempoTotal:0, timerId:null, finalizado:false, inicio:0, dif:'facil', cfg:null };
@@ -1185,7 +1463,9 @@ function iniciarRankeada(textoId) {
   const dif = rankeadaState.dif || 'facil';
   const cfg = RANKEADA_CONFIG[dif];
   const tempo = Math.round(cfg.tempoBase * (cfg.mult[nivel] || 1));
-  rankeadaState = { texto, pos:0, erros:0, tempoRestante:tempo, tempoTotal:tempo, timerId:null, finalizado:false, inicio:0, dif, cfg };
+  // normaliza quebras duplas para evitar duplo Enter
+  const textoNorm = {...texto, texto: texto.texto.replace(/\n+/g, '\n').trim()};
+  rankeadaState = { texto:textoNorm, pos:0, erros:0, tempoRestante:tempo, tempoTotal:tempo, timerId:null, finalizado:false, inicio:0, dif, cfg };
   document.getElementById('rankeadaTopTitle').textContent = `⏱️ ${texto.titulo}`;
   document.getElementById('rankeadaResultado').innerHTML = '';
   renderTextoRankeada();
