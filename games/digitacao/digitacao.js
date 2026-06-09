@@ -1384,10 +1384,10 @@ A tecnologia 5G, com velocidades ate cem vezes maiores que o 4G, vai viabilizar 
 ];
 
 const RANKEADA_CONFIG = {
-  facil:   { tempoBase: 600, penalidade: 1,  bonus: 0.3, mult: {1:1.5, 2:1.2, 3:1.0} },
-  medio:   { tempoBase: 420, penalidade: 3,  bonus: 0.2, mult: {1:1.3, 2:1.0, 3:0.85} },
-  dificil: { tempoBase: 270, penalidade: 6,  bonus: 0.1, mult: {1:1.2, 2:1.0, 3:0.75} },
-  elite:   { tempoBase: 150, penalidade: 10, bonus: 0,   mult: {1:1.1, 2:1.0, 3:0.65} }
+  facil:   { tempoBase: 180, penalidade: 3,  bonus: 0,   mult: {1:1.4, 2:1.1, 3:1.0} },
+  medio:   { tempoBase: 150, penalidade: 5,  bonus: 0,   mult: {1:1.3, 2:1.0, 3:0.85} },
+  dificil: { tempoBase: 120, penalidade: 8,  bonus: 0,   mult: {1:1.2, 2:1.0, 3:0.75} },
+  elite:   { tempoBase: 90,  penalidade: 12, bonus: 0,   mult: {1:1.1, 2:1.0, 3:0.65} }
 };
 
 let rankeadaState = { texto:null, pos:0, erros:0, tempoRestante:0, tempoTotal:0, timerId:null, finalizado:false, inicio:0, dif:'facil', cfg:null };
