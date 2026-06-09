@@ -136,6 +136,120 @@ const FINGER_MAP = {
   ' ':5
 };
 
+// =============================================================
+// MMR — Sistema de Ranking Oculto
+// =============================================================
+const RANK_TIERS = [
+  { nome: 'Aprendiz',             emoji: '🌱', cor: '#94A3B8', mmrMin: 0    },
+  { nome: 'Explorador',           emoji: '🔍', cor: '#10B981', mmrMin: 900  },
+  { nome: 'Técnico',              emoji: '⚙️',  cor: '#3B82F6', mmrMin: 1050 },
+  { nome: 'Especialista',         emoji: '💡', cor: '#8B5CF6', mmrMin: 1200 },
+  { nome: 'Hacker do Bem',        emoji: '🖥️',  cor: '#F59E0B', mmrMin: 1350 },
+  { nome: 'Mestre Digital',       emoji: '🏅', cor: '#EF4444', mmrMin: 1500 },
+  { nome: 'Lenda da Informática', emoji: '🏆', cor: '#EC4899', mmrMin: 1700 },
+];
+// MMR implícito de cada dificuldade (o "oponente")
+const DIF_MMR = { facil: 900, medio: 1075, dificil: 1250 };
+
+function _digGetRanking() {
+  if (!alunoAtivo) return { mmr:1000, lp:0, tier:0, partidas:0, vitorias:0, derrotas:0, sequencia:0 };
+  const r = alunoAtivo.progresso?.ranking;
+  if (r) return r;
+  return { mmr:1000, lp:0, tier:0, partidas:0, vitorias:0, derrotas:0, sequencia:0 };
+}
+
+function _digSalvarRanking(r) {
+  if (!alunoAtivo) return;
+  alunoAtivo.progresso = alunoAtivo.progresso || {};
+  alunoAtivo.progresso.ranking = r;
+  _digSalvarAluno(alunoAtivo);
+}
+
+function _digTierFromMMR(mmr) {
+  for (let i = RANK_TIERS.length - 1; i >= 0; i--) {
+    if (mmr >= RANK_TIERS[i].mmrMin) return i;
+  }
+  return 0;
+}
+
+// Dificuldade recomendada com base no MMR atual
+function _digDifRecomendada(mmr) {
+  if (mmr < 1030) return 'facil';
+  if (mmr < 1200) return 'medio';
+  return 'dificil';
+}
+
+// resultado: 1=vitória, 0.5=empate, 0=derrota
+function _digResultadoMMR(wpm, precisao, completou) {
+  const velNorm = Math.min(1, wpm / 40); // 40 WPM = velocidade máxima
+  const score = (precisao / 100) * 0.6 + velNorm * 0.3 + (completou ? 0.1 : 0);
+  if (score >= 0.82) return 1;
+  if (score >= 0.60) return 0.5;
+  return 0;
+}
+
+function _digAtualizarMMR(wpm, precisao, completou, dif) {
+  const ranking = _digGetRanking();
+  const difMMR  = DIF_MMR[dif] || 1000;
+  const K       = ranking.partidas < 10 ? 32 : ranking.partidas < 30 ? 24 : 16;
+
+  const chance    = 1 / (1 + Math.pow(10, (difMMR - ranking.mmr) / 400));
+  const resultado = _digResultadoMMR(wpm, precisao, completou);
+  const deltaMmr  = Math.round(K * (resultado - chance));
+  const novoMMR   = Math.max(200, ranking.mmr + deltaMmr);
+
+  // LP: base + bônus/penalidade conforme MMR vs rank visível
+  const tierMMRMin = RANK_TIERS[ranking.tier]?.mmrMin || 0;
+  const mmrAdv     = novoMMR - tierMMRMin;
+  const lpMult     = mmrAdv > 150 ? 1.35 : mmrAdv < -100 ? 0.65 : 1.0;
+  const lpBase     = resultado === 1 ? 22 : resultado === 0.5 ? 5 : -18;
+  const lpDelta    = Math.round(lpBase * lpMult);
+
+  let novoLP   = ranking.lp + lpDelta;
+  let novoTier = ranking.tier;
+
+  if (novoLP >= 100) {
+    novoLP -= 100;
+    novoTier = Math.min(RANK_TIERS.length - 1, novoTier + 1);
+  }
+  if (novoLP < 0 && novoTier > 0) {
+    novoTier--;
+    novoLP = Math.max(10, 75 + novoLP); // pouso suave
+  }
+  if (novoLP < 0) novoLP = 0;
+
+  const novoRanking = {
+    mmr:       novoMMR,
+    lp:        novoLP,
+    tier:      novoTier,
+    partidas:  ranking.partidas + 1,
+    vitorias:  ranking.vitorias + (resultado === 1 ? 1 : 0),
+    derrotas:  ranking.derrotas + (resultado === 0 ? 1 : 0),
+    sequencia: resultado === 1 ? (ranking.sequencia + 1) : 0,
+  };
+  _digSalvarRanking(novoRanking);
+  return { novoRanking, deltaMmr, lpDelta, resultado };
+}
+
+function _digRankBadgeHtml(ranking, pequeno) {
+  const tier = RANK_TIERS[ranking.tier] || RANK_TIERS[0];
+  if (pequeno) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;background:${tier.cor}22;border:1.5px solid ${tier.cor};border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:${tier.cor};">
+      ${tier.emoji} ${tier.nome} · ${ranking.lp} LP
+    </span>`;
+  }
+  return `<div style="display:inline-flex;align-items:center;gap:10px;background:${tier.cor}22;border:2px solid ${tier.cor};border-radius:16px;padding:10px 18px;">
+    <span style="font-size:32px;">${tier.emoji}</span>
+    <div>
+      <div style="font-size:18px;font-weight:800;color:${tier.cor};">${tier.nome}</div>
+      <div style="font-size:12px;color:var(--ink-soft);">${ranking.lp} LP · ${ranking.partidas} partidas · MMR ${ranking.mmr}</div>
+      <div style="margin-top:4px;height:6px;background:var(--bg-soft);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${ranking.lp}%;background:${tier.cor};border-radius:3px;transition:width 0.5s;"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
 let digState = {
   modo: 'treino',
   dif: 'facil',
@@ -154,13 +268,24 @@ let digState = {
 
 
 function abrirMenuDigitacao() {
-  digState.dif = digState.dif || 'facil';
-  // marca dificuldade no selector
+  // ajusta dificuldade recomendada conforme MMR do aluno
+  const ranking = _digGetRanking();
+  const difRec = _digDifRecomendada(ranking.mmr);
+  digState.dif = difRec;
+
   document.querySelectorAll('#digNivelSelector .dig-nivel-btn').forEach(b => b.classList.remove('active'));
   const map = {facil:0, medio:1, dificil:2};
-  const idx = map[digState.dif] || 0;
   const btns = document.querySelectorAll('#digNivelSelector .dig-nivel-btn');
-  if (btns[idx]) btns[idx].classList.add('active');
+  if (btns[map[difRec]]) btns[map[difRec]].classList.add('active');
+
+  // mostra badge de rank no menu
+  const badgeContainer = document.getElementById('digRankBadge');
+  if (badgeContainer && alunoAtivo) {
+    badgeContainer.innerHTML = _digRankBadgeHtml(ranking, false);
+    badgeContainer.style.display = 'flex';
+    badgeContainer.style.justifyContent = 'center';
+    badgeContainer.style.marginBottom = '16px';
+  }
 
   renderHistoricoDigitacao();
   mostrarTela('screen-digitacao-menu');
@@ -174,6 +299,10 @@ function setDifDig(d, el) {
 
 function iniciarDigitacao(modo) {
   digState.modo = modo;
+  // no ranqueado, dificuldade é definida pelo MMR do aluno
+  if (modo === 'ranqueado') {
+    digState.dif = _digDifRecomendada(_digGetRanking().mmr);
+  }
   // sorteia texto da dificuldade
   const textos = TEXTOS_DIGITACAO[digState.dif];
   digState.texto = textos[Math.floor(Math.random() * textos.length)];
@@ -404,11 +533,46 @@ function finalizarDigitacao() {
 
   // Calcula pontos (só ranqueado)
   let pontos = 0;
+  let mmrHtml = '';
+
   if (digState.modo === 'ranqueado') {
     const baseDif = {facil: 1, medio: 1.5, dificil: 2}[digState.dif] || 1;
     pontos = Math.round((wpm + precisao - 50) * baseDif);
     pontos = Math.max(5, pontos);
     _digSalvarPontos(pontos);
+
+    // atualiza MMR
+    const mmrRes = _digAtualizarMMR(wpm, precisao, true, digState.dif);
+    const { novoRanking, deltaMmr, lpDelta, resultado } = mmrRes;
+    const tier = RANK_TIERS[novoRanking.tier];
+    const resultadoLabel = resultado === 1 ? '🏅 Vitória' : resultado === 0.5 ? '🤝 Empate técnico' : '💀 Derrota';
+    const lpSinal = lpDelta >= 0 ? `+${lpDelta}` : `${lpDelta}`;
+    const mmrSinal = deltaMmr >= 0 ? `+${deltaMmr}` : `${deltaMmr}`;
+    const lpColor = lpDelta >= 0 ? '#10B981' : '#EF4444';
+
+    mmrHtml = `
+      <div style="background:rgba(0,0,0,0.25);border-radius:14px;padding:14px 18px;margin:12px 0;text-align:center;">
+        <div style="font-size:13px;font-weight:700;opacity:0.8;margin-bottom:6px;">${resultadoLabel} RANQUEADA</div>
+        <div style="display:flex;justify-content:center;gap:20px;align-items:center;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:22px;font-weight:900;color:${lpColor};">${lpSinal} LP</div>
+            <div style="font-size:10px;opacity:0.7;">LIGA</div>
+          </div>
+          <div style="font-size:20px;opacity:0.4;">|</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;opacity:0.85;">${mmrSinal} MMR</div>
+            <div style="font-size:10px;opacity:0.7;">OCULTO</div>
+          </div>
+          <div style="font-size:20px;opacity:0.4;">|</div>
+          <div>
+            ${_digRankBadgeHtml(novoRanking, true)}
+            <div style="font-size:10px;opacity:0.7;margin-top:2px;text-align:center;">${novoRanking.lp}/100 LP</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${novoRanking.lp}%;background:${tier?.cor || '#10B981'};border-radius:3px;transition:width 0.8s;"></div>
+        </div>
+      </div>`;
 
     // salva histórico
     if (!alunoAtivo.progresso.digitacao) alunoAtivo.progresso.digitacao = [];
@@ -430,22 +594,6 @@ function finalizarDigitacao() {
   else if (wpm >= 20) conceito = '👍 Bom ritmo!';
   else conceito = '💪 Continua treinando!';
 
-  // nivel automático
-  let levelUpHtml = '';
-  if (digState.modo === 'ranqueado' && precisao >= 85) {
-    if (digState.dif === 'facil' && wpm >= 20) {
-      levelUpHtml = `<div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px 16px;margin:12px 0;">
-        🎯 <strong>Você está pronto para o Médio!</strong> Seus ${wpm} WPM com ${precisao}% de precisão mostram que o Fácil ficou pequeno.
-        <button class="btn" style="margin-left:12px;background:white;color:#6366F1;padding:6px 14px;" onclick="setNivelEIniciar('medio')">Subir para Médio →</button>
-      </div>`;
-    } else if (digState.dif === 'medio' && wpm >= 35) {
-      levelUpHtml = `<div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px 16px;margin:12px 0;">
-        🔥 <strong>Hora do Difícil!</strong> ${wpm} WPM com ${precisao}% de precisão é resultado de craque.
-        <button class="btn" style="margin-left:12px;background:white;color:#EF4444;padding:6px 14px;" onclick="setNivelEIniciar('dificil')">Subir para Difícil →</button>
-      </div>`;
-    }
-  }
-
   document.getElementById('digResultado').innerHTML = `
     <div class="dig-completo">
       <div style="font-size:64px; margin-bottom:8px;">${digState.modo === 'ranqueado' ? '🏆' : '🎉'}</div>
@@ -453,8 +601,8 @@ function finalizarDigitacao() {
       <div style="font-size:16px; opacity:0.9; margin-bottom:16px;">
         ${wpm} palavras/min · ${precisao}% precisão · ${Math.floor(tempoSeg)}s · ${digState.erros} erros
       </div>
-      ${digState.modo === 'ranqueado' ? `<div style="font-size:32px; font-weight:900;">+${pontos} ⭐</div>` : ''}
-      ${levelUpHtml}
+      ${digState.modo === 'ranqueado' ? `<div style="font-size:28px; font-weight:900;">+${pontos} ⭐</div>` : ''}
+      ${mmrHtml}
       <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
         <button class="btn ghost" style="background:white;color:var(--green);" onclick="iniciarDigitacao('${digState.modo}')">↻ Novo texto</button>
         <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Mudar modo</button>
@@ -474,34 +622,35 @@ function renderHistoricoDigitacao() {
   const container = document.getElementById('digHistorico');
   if (!container || !alunoAtivo) return;
 
-  // Ranking de WPM (melhor de cada aluno cadastrado)
+  // Ranking por MMR oculto
   const alunos = _digGetAlunos();
-  const ranking = [];
+  const rankingMMR = [];
   alunos.forEach(a => {
-    const hist = a.progresso?.digitacao || [];
-    const ranqueados = hist.filter(r => r.modo === 'ranqueado');
-    if (ranqueados.length > 0) {
-      const melhor = ranqueados.reduce((m, r) => r.wpm > m.wpm ? r : m, ranqueados[0]);
-      ranking.push({nome: a.nome, id: a.id, wpm: melhor.wpm, precisao: melhor.precisao, dif: melhor.dif});
+    const r = a.progresso?.ranking;
+    if (r && r.partidas > 0) {
+      rankingMMR.push({ nome: a.nome, id: a.id, mmr: r.mmr, lp: r.lp, tier: r.tier, partidas: r.partidas });
     }
   });
-  ranking.sort((a, b) => b.wpm - a.wpm);
+  rankingMMR.sort((a, b) => b.mmr - a.mmr || b.lp - a.lp);
 
   let html = '';
-  if (ranking.length > 0) {
-    html += `<div class="section-titulo"><iconify-icon icon="ph:trophy-bold"></iconify-icon> RANKING DE DIGITAÇÃO (MELHOR WPM)</div>
+  if (rankingMMR.length > 0) {
+    html += `<div class="section-titulo"><iconify-icon icon="ph:trophy-bold"></iconify-icon> RANKING RANQUEADO</div>
     <div class="dig-ranking-table">
       <table>
-        <thead><tr><th>POS</th><th>ALUNO</th><th>WPM</th><th>PRECISÃO</th><th>NÍVEL</th></tr></thead>
+        <thead><tr><th>POS</th><th>ALUNO</th><th>RANK</th><th>LP</th><th>MMR</th><th>PARTIDAS</th></tr></thead>
         <tbody>
-          ${ranking.map((r, i) => `
-            <tr class="${r.id === alunoAtivo.id ? 'me' : ''}">
+          ${rankingMMR.map((r, i) => {
+            const tier = RANK_TIERS[r.tier] || RANK_TIERS[0];
+            return `<tr class="${r.id === alunoAtivo.id ? 'me' : ''}">
               <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1) + 'º'}</td>
               <td>${escapeHtml(r.nome)}${r.id === alunoAtivo.id ? ' (você)' : ''}</td>
-              <td><strong>${r.wpm}</strong></td>
-              <td>${r.precisao}%</td>
-              <td>${r.dif === 'facil' ? '🟢' : r.dif === 'medio' ? '🟡' : '🔴'} ${r.dif}</td>
-            </tr>`).join('')}
+              <td style="color:${tier.cor};font-weight:700;">${tier.emoji} ${tier.nome}</td>
+              <td>${r.lp}</td>
+              <td style="font-size:11px;opacity:0.7;">${r.mmr}</td>
+              <td>${r.partidas}</td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
     </div>`;
