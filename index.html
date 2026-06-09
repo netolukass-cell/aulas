@@ -2044,6 +2044,8 @@
       </div>
     </div>
 
+    <div id="aulaHojeSection"></div>
+
     <!-- DIGITAÇÃO em destaque no topo -->
     <div onclick="abrirJogo('digitacao','')" style="cursor:pointer;background:linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%);border-radius:20px;padding:28px 36px;display:flex;align-items:center;gap:32px;margin-bottom:32px;box-shadow:0 20px 60px -12px rgba(99,102,241,0.45);position:relative;overflow:hidden;">
       <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.25),transparent 65%);pointer-events:none;"></div>
@@ -2130,7 +2132,7 @@
       <div class="pratique-card" onclick="abrirJogo('ram-manager','memoria')">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:memory-bold"></iconify-icon></div>
         <div class="pratique-title">Gerenciador de RAM</div>
-        <div class="pratique-desc">Processos invadem a memória — mate-os antes de travar o sistema.</div>
+        <div class="pratique-desc">Processos invadem a memória — encerre-os antes de travar o sistema.</div>
         <div class="pratique-arrow">→</div>
       </div>
     </div>
@@ -2168,13 +2170,18 @@
         <div style="color:white;font-size:22px;font-weight:900;">Painel da Turma</div>
       </div>
       <div id="painelSyncIndicator" style="background:rgba(255,255,255,.15);border-radius:12px;padding:8px 14px;color:white;font-size:13px;font-weight:600;cursor:pointer;" onclick="painelRefresh()">⟳ Atualizar</div>
+      <button id="painelBackupBtn" onclick="_exportarBackup()" style="background:#10B981;color:#fff;border:none;border-radius:12px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;">⬇️ Backup</button>
       <button onclick="document.getElementById('modalPainelPro').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:white;border-radius:12px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:16px;">✕</button>
     </div>
     <div style="padding:24px;">
       <!-- Stats row -->
-      <div id="painelStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;"></div>
+      <div id="painelStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;"></div>
+      <!-- Ranking semanal de missões -->
+      <div style="background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div style="font-size:11px;font-weight:800;color:#64748B;letter-spacing:1px;margin-bottom:10px;">🏅 RANKING SEMANAL DE MISSÕES</div>
+        <div id="painelRankSemanal"></div>
+      </div>
       <!-- Students list -->
-      <div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:12px;">ALUNOS</div>
       <div id="painelAlunos"></div>
     </div>
   </div>
@@ -3341,6 +3348,141 @@ function _planSave(turmaKey, texto) {
   localStorage.setItem(PLAN_KEY, JSON.stringify(d));
 }
 
+
+// =============================================================
+// MISSÕES DA SEMANA — sistema de aulas guiadas
+// Chave separada, não interfere em dados existentes.
+// =============================================================
+const MISSOES_KEY = 'lusca_missoes';
+
+const MISSOES_CATALOGO = {
+  'dig-treino':    { titulo:'Aquecimento de Digitação', tipo:'digitacao', emoji:'⌨️', desc:'Treine no seu ritmo por alguns minutos.', pontos:15, acao:"abrirJogo('digitacao','')" },
+  'dig-fileiras':  { titulo:'Aprender por Fileira', tipo:'digitacao', emoji:'🏫', desc:'Lições progressivas: home row, superior e inferior.', pontos:20, acao:"abrirFileiras()" },
+  'dig-rank':      { titulo:'Digitação Ranqueada', tipo:'digitacao', emoji:'🏆', desc:'Cronômetro ativo! Suba no ranking da turma.', pontos:40, acao:"iniciarDigitacao('ranqueado')" },
+  'quiz-hw':       { titulo:'Quiz de Hardware', tipo:'quiz', emoji:'🖥️', desc:'O que é hardware? Prove que sabe!', pontos:25, acao:"iniciarQuizModulo('hardware')" },
+  'quiz-sw':       { titulo:'Quiz de Software', tipo:'quiz', emoji:'💻', desc:'Sistemas operacionais e programas.', pontos:25, acao:"iniciarQuizModulo('software')" },
+  'quiz-nav':      { titulo:'Quiz de Navegadores', tipo:'quiz', emoji:'🌐', desc:'Chrome, Edge, Firefox — você entende?', pontos:25, acao:"iniciarQuizModulo('navegadores')" },
+  'quiz-av':       { titulo:'Quiz de Antivírus', tipo:'quiz', emoji:'🛡️', desc:'Segurança digital e proteção do PC.', pontos:25, acao:"iniciarQuizModulo('antivirus')" },
+  'quiz-mem':      { titulo:'Quiz de Memória', tipo:'quiz', emoji:'🧠', desc:'RAM, HD, SSD — armazenamento do PC.', pontos:25, acao:"iniciarQuizModulo('memoria')" },
+  'jogo-memoria':  { titulo:'Jogo da Memória', tipo:'jogo', emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.', pontos:20, acao:"iniciarJogoMemoria()" },
+  'jogo-rede':     { titulo:'Reparar a Rede', tipo:'jogo', emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30, acao:"iniciarRedePuzzle()" },
+  'jogo-atirador': { titulo:'Atirador de Palavras', tipo:'jogo', emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!', pontos:20, acao:"iniciarAtiradorPalavras()" },
+  'jogo-runner':   { titulo:'Hacker Runner', tipo:'jogo', emoji:'🎮', desc:'Fase de plataforma pixel art. Colete dados, chegue ao PC Central.', pontos:20, acao:"abrirJogo('hacker-runner','hardware')" },
+  'jogo-ram':      { titulo:'Gerenciador de RAM', tipo:'jogo', emoji:'⚙️', desc:'Processos invadem a memória — encerre-os antes de travar.', pontos:20, acao:"abrirJogo('ram-manager','memoria')" },
+  'prova-final':   { titulo:'Prova Final', tipo:'boss', emoji:'🏅', desc:'Desafio completo! Só para quem concluiu todos os módulos.', pontos:100, acao:"iniciarProva()" },
+};
+
+// Plano semanal por turma — professor atualiza aqui conforme o andamento da turma.
+// Cada array lista missaoIds em ordem de execução.
+const PLANO_SEMANA = {
+  T1: ['dig-fileiras', 'quiz-hw', 'quiz-sw', 'jogo-memoria', 'dig-rank'],
+  T2: ['dig-fileiras', 'quiz-nav', 'quiz-av', 'jogo-rede', 'dig-rank'],
+  T3: ['dig-treino', 'quiz-mem', 'quiz-hw', 'jogo-atirador', 'dig-rank'],
+  SEM_TURMA: ['dig-fileiras', 'quiz-hw', 'jogo-memoria', 'dig-rank'],
+};
+
+function _semanaISO() {
+  const d = new Date();
+  const startOfYear = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+}
+
+function _getMissoesCompletas(alunoId) {
+  try {
+    const d = JSON.parse(localStorage.getItem(MISSOES_KEY)) || {};
+    return (d[alunoId] || {})[_semanaISO()] || [];
+  } catch(e) { return []; }
+}
+
+function _marcarMissaoConcluida(alunoId, missaoId) {
+  let d; try { d = JSON.parse(localStorage.getItem(MISSOES_KEY)) || {}; } catch(e) { d = {}; }
+  if (!d[alunoId]) d[alunoId] = {};
+  const sem = _semanaISO();
+  if (!d[alunoId][sem]) d[alunoId][sem] = [];
+  if (!d[alunoId][sem].includes(missaoId)) {
+    d[alunoId][sem].push(missaoId);
+    localStorage.setItem(MISSOES_KEY, JSON.stringify(d));
+  }
+}
+
+// Chamado pelo botão "Fazer agora" — marca concluída e abre a atividade
+function concluirMissao(missaoId) {
+  if (!alunoAtivo) return;
+  _marcarMissaoConcluida(alunoAtivo.id, missaoId);
+  const m = MISSOES_CATALOGO[missaoId];
+  if (!m) return;
+  // safe eval: acao vem sempre do catálogo controlado acima
+  // eslint-disable-next-line no-new-func
+  (new Function(m.acao))();
+}
+
+function renderAulaHoje() {
+  const el = document.getElementById('aulaHojeSection');
+  if (!el || !alunoAtivo) return;
+
+  const turmaKey = getTurmaDeAluno(alunoAtivo.id) || 'SEM_TURMA';
+  const missaoIds = (PLANO_SEMANA[turmaKey] || PLANO_SEMANA['SEM_TURMA']).filter(id => MISSOES_CATALOGO[id]);
+  const completas = _getMissoesCompletas(alunoAtivo.id);
+  const totalCompletas = missaoIds.filter(id => completas.includes(id)).length;
+  const pct = missaoIds.length ? Math.round(totalCompletas / missaoIds.length * 100) : 0;
+
+  const tCfg = TURMAS_CONFIG[turmaKey];
+  const semLabel = _semanaISO().replace('-W', ' · Semana ');
+
+  const TIPO_COR   = { digitacao:'#6366F1', quiz:'#10B981', jogo:'#F59E0B', boss:'#EF4444', bonus:'#8B5CF6' };
+  const TIPO_LABEL = { digitacao:'⌨️ Digitação', quiz:'📝 Quiz', jogo:'🎮 Jogo', boss:'🏅 Boss', bonus:'⭐ Bônus' };
+
+  let cartoes = '';
+  missaoIds.forEach((missaoId) => {
+    const m = MISSOES_CATALOGO[missaoId];
+    if (!m) return;
+    const done = completas.includes(missaoId);
+    const cor = TIPO_COR[m.tipo] || '#64748B';
+    const label = TIPO_LABEL[m.tipo] || m.tipo;
+    cartoes += `
+    <div style="display:flex;align-items:center;gap:14px;background:${done?'#F0FDF4':'#fff'};border:2px solid ${done?'#86EFAC':cor+'44'};border-radius:14px;padding:12px 16px;">
+      <div style="font-size:28px;flex-shrink:0;">${done ? '✅' : m.emoji}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-weight:800;font-size:15px;color:${done?'#059669':'#0F172A'};${done?'text-decoration:line-through;':''}">${m.titulo}</span>
+          <span style="font-size:10px;font-weight:800;background:${cor}1A;color:${cor};border-radius:20px;padding:2px 8px;">${label}</span>
+        </div>
+        <div style="font-size:12px;color:#64748B;margin-top:2px;">${m.desc}</div>
+      </div>
+      <div style="flex-shrink:0;text-align:right;">
+        <div style="font-size:11px;color:#F59E0B;font-weight:800;margin-bottom:6px;">+${m.pontos} ⭐</div>
+        ${done
+          ? `<span style="font-size:12px;color:#059669;font-weight:800;">✓ Feito!</span>`
+          : `<button onclick="concluirMissao('${missaoId}')" style="background:${cor};color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;">Fazer →</button>`}
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = `
+  <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 60%,#1E293B 100%);border-radius:20px;padding:20px 24px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.3),transparent 65%);pointer-events:none;"></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;z-index:1;">
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.45);margin-bottom:4px;">${semLabel}${tCfg?' · '+tCfg.emoji+' '+tCfg.nome:''}</div>
+        <div style="font-size:22px;font-weight:900;">🎯 Aula de Hoje</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.65);margin-top:2px;">${totalCompletas} de ${missaoIds.length} missões concluídas</div>
+      </div>
+      <div style="text-align:center;flex-shrink:0;">
+        <div style="font-size:38px;font-weight:900;color:${pct===100?'#34D399':'#FBBF24'};">${pct}%</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);">PROGRESSO</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden;position:relative;z-index:1;">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#6366F1,#34D399);border-radius:4px;transition:width .5s ease;"></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">${cartoes}</div>
+  <div style="text-align:center;margin-top:-18px;margin-bottom:24px;">
+    <button onclick="document.getElementById('aulaHojeSection').style.display='none';document.getElementById('aulaHojeSection').dataset.collapsed='1';" style="background:none;border:1px solid var(--line);border-radius:10px;padding:6px 16px;font-size:12px;color:var(--ink-soft);cursor:pointer;">Minimizar aula de hoje ↑</button>
+  </div>`;
+}
+
 // pré-carrega as turmas fixas se ainda não atribuídas
 // Roda toda vez que renderHome é chamado — atribui apenas alunos ainda sem turma
 function _seedTurmasAuto() {
@@ -3875,6 +4017,7 @@ function renderDashboard() {
   if (!a) return goHome();
   const n = a.nivel;
 
+  renderAulaHoje();
   document.getElementById("dashAvatarImg").src = avatarUrl(a);
   document.getElementById("dashAvatarWrap").setAttribute("data-n", n);
   document.querySelector(".dash-header").setAttribute("data-n", n);
@@ -7472,6 +7615,80 @@ function ppHistGet(){ try{ return JSON.parse(localStorage.getItem('professorlusc
 function ppRegistrarSemana(alunos){ const h=ppHistGet(); const wk=ppIsoWeek(new Date()); alunos.forEach(a=>{ if(!h[a.id]) h[a.id]={}; h[a.id][wk]=ppSnap(a); }); localStorage.setItem('professorlusca_hist', JSON.stringify(h)); return wk; }
 function ppEvolucao(a){ const h=ppHistGet(); const reg=h[a.id]||{}; const wks=Object.keys(reg).sort(); const wk=ppIsoWeek(new Date()); const curr=reg[wk]||ppSnap(a); const prevKey=wks.filter(k=>k<wk).pop(); const prev=prevKey?reg[prevKey]:null; return {curr,prev,prevKey}; }
 
+
+// =============================================================
+// BACKUP / EXPORTAÇÃO DE DADOS
+// =============================================================
+function _exportarBackup() {
+  const alunos = getAlunos();
+  const turmas = getTurmas();
+  const turmasConteudo = (() => { try { return JSON.parse(localStorage.getItem('lusca_turmas_conteudo')) || {}; } catch(e) { return {}; } })();
+  const frequencia = (() => { try { return JSON.parse(localStorage.getItem('lusca_frequencia')) || {}; } catch(e) { return {}; } })();
+  const missoes = (() => { try { return JSON.parse(localStorage.getItem('lusca_missoes')) || {}; } catch(e) { return {}; } })();
+  const planejamento = (() => { try { return JSON.parse(localStorage.getItem('lusca_planejamento')) || {}; } catch(e) { return {}; } })();
+
+  const backup = {
+    versao: '2.0',
+    geradoEm: new Date().toISOString(),
+    alunos,
+    turmas,
+    turmasConteudo,
+    frequencia,
+    missoes,
+    planejamento,
+    ranking: alunos.map(a => ({
+      id: a.id,
+      nome: a.nome,
+      nivel: a.nivel,
+      pontos: calcularPontos(a),
+      wpm: a.progresso?.digitacaoMelhorWpm || 0,
+    })).sort((a,b) => b.pontos - a.pontos),
+  };
+
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const hoje = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `backup-lusca-academy-${hoje}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// =============================================================
+// RANKING SEMANAL
+// =============================================================
+function _rankingSemanalHtml(alunos) {
+  const semana = _semanaISO();
+  // pontuação semanal = missões concluídas na semana × pontos do catálogo
+  const scores = alunos.map(a => {
+    let pts = 0;
+    try {
+      const d = JSON.parse(localStorage.getItem(MISSOES_KEY)) || {};
+      const completas = (d[a.id] || {})[semana] || [];
+      completas.forEach(id => { pts += (MISSOES_CATALOGO[id]?.pontos || 0); });
+    } catch(e) {}
+    return { nome: a.nome, id: a.id, pts, nivel: a.nivel };
+  }).sort((a,b) => b.pts - a.pts).filter(x => x.pts > 0);
+
+  if (!scores.length) return '<div style="text-align:center;color:#94A3B8;padding:16px;font-size:13px;">Nenhuma missão concluída esta semana ainda.</div>';
+
+  const medalhas = ['🥇','🥈','🥉'];
+  return scores.map((s, i) => {
+    const pct = scores[0].pts ? Math.round(s.pts/scores[0].pts*100) : 0;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F5F9;">
+      <div style="font-size:20px;width:28px;text-align:center;">${medalhas[i] || `#${i+1}`}</div>
+      <img src="${avatarUrl(alunos.find(a=>a.id===s.id)||{nivel:s.nivel,nome:s.nome,id:s.id})}" style="width:36px;height:36px;border-radius:50%;background:#EEF2FF;" onerror="this.style.visibility='hidden'">
+      <div style="flex:1;">
+        <div style="font-weight:800;font-size:14px;color:#0F172A;">${escapeHtml(s.nome)}</div>
+        <div style="height:6px;background:#F1F5F9;border-radius:3px;overflow:hidden;margin-top:4px;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#6366F1,#34D399);border-radius:3px;"></div></div>
+      </div>
+      <div style="font-size:15px;font-weight:900;color:#F59E0B;">${s.pts} ⭐</div>
+    </div>`;
+  }).join('');
+}
+
 function renderPainelPro() {
   _marcarAusentesRetroativos();
   const alunos = getAlunos();
@@ -7479,6 +7696,10 @@ function renderPainelPro() {
   const alunosEl = document.getElementById("painelAlunos");
   const syncUrl = getSyncUrl();
   document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizar";
+
+  // Render backup button
+  const backupEl = document.getElementById("painelBackupBtn");
+  if (backupEl) backupEl.onclick = _exportarBackup;
 
   // registra snapshot desta semana (constrói histórico daqui pra frente)
   const semanaAtual = ppRegistrarSemana(alunos);
@@ -7530,6 +7751,10 @@ function renderPainelPro() {
     ${ppStatCard(mediaScore, "Pontos (média)", "#F59E0B")}
     ${ppStatCard(mediaWpm||"—", "WPM médio", "#3B82F6")}
   `;
+
+  // Ranking semanal de missões
+  const rankSemEl = document.getElementById('painelRankSemanal');
+  if (rankSemEl) rankSemEl.innerHTML = _rankingSemanalHtml(alunos);
 
   // ---- BANNER: FOCO DA SEMANA ----
   let focoHtml = "";
