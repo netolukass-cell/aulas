@@ -3196,6 +3196,89 @@ const MODULOS = {
 const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria"];
 
 // =============================================================
+// TURMAS — configuração e persistência (additive, chave separada)
+// =============================================================
+const TURMAS_KEY = 'lusca_turmas';
+const TURMAS_CONTEUDO_KEY = 'lusca_turmas_conteudo';
+
+const TURMAS_CONFIG = {
+  T1: { nome: 'Turma 1', emoji: '📘', cor: '#6366F1', corSoft: '#EEF2FF', dias: 'Quinta e Sexta · 18h', turno: 'Tarde/Noite' },
+  T2: { nome: 'Turma 2', emoji: '📗', cor: '#10B981', corSoft: '#ECFDF5', dias: 'Segunda · 18h', turno: 'Noite' },
+  T3: { nome: 'Turma 3', emoji: '📙', cor: '#F59E0B', corSoft: '#FFFBEB', dias: 'Quarta · 18h  ·  Sábado · 8h', turno: 'Manhã/Noite' },
+};
+
+// Estrutura: { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }
+function getTurmas() {
+  try { return JSON.parse(localStorage.getItem(TURMAS_KEY)) || { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }; }
+  catch(e) { return { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }; }
+}
+function saveTurmas(t) { localStorage.setItem(TURMAS_KEY, JSON.stringify(t)); }
+
+function getTurmaDeAluno(id) {
+  const t = getTurmas();
+  for (const key of Object.keys(TURMAS_CONFIG)) {
+    if ((t[key]?.ids || []).includes(id)) return key;
+  }
+  return null;
+}
+
+function atribuirTurma(id, turmaKey) {
+  const t = getTurmas();
+  // remove de qualquer turma anterior
+  for (const k of Object.keys(TURMAS_CONFIG)) {
+    if (t[k]) t[k].ids = (t[k].ids || []).filter(x => x !== id);
+  }
+  if (turmaKey && TURMAS_CONFIG[turmaKey]) {
+    if (!t[turmaKey]) t[turmaKey] = { ids: [] };
+    if (!t[turmaKey].ids.includes(id)) t[turmaKey].ids.push(id);
+  }
+  saveTurmas(t);
+}
+
+// Conteúdo ensinado por turma: { T1: {hardware:true, ...}, ... }
+function getTurmaConteudo(turmaKey) {
+  try { const d = JSON.parse(localStorage.getItem(TURMAS_CONTEUDO_KEY)) || {}; return d[turmaKey] || {}; }
+  catch(e) { return {}; }
+}
+function saveTurmaConteudo(turmaKey, data) {
+  let d; try { d = JSON.parse(localStorage.getItem(TURMAS_CONTEUDO_KEY)) || {}; } catch(e) { d = {}; }
+  d[turmaKey] = data;
+  localStorage.setItem(TURMAS_CONTEUDO_KEY, JSON.stringify(d));
+}
+function toggleConteudoEnsinado(turmaKey, modulo) {
+  const c = getTurmaConteudo(turmaKey);
+  c[modulo] = !c[modulo];
+  saveTurmaConteudo(turmaKey, c);
+  renderPainelPro();
+}
+
+// pré-carrega as turmas fixas se ainda não atribuídas
+(function seedTurmas() {
+  const t = getTurmas();
+  const alunos = getAlunos ? getAlunos() : [];
+  // Apenas faz seed se há alunos cadastrados e turmas ainda vazias
+  const totalAtribuidos = Object.values(t).reduce((s,v)=>s+(v.ids||[]).length,0);
+  if (totalAtribuidos > 0) return; // já foram atribuídos manualmente
+  const seed = {
+    T1: ['miguel','pedro'],
+    T2: ['diego','theo','gabriel'],
+    T3: ['guilherme','joão','joao','luiz'],
+  };
+  let changed = false;
+  alunos.forEach(a => {
+    const nomeLower = (a.nome||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    for (const [tk, nomes] of Object.entries(seed)) {
+      if (nomes.some(n => nomeLower.includes(n))) {
+        if (!t[tk]) t[tk] = {ids:[]};
+        if (!t[tk].ids.includes(a.id)) { t[tk].ids.push(a.id); changed = true; }
+        break;
+      }
+    }
+  });
+  if (changed) saveTurmas(t);
+})();
+
+// =============================================================
 // PROVA FINAL — 10 questões mistas por nível
 // =============================================================
 const PROVAS = {
@@ -3506,30 +3589,80 @@ function salvarAvatarEscolhido(){
   renderDashboard();
 }
 
+let _homeTurma = null; // null = mostrar cards de turma; 'T1'/'T2'/'T3' = alunos da turma
+let _cadastroTurma = null; // turma pré-selecionada para novo cadastro
+
 function renderHome() {
   const grid = document.getElementById("alunosGrid");
   const alunos = getAlunos();
 
-  let html = "";
-  alunos.forEach(a => {
+  // Se ainda não escolheu turma, mostra os cards de turma
+  if (_homeTurma === null) {
+    const turmas = getTurmas();
+    let html = '<div style="margin-bottom:20px;text-align:center;"><div style="font-size:13px;font-weight:800;color:var(--ink-soft);letter-spacing:1.5px;">SELECIONE SUA TURMA</div></div>';
+    html += '<div style="display:flex;flex-direction:column;gap:14px;max-width:440px;margin:0 auto;">';
+    for (const [key, cfg] of Object.entries(TURMAS_CONFIG)) {
+      const ids = turmas[key]?.ids || [];
+      const membros = alunos.filter(a => ids.includes(a.id));
+      const nomes = membros.length ? membros.map(a=>escapeHtml(a.nome)).join(', ') : 'Nenhum aluno ainda';
+      html += `
+        <div onclick="_homeTurma='${key}';renderHome();" style="cursor:pointer;background:${cfg.corSoft};border:2px solid ${cfg.cor};border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;transition:transform .12s ease,box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="font-size:38px;line-height:1;">${cfg.emoji}</div>
+          <div style="flex:1;">
+            <div style="font-size:18px;font-weight:900;color:${cfg.cor};">${cfg.nome}</div>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">📅 ${cfg.dias}</div>
+            <div style="font-size:12px;color:#374151;margin-top:4px;font-weight:600;">👥 ${nomes}</div>
+          </div>
+          <div style="font-size:22px;color:${cfg.cor};">›</div>
+        </div>`;
+    }
+    // Card "sem turma" se houver alunos não atribuídos
+    const todosIds = Object.values(turmas).flatMap(v=>v.ids||[]);
+    const semTurma = alunos.filter(a => !todosIds.includes(a.id));
+    if (semTurma.length) {
+      html += `<div onclick="_homeTurma='SEM_TURMA';renderHome();" style="cursor:pointer;background:#F8FAFC;border:2px dashed #CBD5E1;border-radius:18px;padding:14px 22px;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='#94A3B8'" onmouseout="this.style.borderColor='#CBD5E1'">
+        <div style="font-size:28px;">❓</div>
+        <div><div style="font-weight:800;color:#475569;">Sem turma (${semTurma.length})</div><div style="font-size:12px;color:#94A3B8;">${semTurma.map(a=>escapeHtml(a.nome)).join(', ')}</div></div>
+      </div>`;
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    return;
+  }
+
+  // Mostrar alunos da turma selecionada
+  const cfg = TURMAS_CONFIG[_homeTurma];
+  const turmas = getTurmas();
+  let alunosDaTurma;
+  if (_homeTurma === 'SEM_TURMA') {
+    const todosIds = Object.values(turmas).flatMap(v=>v.ids||[]);
+    alunosDaTurma = alunos.filter(a => !todosIds.includes(a.id));
+  } else {
+    const ids = turmas[_homeTurma]?.ids || [];
+    alunosDaTurma = alunos.filter(a => ids.includes(a.id));
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <button onclick="_homeTurma=null;renderHome();" style="background:transparent;border:2px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:700;color:var(--ink-soft);">← Turmas</button>
+      ${cfg ? `<div style="font-size:18px;font-weight:900;color:${cfg.cor};">${cfg.emoji} ${cfg.nome}</div>` : '<div style="font-size:16px;font-weight:800;color:#475569;">Sem turma</div>'}
+    </div>`;
+
+  alunosDaTurma.forEach(a => {
     const n = a.nivel;
     const pontos = calcularPontos(a);
     const medalhas = calcularMedalhas(a);
     const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso[m]?.quizDone).length;
     const provaFeita = a.progresso.prova?.done ? 1 : 0;
-    const totalEtapas = ORDEM_MODULOS.length + 1; // 4 módulos + prova
+    const totalEtapas = ORDEM_MODULOS.length + 1;
     const progresso = Math.round(((modulosFeitos + provaFeita) / totalEtapas) * 100);
-
-    // Top 5 medalhas (4 visíveis + 1 com indicador "+N")
     const badgesHtml = medalhas.slice(0, 5).map(m =>
       `<div class="aluno-badge" title="${m.texto}">${m.emoji}</div>`
     ).join('') + (medalhas.length > 5 ?
       `<div class="aluno-badge" style="font-size:10px;font-weight:800;">+${medalhas.length - 5}</div>` : '') ||
       `<div class="aluno-badge locked">🔒</div>`.repeat(3);
-
     let progLabel = `${progresso}% completo`;
     if (provaFeita) progLabel = '✓ Prova aprovada';
-
     html += `
       <div class="aluno-card" data-n="${n}" onclick="entrar('${a.id}')">
         <div class="aluno-banner">
@@ -3553,13 +3686,13 @@ function renderHome() {
   });
 
   html += `
-    <div class="novo-aluno-card" onclick="goCadastro()">
+    <div class="novo-aluno-card" onclick="_cadastroTurma=_homeTurma;goCadastro();">
       <div class="novo-aluno-icon">
         <iconify-icon icon="ph:user-plus-bold"></iconify-icon>
       </div>
       <div>
         <div class="novo-aluno-titulo">Cadastrar aluno</div>
-        <div class="novo-aluno-sub">Crie um novo perfil</div>
+        <div class="novo-aluno-sub">${cfg ? 'Adicionar na ' + cfg.nome : 'Sem turma'}</div>
       </div>
     </div>`;
 
@@ -3620,6 +3753,11 @@ function finalizarCadastro() {
     criado: new Date().toISOString()
   };
   salvarAluno(aluno);
+  // Atribuir turma se veio de uma turma específica
+  if (_cadastroTurma && TURMAS_CONFIG[_cadastroTurma]) {
+    atribuirTurma(aluno.id, _cadastroTurma);
+  }
+  _cadastroTurma = null;
   alunoAtivo = aluno;
   localStorage.setItem(ATIVO_KEY, aluno.id);
   goDashboard();
@@ -7337,9 +7475,8 @@ function renderPainelPro() {
     return;
   }
 
-  // ---- LISTA DE ALUNOS (resumida, clicável) ----
-  const ordenados = [...alunos].sort((a,b)=>ppSeveridade(b)-ppSeveridade(a)); // mais críticos primeiro
-  const linhas = ordenados.map(a=>{
+  // ---- helper: card de um aluno ----
+  function _ppAlunoCard(a) {
     const nivel = a.nivel || calcularNivel(a.idade);
     const sev = ppSeveridade(a);
     const diag = ppDiagnostico(a);
@@ -7349,7 +7486,6 @@ function renderPainelPro() {
     const statusTxt = sev===0?'Em dia': sev>=5?'Precisa de atenção':'Acompanhar';
     const dias = ppDiasDesde(ppUltimaAtividade(a));
     const inativo = dias!==null && dias>=7;
-    // health dots por módulo
     const dots = ORDEM_MODULOS.map(m=>{
       const pct = ppModuloPct(a,m);
       const cor = pct===null?'#E2E8F0': pct>=80?'#10B981': pct>=60?'#F59E0B':'#EF4444';
@@ -7376,11 +7512,96 @@ function renderPainelPro() {
         </div>
       </div>
     </button>`;
-  }).join("");
+  }
 
-  alunosEl.innerHTML = focoHtml + barras +
-    `<div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:1px;margin:4px 0 12px;">ALUNOS (${ordenados.length}) · ordenados por prioridade</div>` +
-    linhas;
+  // ---- LISTA DE ALUNOS AGRUPADA POR TURMA ----
+  const turmasData = getTurmas();
+  let turmasHtml = '';
+
+  const MODULOS_CONTEUDO = [
+    ...ORDEM_MODULOS.map(m=>({ key:m, label: PP_NOME_MOD[m]||m })),
+    { key:'prova', label:'Prova Final' },
+    { key:'digitacao', label:'Digitação' },
+  ];
+
+  for (const [tKey, tCfg] of Object.entries(TURMAS_CONFIG)) {
+    const ids = turmasData[tKey]?.ids || [];
+    const membros = [...alunos].filter(a => ids.includes(a.id)).sort((a,b)=>ppSeveridade(b)-ppSeveridade(a));
+    const conteudo = getTurmaConteudo(tKey);
+    const precisamAtencaoT = membros.filter(a=>ppSeveridade(a)>=5).length;
+
+    // tracker de conteúdo
+    const trackerHtml = MODULOS_CONTEUDO.map(mod => {
+      const ensinado = conteudo[mod.key];
+      return `<button onclick="toggleConteudoEnsinado('${tKey}','${mod.key}')" title="${ensinado?'Marcar como não ensinado':'Marcar como ensinado'}"
+        style="background:${ensinado?tCfg.cor:'#F1F5F9'};color:${ensinado?'#fff':'#94A3B8'};border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;">${ensinado?'✓ ':''} ${mod.label}</button>`;
+    }).join('');
+
+    turmasHtml += `
+    <div style="background:#fff;border-radius:18px;padding:0;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;border:2px solid ${tCfg.cor}22;">
+      <div style="background:${tCfg.corSoft};padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:26px;">${tCfg.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-size:17px;font-weight:900;color:${tCfg.cor};">${tCfg.nome} <span style="font-size:13px;font-weight:600;color:#64748B;">· ${membros.length} aluno${membros.length!==1?'s':''}</span></div>
+          <div style="font-size:12px;color:#64748B;">📅 ${tCfg.dias}</div>
+        </div>
+        ${precisamAtencaoT?`<div style="background:#FEF2F2;color:#B91C1C;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:800;">⚠️ ${precisamAtencaoT} precisam atenção</div>`:''}
+      </div>
+
+      <div style="padding:12px 18px 8px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#94A3B8;margin-bottom:8px;">CONTEÚDO ENSINADO PELO PROFESSOR</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">${trackerHtml}</div>
+      </div>
+
+      <div style="padding:8px 18px 14px;">
+        ${membros.length ? membros.map(_ppAlunoCard).join('') : `<div style="text-align:center;color:#94A3B8;padding:20px 0;font-size:14px;">Nenhum aluno nesta turma ainda.</div>`}
+      </div>
+    </div>`;
+  }
+
+  // Alunos sem turma
+  const todosIdsAtribuidos = Object.values(turmasData).flatMap(v=>v.ids||[]);
+  const semTurma = [...alunos].filter(a => !todosIdsAtribuidos.includes(a.id)).sort((a,b)=>ppSeveridade(b)-ppSeveridade(a));
+  if (semTurma.length) {
+    turmasHtml += `
+    <div style="background:#fff;border-radius:18px;padding:0;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;border:2px dashed #CBD5E1;">
+      <div style="background:#F8FAFC;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:24px;">❓</div>
+        <div><div style="font-size:16px;font-weight:800;color:#475569;">Sem turma (${semTurma.length})</div></div>
+      </div>
+      <div style="padding:8px 18px 14px;">${semTurma.map(_ppAlunoCard).join('')}</div>
+    </div>`;
+  }
+
+  // ---- FERRAMENTAS DE GESTÃO ----
+  const ferramentasHtml = `
+  <div style="background:linear-gradient(135deg,#0F172A,#1E293B);border-radius:18px;padding:20px 24px;margin-bottom:20px;color:#fff;">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.5);margin-bottom:14px;">💡 SUGESTÕES DE FERRAMENTAS</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
+        <div style="font-size:20px;margin-bottom:6px;">💰</div>
+        <div style="font-weight:800;font-size:14px;">Controle de Pagamento</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Use <strong>Planilha Google</strong> ou <strong>Notion</strong> para registrar mensalidades por turma.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
+        <div style="font-size:20px;margin-bottom:6px;">📱</div>
+        <div style="font-weight:800;font-size:14px;">Comunicação</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;"><strong>WhatsApp Groups</strong> por turma — um grupo por linha acima.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
+        <div style="font-size:20px;margin-bottom:6px;">📋</div>
+        <div style="font-weight:800;font-size:14px;">Frequência</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Use <strong>Google Forms</strong> de check-in ou lista em papel digitalizada.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
+        <div style="font-size:20px;margin-bottom:6px;">📊</div>
+        <div style="font-weight:800;font-size:14px;">Relatórios</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Tire um print desta tela para enviar no WhatsApp dos responsáveis.</div>
+      </div>
+    </div>
+  </div>`;
+
+  alunosEl.innerHTML = focoHtml + barras + turmasHtml + ferramentasHtml;
 }
 
 function ppStatCard(valor, label, cor){
