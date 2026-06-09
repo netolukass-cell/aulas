@@ -1577,8 +1577,8 @@ function iniciarRankeada(textoId) {
   const dif = rankeadaState.dif || 'facil';
   const cfg = RANKEADA_CONFIG[dif];
   const tempo = Math.round(cfg.tempoBase * (cfg.mult[nivel] || 1));
-  // normaliza quebras duplas para evitar duplo Enter
-  const textoNorm = {...texto, texto: texto.texto.replace(/\n+/g, '\n').trim()};
+  // remove quebras de linha — digitação contínua sem precisar pressionar Enter
+  const textoNorm = {...texto, texto: texto.texto.replace(/\n+/g, ' ').replace(/  +/g, ' ').trim()};
   rankeadaState = { texto:textoNorm, pos:0, erros:0, tempoRestante:tempo, tempoTotal:tempo, timerId:null, finalizado:false, inicio:0, dif, cfg };
   document.getElementById('rankeadaTopTitle').textContent = `⏱️ ${texto.titulo}`;
   document.getElementById('rankeadaResultado').innerHTML = '';
