@@ -2044,6 +2044,8 @@
       </div>
     </div>
 
+    <div id="aulaHojeSection"></div>
+
     <!-- DIGITAÇÃO em destaque no topo -->
     <div onclick="abrirJogo('digitacao','')" style="cursor:pointer;background:linear-gradient(135deg,#0F172A 0%,#312E81 50%,#1E293B 100%);border-radius:20px;padding:28px 36px;display:flex;align-items:center;gap:32px;margin-bottom:32px;box-shadow:0 20px 60px -12px rgba(99,102,241,0.45);position:relative;overflow:hidden;">
       <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.25),transparent 65%);pointer-events:none;"></div>
@@ -2130,7 +2132,7 @@
       <div class="pratique-card" onclick="abrirJogo('ram-manager','memoria')">
         <div class="pratique-icon-wrap"><iconify-icon icon="ph:memory-bold"></iconify-icon></div>
         <div class="pratique-title">Gerenciador de RAM</div>
-        <div class="pratique-desc">Processos invadem a memória — mate-os antes de travar o sistema.</div>
+        <div class="pratique-desc">Processos invadem a memória — encerre-os antes de travar o sistema.</div>
         <div class="pratique-arrow">→</div>
       </div>
     </div>
@@ -2168,13 +2170,18 @@
         <div style="color:white;font-size:22px;font-weight:900;">Painel da Turma</div>
       </div>
       <div id="painelSyncIndicator" style="background:rgba(255,255,255,.15);border-radius:12px;padding:8px 14px;color:white;font-size:13px;font-weight:600;cursor:pointer;" onclick="painelRefresh()">⟳ Atualizar</div>
+      <button id="painelBackupBtn" onclick="_exportarBackup()" style="background:#10B981;color:#fff;border:none;border-radius:12px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;">⬇️ Backup</button>
       <button onclick="document.getElementById('modalPainelPro').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:white;border-radius:12px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:16px;">✕</button>
     </div>
     <div style="padding:24px;">
       <!-- Stats row -->
-      <div id="painelStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;"></div>
+      <div id="painelStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;"></div>
+      <!-- Ranking semanal de missões -->
+      <div style="background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div style="font-size:11px;font-weight:800;color:#64748B;letter-spacing:1px;margin-bottom:10px;">🏅 RANKING SEMANAL DE MISSÕES</div>
+        <div id="painelRankSemanal"></div>
+      </div>
       <!-- Students list -->
-      <div style="font-size:13px;font-weight:700;color:#64748B;letter-spacing:1px;margin-bottom:12px;">ALUNOS</div>
       <div id="painelAlunos"></div>
     </div>
   </div>
@@ -3196,6 +3203,424 @@ const MODULOS = {
 const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria"];
 
 // =============================================================
+// TURMAS — configuração e persistência (additive, chave separada)
+// =============================================================
+const TURMAS_KEY = 'lusca_turmas';
+const TURMAS_CONTEUDO_KEY = 'lusca_turmas_conteudo';
+
+const TURMAS_CONFIG = {
+  T1: { nome: 'Turma 1', emoji: '📘', cor: '#6366F1', corSoft: '#EEF2FF', dias: 'Quinta e Sexta · 18h', turno: 'Tarde/Noite' },
+  T2: { nome: 'Turma 2', emoji: '📗', cor: '#10B981', corSoft: '#ECFDF5', dias: 'Segunda · 18h', turno: 'Noite' },
+  T3: { nome: 'Turma 3', emoji: '📙', cor: '#F59E0B', corSoft: '#FFFBEB', dias: 'Quarta · 18h  ·  Sábado · 8h', turno: 'Manhã/Noite' },
+};
+
+// Estrutura: { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }
+function getTurmas() {
+  try { return JSON.parse(localStorage.getItem(TURMAS_KEY)) || { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }; }
+  catch(e) { return { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }; }
+}
+function saveTurmas(t) { localStorage.setItem(TURMAS_KEY, JSON.stringify(t)); }
+
+function getTurmaDeAluno(id) {
+  const t = getTurmas();
+  for (const key of Object.keys(TURMAS_CONFIG)) {
+    if ((t[key]?.ids || []).includes(id)) return key;
+  }
+  return null;
+}
+
+function atribuirTurma(id, turmaKey) {
+  const t = getTurmas();
+  // remove de qualquer turma anterior
+  for (const k of Object.keys(TURMAS_CONFIG)) {
+    if (t[k]) t[k].ids = (t[k].ids || []).filter(x => x !== id);
+  }
+  if (turmaKey && TURMAS_CONFIG[turmaKey]) {
+    if (!t[turmaKey]) t[turmaKey] = { ids: [] };
+    if (!t[turmaKey].ids.includes(id)) t[turmaKey].ids.push(id);
+  }
+  saveTurmas(t);
+}
+
+// Conteúdo ensinado por turma: { T1: {hardware:true, ...}, ... }
+function getTurmaConteudo(turmaKey) {
+  try { const d = JSON.parse(localStorage.getItem(TURMAS_CONTEUDO_KEY)) || {}; return d[turmaKey] || {}; }
+  catch(e) { return {}; }
+}
+function saveTurmaConteudo(turmaKey, data) {
+  let d; try { d = JSON.parse(localStorage.getItem(TURMAS_CONTEUDO_KEY)) || {}; } catch(e) { d = {}; }
+  d[turmaKey] = data;
+  localStorage.setItem(TURMAS_CONTEUDO_KEY, JSON.stringify(d));
+}
+function toggleConteudoEnsinado(turmaKey, modulo) {
+  const c = getTurmaConteudo(turmaKey);
+  c[modulo] = !c[modulo];
+  saveTurmaConteudo(turmaKey, c);
+  renderPainelPro();
+}
+
+// =============================================================
+// FREQUÊNCIA AUTOMÁTICA
+// lusca_frequencia: { [alunoId]: { 'YYYY-MM-DD': 'P' | 'A' } }
+// =============================================================
+const FREQ_KEY = 'lusca_frequencia';
+// Dias de aula por turma (getDay(): 0=Dom,1=Seg,2=Ter,3=Qua,4=Qui,5=Sex,6=Sáb)
+const TURMAS_DIAS = { T1: [4, 5], T2: [1], T3: [3, 6] };
+
+function _freqGet() {
+  try { return JSON.parse(localStorage.getItem(FREQ_KEY)) || {}; } catch(e) { return {}; }
+}
+function _freqSave(d) { localStorage.setItem(FREQ_KEY, JSON.stringify(d)); }
+
+function _isoDate(dt) {
+  return dt.toISOString().slice(0, 10);
+}
+
+// Chamado quando aluno abre o dashboard — marca P se hoje é dia de aula dele
+function _registrarPresenca(alunoId) {
+  const turmaKey = getTurmaDeAluno(alunoId);
+  if (!turmaKey || !TURMAS_DIAS[turmaKey]) return;
+  const hoje = new Date();
+  const diaSemana = hoje.getDay();
+  if (!TURMAS_DIAS[turmaKey].includes(diaSemana)) return; // não é dia de aula
+  const data = _isoDate(hoje);
+  const d = _freqGet();
+  if (!d[alunoId]) d[alunoId] = {};
+  if (!d[alunoId][data]) { d[alunoId][data] = 'P'; _freqSave(d); }
+}
+
+// Chamado quando professor abre o painel — preenche ausências retroativas (últimos 60 dias)
+function _marcarAusentesRetroativos() {
+  const d = _freqGet();
+  const alunos = getAlunos();
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  let changed = false;
+  for (const [tk, dias] of Object.entries(TURMAS_DIAS)) {
+    const turmas = getTurmas();
+    const ids = turmas[tk]?.ids || [];
+    // percorre últimos 60 dias
+    for (let back = 1; back <= 60; back++) {
+      const d2 = new Date(hoje); d2.setDate(hoje.getDate() - back);
+      if (!dias.includes(d2.getDay())) continue;
+      const iso = _isoDate(d2);
+      ids.forEach(id => {
+        if (!d[id]) d[id] = {};
+        if (!d[id][iso]) { d[id][iso] = 'A'; changed = true; }
+      });
+    }
+  }
+  if (changed) _freqSave(d);
+}
+
+// Retorna dados de frequência de um aluno: { total, presentes, ausentes, pct }
+function _freqAluno(alunoId) {
+  const d = _freqGet()[alunoId] || {};
+  const vals = Object.values(d);
+  const total = vals.length;
+  const presentes = vals.filter(v => v === 'P').length;
+  return { total, presentes, ausentes: total - presentes, pct: total ? Math.round(presentes/total*100) : null };
+}
+
+// Últimas N aulas de uma turma (datas ISO, mais recente primeiro)
+function _ultimasAulas(turmaKey, n) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const dias = TURMAS_DIAS[turmaKey] || [];
+  const datas = [];
+  for (let back = 0; back <= 120 && datas.length < n; back++) {
+    const d2 = new Date(hoje); d2.setDate(hoje.getDate() - back);
+    if (dias.includes(d2.getDay())) datas.push(_isoDate(d2));
+  }
+  return datas;
+}
+
+// =============================================================
+// PLANEJAMENTO DE AULA
+// lusca_planejamento: { T1: "texto...", T2: "...", T3: "..." }
+// =============================================================
+const PLAN_KEY = 'lusca_planejamento';
+function _planGet(turmaKey) {
+  try { const d = JSON.parse(localStorage.getItem(PLAN_KEY)) || {}; return d[turmaKey] || ''; } catch(e) { return ''; }
+}
+function _planSave(turmaKey, texto) {
+  let d; try { d = JSON.parse(localStorage.getItem(PLAN_KEY)) || {}; } catch(e) { d = {}; }
+  d[turmaKey] = texto;
+  localStorage.setItem(PLAN_KEY, JSON.stringify(d));
+}
+
+
+// =============================================================
+// MISSÕES DA SEMANA — sistema de aulas guiadas
+// Chave separada, não interfere em dados existentes.
+// =============================================================
+const MISSOES_KEY = 'lusca_missoes';
+
+// completionTrigger: 'activity_return' | 'quiz_finish' | 'manual'
+const MISSOES_CATALOGO = {
+  'dig-treino':    { titulo:'Aquecimento de Digitação', tipo:'digitacao', emoji:'⌨️', desc:'Treine no seu ritmo por alguns minutos.',       pontos:15,  acao:"abrirJogo('digitacao','')",          completionTrigger:'activity_return' },
+  'dig-fileiras':  { titulo:'Aprender por Fileira',     tipo:'digitacao', emoji:'🏫', desc:'Lições progressivas pela fileira do teclado.',   pontos:20,  acao:"abrirFileiras()",                    completionTrigger:'activity_return' },
+  'dig-rank':      { titulo:'Digitação Ranqueada',      tipo:'digitacao', emoji:'🏆', desc:'Cronômetro ativo! Suba no ranking da turma.',    pontos:40,  acao:"iniciarDigitacao('ranqueado')",      completionTrigger:'activity_return' },
+  'quiz-hw':       { titulo:'Quiz de Hardware',         tipo:'quiz',      emoji:'🖥️',  desc:'O que é hardware? Prove que sabe!',              pontos:25,  acao:"iniciarQuizModulo('hardware')",      completionTrigger:'quiz_finish' },
+  'quiz-sw':       { titulo:'Quiz de Software',         tipo:'quiz',      emoji:'💻', desc:'Sistemas operacionais e programas.',             pontos:25,  acao:"iniciarQuizModulo('software')",      completionTrigger:'quiz_finish' },
+  'quiz-nav':      { titulo:'Quiz de Navegadores',      tipo:'quiz',      emoji:'🌐', desc:'Chrome, Edge, Firefox — você entende?',          pontos:25,  acao:"iniciarQuizModulo('navegadores')",   completionTrigger:'quiz_finish' },
+  'quiz-av':       { titulo:'Quiz de Antivírus',        tipo:'quiz',      emoji:'🛡️', desc:'Segurança digital e proteção do PC.',            pontos:25,  acao:"iniciarQuizModulo('antivirus')",     completionTrigger:'quiz_finish' },
+  'quiz-mem':      { titulo:'Quiz de Memória',          tipo:'quiz',      emoji:'🧠', desc:'RAM, HD, SSD — armazenamento do PC.',            pontos:25,  acao:"iniciarQuizModulo('memoria')",       completionTrigger:'quiz_finish' },
+  'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return' },
+  'jogo-rede':     { titulo:'Reparar a Rede',           tipo:'jogo',      emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30,  acao:"iniciarRedePuzzle()",                completionTrigger:'activity_return' },
+  'jogo-atirador': { titulo:'Atirador de Palavras',     tipo:'jogo',      emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!',       pontos:20,  acao:"iniciarAtiradorPalavras()",          completionTrigger:'activity_return' },
+  'jogo-runner':   { titulo:'Hacker Runner',            tipo:'jogo',      emoji:'🎮', desc:'Fase de plataforma pixel art.',                  pontos:20,  acao:"abrirJogo('hacker-runner','hardware')", completionTrigger:'activity_return' },
+  'jogo-ram':      { titulo:'Gerenciador de RAM',       tipo:'jogo',      emoji:'⚙️',  desc:'Processos invadem a memória — encerre-os.',     pontos:20,  acao:"abrirJogo('ram-manager','memoria')",    completionTrigger:'activity_return' },
+  'prova-final':   { titulo:'Prova Final',              tipo:'boss',      emoji:'🏅', desc:'Desafio completo! Só para quem concluiu todos os módulos.', pontos:100, acao:"iniciarProva()", completionTrigger:'quiz_finish' },
+};
+
+// Plano semanal por turma — professor atualiza aqui conforme o andamento da turma.
+// Cada array lista missaoIds em ordem de execução.
+// Turma é o plano base. Nível adapta o conteúdo dentro da turma.
+const PLANO_SEMANA = {
+  T1:       ['dig-fileiras', 'quiz-hw',  'quiz-sw',  'jogo-memoria',  'dig-rank'],
+  T2:       ['dig-fileiras', 'quiz-nav', 'quiz-av',  'jogo-rede',     'dig-rank'],
+  T3:       ['dig-treino',   'quiz-mem', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
+  SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-memoria', 'dig-rank'],
+};
+
+// Plano adaptado por nível — sobrescreve o plano da turma quando o nível não bate.
+// Nível 1 (≤10 anos): foco em fileiras e quizzes básicos, sem cronômetro.
+// Nível 2 (11-13): mix — alguns quizzes e jogo com ranqueado opcional.
+// Nível 3 (14+): desafios avançados, cronômetro, puzzles de rede.
+const PLANO_NIVEL = {
+  1: ['dig-fileiras', 'quiz-hw',  'jogo-memoria',  'dig-treino'],
+  2: ['dig-treino',   'quiz-sw',  'quiz-nav',       'jogo-rede',     'dig-rank'],
+  3: ['dig-rank',     'quiz-av',  'quiz-mem',       'jogo-atirador', 'jogo-ram'],
+};
+
+// Retorna o plano certo para o aluno: turma+nível específico > nível > turma
+function _getMissoesPlan(turmaKey, nivel) {
+  // 1. turma + nível específico (professor pode definir T1_n2, etc.)
+  const especifico = PLANO_SEMANA[turmaKey + '_n' + nivel];
+  if (especifico) return especifico;
+  // 2. plano por nível (adapta automaticamente)
+  if (PLANO_NIVEL[nivel]) return PLANO_NIVEL[nivel];
+  // 3. fallback: plano da turma geral
+  return PLANO_SEMANA[turmaKey] || PLANO_SEMANA['SEM_TURMA'];
+}
+
+function _semanaISO() {
+  const d = new Date();
+  const startOfYear = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+}
+
+// =============================================================
+// STORAGE: { [alunoId]: { "2026-W24": { completed:[], initiated:[], delivered:[] } } }
+// Semanas anteriores nunca são apagadas — histórico preservado.
+// =============================================================
+function _missaoRawData() {
+  try { return JSON.parse(localStorage.getItem(MISSOES_KEY)) || {}; } catch(e) { return {}; }
+}
+function _missaoSemana(alunoId, semana) {
+  const raw = _missaoRawData();
+  const s = (raw[alunoId] || {})[semana || _semanaISO()] || {};
+  return { completed: s.completed||[], initiated: s.initiated||[], delivered: s.delivered||[] };
+}
+function _missaoGravarSemana(alunoId, semana, obj) {
+  const raw = _missaoRawData();
+  if (!raw[alunoId]) raw[alunoId] = {};
+  raw[alunoId][semana] = obj;     // nunca toca outras semanas
+  localStorage.setItem(MISSOES_KEY, JSON.stringify(raw));
+}
+function _missaoStatus(alunoId, missaoId) {
+  const s = _missaoSemana(alunoId, _semanaISO());
+  if (s.completed.includes(missaoId)) return 'completed';
+  if (s.delivered.includes(missaoId)) return 'delivered';
+  if (s.initiated.includes(missaoId))  return 'initiated';
+  return 'pending';
+}
+function _missaoMarcarStatus(alunoId, missaoId, novoStatus) {
+  const sem = _semanaISO();
+  const s = _missaoSemana(alunoId, sem);
+  ['completed','initiated','delivered'].forEach(k => { s[k] = s[k].filter(x => x !== missaoId); });
+  if (['completed','initiated','delivered'].includes(novoStatus)) s[novoStatus].push(missaoId);
+  _missaoGravarSemana(alunoId, sem, s);
+}
+function _missoesConcluidasNaSemana(alunoId, semana) {
+  return _missaoSemana(alunoId, semana || _semanaISO()).completed;
+}
+
+// =============================================================
+// AÇÕES DE MISSÃO
+// =============================================================
+
+// "Fazer →" — abre a atividade e marca como 'initiated'. NÃO conclui.
+function iniciarMissao(missaoId) {
+  if (!alunoAtivo) return;
+  const m = MISSOES_CATALOGO[missaoId];
+  if (!m) return;
+  if (_missaoStatus(alunoAtivo.id, missaoId) === 'pending') {
+    _missaoMarcarStatus(alunoAtivo.id, missaoId, 'initiated');
+  }
+  localStorage.setItem('lusca_missao_ativa', JSON.stringify({ missaoId, alunoId: alunoAtivo.id }));
+  renderAulaHoje();
+  (new Function(m.acao))();
+}
+
+// "Marcar como entregue" — para tipo pratica/bonus, aguarda validação do professor
+function entregarMissao(missaoId) {
+  if (!alunoAtivo) return;
+  if (_missaoStatus(alunoAtivo.id, missaoId) !== 'completed') {
+    _missaoMarcarStatus(alunoAtivo.id, missaoId, 'delivered');
+  }
+  renderAulaHoje();
+}
+
+// Callback para atividades externas (games) ao retornar com resultado válido
+function _missaoConcluidaCallback() {
+  try {
+    const raw = localStorage.getItem('lusca_missao_ativa');
+    if (!raw) return;
+    const { missaoId, alunoId } = JSON.parse(raw);
+    if (!missaoId || !alunoId) return;
+    const st = _missaoStatus(alunoId, missaoId);
+    if (st === 'initiated' || st === 'pending') _missaoMarcarStatus(alunoId, missaoId, 'completed');
+    localStorage.removeItem('lusca_missao_ativa');
+  } catch(e) {}
+}
+
+// Hook chamado ao concluir um quiz — conclui missão se completionTrigger = 'quiz_finish'
+function _hookQuizFim(moduloId) {
+  try {
+    const raw = localStorage.getItem('lusca_missao_ativa');
+    if (!raw) return;
+    const { missaoId, alunoId } = JSON.parse(raw);
+    if (!missaoId) return;
+    const m = MISSOES_CATALOGO[missaoId];
+    if (!m || m.completionTrigger !== 'quiz_finish') return;
+    const mapa = { 'quiz-hw':'hardware','quiz-sw':'software','quiz-nav':'navegadores','quiz-av':'antivirus','quiz-mem':'memoria','prova-final':'prova' };
+    if (moduloId && mapa[missaoId] && mapa[missaoId] !== moduloId) return;
+    if (_missaoStatus(alunoId, missaoId) !== 'completed') _missaoMarcarStatus(alunoId, missaoId, 'completed');
+    localStorage.removeItem('lusca_missao_ativa');
+  } catch(e) {}
+}
+
+function renderAulaHoje() {
+  const el = document.getElementById('aulaHojeSection');
+  if (!el || !alunoAtivo) return;
+
+  const turmaKey = getTurmaDeAluno(alunoAtivo.id) || 'SEM_TURMA';
+  const nivel = alunoAtivo.nivel || 1;
+  const missaoIds = _getMissoesPlan(turmaKey, nivel).filter(id => MISSOES_CATALOGO[id]);
+  const completasIds = _missoesConcluidasNaSemana(alunoAtivo.id);
+  const totalCompletas = missaoIds.filter(id => completasIds.includes(id)).length;
+  const pct = missaoIds.length ? Math.round(totalCompletas / missaoIds.length * 100) : 0;
+
+  const tCfg = TURMAS_CONFIG[turmaKey];
+  const semLabel = _semanaISO().replace('-W', ' · Semana ');
+
+  const TIPO_COR   = { digitacao:'#6366F1', quiz:'#10B981', jogo:'#F59E0B', pratica:'#3B82F6', boss:'#EF4444', bonus:'#8B5CF6' };
+  const TIPO_LABEL = { digitacao:'⌨️ Digitação', quiz:'📝 Quiz', jogo:'🎮 Jogo', pratica:'📋 Prática', boss:'🏅 Boss', bonus:'⭐ Bônus' };
+  const STATUS_UI = {
+    completed: { bg:'#F0FDF4', border:'#86EFAC', icon:'✅',  tagColor:'#059669', tagText:'✓ Concluída',   strike:true  },
+    delivered: { bg:'#EFF6FF', border:'#93C5FD', icon:null,  tagColor:'#1D4ED8', tagText:'📬 Entregue',    strike:false },
+    initiated: { bg:'#FFFBEB', border:'#FCD34D', icon:null,  tagColor:'#92400E', tagText:'▶ Em andamento', strike:false },
+    pending:   { bg:'#fff',    border:'',         icon:null,  tagColor:'',        tagText:'',               strike:false },
+  };
+
+  let cartoes = '';
+  missaoIds.forEach((missaoId) => {
+    const m = MISSOES_CATALOGO[missaoId];
+    if (!m) return;
+    const status = _missaoStatus(alunoAtivo.id, missaoId);
+    const ui = STATUS_UI[status];
+    const cor = TIPO_COR[m.tipo] || '#64748B';
+    const label = TIPO_LABEL[m.tipo] || m.tipo;
+    const border = ui.border || cor + '44';
+    const icon = ui.icon || m.emoji;
+
+    let botao = '';
+    if (status === 'completed') {
+      botao = `<span style="font-size:12px;color:#059669;font-weight:800;">✓ Concluída!</span>`;
+    } else if (status === 'delivered') {
+      botao = `<span style="font-size:12px;color:#1D4ED8;font-weight:700;">Aguardando validação</span>`;
+    } else {
+      const lblBtn = status === 'initiated' ? 'Continuar →' : 'Fazer →';
+      botao = `<button onclick="iniciarMissao('${missaoId}')" style="background:${cor};color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;">${lblBtn}</button>`;
+      if (m.tipo === 'pratica' || m.tipo === 'bonus') {
+        botao += `<br><button onclick="entregarMissao('${missaoId}')" style="margin-top:6px;background:none;border:1px solid #CBD5E1;border-radius:8px;padding:4px 10px;font-size:11px;color:#64748B;cursor:pointer;">📬 Marcar como entregue</button>`;
+      }
+    }
+
+    cartoes += `
+    <div style="display:flex;align-items:center;gap:14px;background:${ui.bg};border:2px solid ${border};border-radius:14px;padding:12px 16px;">
+      <div style="font-size:28px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-weight:800;font-size:15px;color:${status==='completed'?'#059669':'#0F172A'};${ui.strike?'text-decoration:line-through;':''}">${m.titulo}</span>
+          <span style="font-size:10px;font-weight:800;background:${cor}1A;color:${cor};border-radius:20px;padding:2px 8px;">${label}</span>
+          ${ui.tagText?`<span style="font-size:10px;font-weight:700;color:${ui.tagColor};">${ui.tagText}</span>`:''}
+        </div>
+        <div style="font-size:12px;color:#64748B;margin-top:2px;">${m.desc}</div>
+      </div>
+      <div style="flex-shrink:0;text-align:right;">
+        <div style="font-size:11px;color:#F59E0B;font-weight:800;margin-bottom:6px;">+${m.pontos} ⭐</div>
+        ${botao}
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = `
+  <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 60%,#1E293B 100%);border-radius:20px;padding:20px 24px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.3),transparent 65%);pointer-events:none;"></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;z-index:1;">
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.45);margin-bottom:4px;">${semLabel}${tCfg?' · '+tCfg.emoji+' '+tCfg.nome:''}</div>
+        <div style="font-size:22px;font-weight:900;">🎯 Aula de Hoje</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.65);margin-top:2px;">${totalCompletas} de ${missaoIds.length} missões concluídas</div>
+      </div>
+      <div style="text-align:center;flex-shrink:0;">
+        <div style="font-size:38px;font-weight:900;color:${pct===100?'#34D399':'#FBBF24'};">${pct}%</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);">PROGRESSO</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden;position:relative;z-index:1;">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#6366F1,#34D399);border-radius:4px;transition:width .5s ease;"></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">${cartoes}</div>
+  <div style="text-align:center;margin-top:-18px;margin-bottom:24px;">
+    <button onclick="document.getElementById('aulaHojeSection').style.display='none';" style="background:none;border:1px solid var(--line);border-radius:10px;padding:6px 16px;font-size:12px;color:var(--ink-soft);cursor:pointer;">Minimizar ↑</button>
+  </div>`;
+}
+
+// pré-carrega as turmas fixas se ainda não atribuídas
+// Roda toda vez que renderHome é chamado — atribui apenas alunos ainda sem turma
+function _seedTurmasAuto() {
+  const SEED = {
+    T1: ['miguel','pedro'],
+    T2: ['diego','theo','gabriel'],
+    T3: ['guilherme','joao','luiz'],
+  };
+  const t = getTurmas();
+  const alunos = getAlunos();
+  const atribuidos = new Set(Object.values(t).flatMap(v => v.ids || []));
+  let changed = false;
+  alunos.forEach(a => {
+    if (atribuidos.has(a.id)) return; // já tem turma
+    const nomeLower = (a.nome || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    for (const [tk, nomes] of Object.entries(SEED)) {
+      if (nomes.some(n => nomeLower.includes(n))) {
+        if (!t[tk]) t[tk] = { ids: [] };
+        t[tk].ids.push(a.id);
+        atribuidos.add(a.id);
+        changed = true;
+        break;
+      }
+    }
+    // "professor" ou "lusca" não recebe turma — fica em sem turma propositalmente
+  });
+  if (changed) saveTurmas(t);
+}
+
+// =============================================================
 // PROVA FINAL — 10 questões mistas por nível
 // =============================================================
 const PROVAS = {
@@ -3415,6 +3840,7 @@ function goCadastro() {
 
 function goDashboard() {
   if (!alunoAtivo) return goHome();
+  _registrarPresenca(alunoAtivo.id);
   renderDashboard();
   showScreen("dashboard");
   iniciarTimerHacker();
@@ -3506,30 +3932,81 @@ function salvarAvatarEscolhido(){
   renderDashboard();
 }
 
+let _homeTurma = null; // null = mostrar cards de turma; 'T1'/'T2'/'T3' = alunos da turma
+let _cadastroTurma = null; // turma pré-selecionada para novo cadastro
+
 function renderHome() {
+  _seedTurmasAuto(); // garante que alunos conhecidos estejam na turma certa
   const grid = document.getElementById("alunosGrid");
   const alunos = getAlunos();
 
-  let html = "";
-  alunos.forEach(a => {
+  // Se ainda não escolheu turma, mostra os cards de turma
+  if (_homeTurma === null) {
+    const turmas = getTurmas();
+    let html = '<div style="margin-bottom:20px;text-align:center;"><div style="font-size:13px;font-weight:800;color:var(--ink-soft);letter-spacing:1.5px;">SELECIONE SUA TURMA</div></div>';
+    html += '<div style="display:flex;flex-direction:column;gap:14px;max-width:440px;margin:0 auto;">';
+    for (const [key, cfg] of Object.entries(TURMAS_CONFIG)) {
+      const ids = turmas[key]?.ids || [];
+      const membros = alunos.filter(a => ids.includes(a.id));
+      const nomes = membros.length ? membros.map(a=>escapeHtml(a.nome)).join(', ') : 'Nenhum aluno ainda';
+      html += `
+        <div onclick="_homeTurma='${key}';renderHome();" style="cursor:pointer;background:${cfg.corSoft};border:2px solid ${cfg.cor};border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;transition:transform .12s ease,box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="font-size:38px;line-height:1;">${cfg.emoji}</div>
+          <div style="flex:1;">
+            <div style="font-size:18px;font-weight:900;color:${cfg.cor};">${cfg.nome}</div>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">📅 ${cfg.dias}</div>
+            <div style="font-size:12px;color:#374151;margin-top:4px;font-weight:600;">👥 ${nomes}</div>
+          </div>
+          <div style="font-size:22px;color:${cfg.cor};">›</div>
+        </div>`;
+    }
+    // Card "sem turma" se houver alunos não atribuídos
+    const todosIds = Object.values(turmas).flatMap(v=>v.ids||[]);
+    const semTurma = alunos.filter(a => !todosIds.includes(a.id));
+    if (semTurma.length) {
+      html += `<div onclick="_homeTurma='SEM_TURMA';renderHome();" style="cursor:pointer;background:#F8FAFC;border:2px dashed #CBD5E1;border-radius:18px;padding:14px 22px;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='#94A3B8'" onmouseout="this.style.borderColor='#CBD5E1'">
+        <div style="font-size:28px;">❓</div>
+        <div><div style="font-weight:800;color:#475569;">Sem turma (${semTurma.length})</div><div style="font-size:12px;color:#94A3B8;">${semTurma.map(a=>escapeHtml(a.nome)).join(', ')}</div></div>
+      </div>`;
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    return;
+  }
+
+  // Mostrar alunos da turma selecionada
+  const cfg = TURMAS_CONFIG[_homeTurma];
+  const turmas = getTurmas();
+  let alunosDaTurma;
+  if (_homeTurma === 'SEM_TURMA') {
+    const todosIds = Object.values(turmas).flatMap(v=>v.ids||[]);
+    alunosDaTurma = alunos.filter(a => !todosIds.includes(a.id));
+  } else {
+    const ids = turmas[_homeTurma]?.ids || [];
+    alunosDaTurma = alunos.filter(a => ids.includes(a.id));
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <button onclick="_homeTurma=null;renderHome();" style="background:transparent;border:2px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:700;color:var(--ink-soft);">← Turmas</button>
+      ${cfg ? `<div style="font-size:18px;font-weight:900;color:${cfg.cor};">${cfg.emoji} ${cfg.nome}</div>` : '<div style="font-size:16px;font-weight:800;color:#475569;">Sem turma</div>'}
+    </div>`;
+
+  alunosDaTurma.forEach(a => {
     const n = a.nivel;
     const pontos = calcularPontos(a);
     const medalhas = calcularMedalhas(a);
     const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso[m]?.quizDone).length;
     const provaFeita = a.progresso.prova?.done ? 1 : 0;
-    const totalEtapas = ORDEM_MODULOS.length + 1; // 4 módulos + prova
+    const totalEtapas = ORDEM_MODULOS.length + 1;
     const progresso = Math.round(((modulosFeitos + provaFeita) / totalEtapas) * 100);
-
-    // Top 5 medalhas (4 visíveis + 1 com indicador "+N")
     const badgesHtml = medalhas.slice(0, 5).map(m =>
       `<div class="aluno-badge" title="${m.texto}">${m.emoji}</div>`
     ).join('') + (medalhas.length > 5 ?
       `<div class="aluno-badge" style="font-size:10px;font-weight:800;">+${medalhas.length - 5}</div>` : '') ||
       `<div class="aluno-badge locked">🔒</div>`.repeat(3);
-
     let progLabel = `${progresso}% completo`;
     if (provaFeita) progLabel = '✓ Prova aprovada';
-
     html += `
       <div class="aluno-card" data-n="${n}" onclick="entrar('${a.id}')">
         <div class="aluno-banner">
@@ -3553,13 +4030,13 @@ function renderHome() {
   });
 
   html += `
-    <div class="novo-aluno-card" onclick="goCadastro()">
+    <div class="novo-aluno-card" onclick="_cadastroTurma=_homeTurma;goCadastro();">
       <div class="novo-aluno-icon">
         <iconify-icon icon="ph:user-plus-bold"></iconify-icon>
       </div>
       <div>
         <div class="novo-aluno-titulo">Cadastrar aluno</div>
-        <div class="novo-aluno-sub">Crie um novo perfil</div>
+        <div class="novo-aluno-sub">${cfg ? 'Adicionar na ' + cfg.nome : 'Sem turma'}</div>
       </div>
     </div>`;
 
@@ -3620,6 +4097,11 @@ function finalizarCadastro() {
     criado: new Date().toISOString()
   };
   salvarAluno(aluno);
+  // Atribuir turma se veio de uma turma específica
+  if (_cadastroTurma && TURMAS_CONFIG[_cadastroTurma]) {
+    atribuirTurma(aluno.id, _cadastroTurma);
+  }
+  _cadastroTurma = null;
   alunoAtivo = aluno;
   localStorage.setItem(ATIVO_KEY, aluno.id);
   goDashboard();
@@ -3643,6 +4125,7 @@ function renderDashboard() {
   if (!a) return goHome();
   const n = a.nivel;
 
+  renderAulaHoje();
   document.getElementById("dashAvatarImg").src = avatarUrl(a);
   document.getElementById("dashAvatarWrap").setAttribute("data-n", n);
   document.querySelector(".dash-header").setAttribute("data-n", n);
@@ -4277,6 +4760,7 @@ function finalizarQuizModulo() {
   // salva
   if (!alunoAtivo.progresso[estadoQuiz.modulo]) alunoAtivo.progresso[estadoQuiz.modulo] = {};
   alunoAtivo.progresso[estadoQuiz.modulo].quizDone = true;
+  _hookQuizFim(estadoQuiz.modulo); // conclui missão ativa se completionTrigger = 'quiz_finish'
   alunoAtivo.progresso[estadoQuiz.modulo].quizScore = score;
   alunoAtivo.progresso[estadoQuiz.modulo].quizTotal = total;
   alunoAtivo.progresso[estadoQuiz.modulo].erros = estadoQuiz.erros || [];
@@ -7240,12 +7724,105 @@ function ppHistGet(){ try{ return JSON.parse(localStorage.getItem('professorlusc
 function ppRegistrarSemana(alunos){ const h=ppHistGet(); const wk=ppIsoWeek(new Date()); alunos.forEach(a=>{ if(!h[a.id]) h[a.id]={}; h[a.id][wk]=ppSnap(a); }); localStorage.setItem('professorlusca_hist', JSON.stringify(h)); return wk; }
 function ppEvolucao(a){ const h=ppHistGet(); const reg=h[a.id]||{}; const wks=Object.keys(reg).sort(); const wk=ppIsoWeek(new Date()); const curr=reg[wk]||ppSnap(a); const prevKey=wks.filter(k=>k<wk).pop(); const prev=prevKey?reg[prevKey]:null; return {curr,prev,prevKey}; }
 
+
+// =============================================================
+// BACKUP / EXPORTAÇÃO DE DADOS
+// =============================================================
+function _exportarBackup() {
+  const alunos = getAlunos();
+  const turmas = getTurmas();
+  const turmasConteudo = (() => { try { return JSON.parse(localStorage.getItem('lusca_turmas_conteudo')) || {}; } catch(e) { return {}; } })();
+  const frequencia = (() => { try { return JSON.parse(localStorage.getItem('lusca_frequencia')) || {}; } catch(e) { return {}; } })();
+  // backup de missões: histórico completo de TODAS as semanas (nunca apagado)
+  const missoesRaw = (() => { try { return JSON.parse(localStorage.getItem('lusca_missoes')) || {}; } catch(e) { return {}; } })();
+  const missoes = missoesRaw;
+  const progressoSemanal = {};
+  Object.entries(missoesRaw).forEach(([aId, semanas]) => {
+    progressoSemanal[aId] = {};
+    Object.entries(semanas).forEach(([sem, obj]) => {
+      progressoSemanal[aId][sem] = {
+        concluidas: (obj.completed||[]).length,
+        iniciadas:  (obj.initiated||[]).length,
+        entregues:  (obj.delivered||[]).length,
+      };
+    });
+  });
+  const planejamento = (() => { try { return JSON.parse(localStorage.getItem('lusca_planejamento')) || {}; } catch(e) { return {}; } })();
+
+  const backup = {
+    versao: '2.0',
+    geradoEm: new Date().toISOString(),
+    alunos,
+    turmas,
+    turmasConteudo,
+    frequencia,
+    missoes,
+    progressoSemanal,
+    planejamento,
+    ranking: alunos.map(a => ({
+      id: a.id,
+      nome: a.nome,
+      nivel: a.nivel,
+      pontos: calcularPontos(a),
+      wpm: a.progresso?.digitacaoMelhorWpm || 0,
+    })).sort((a,b) => b.pontos - a.pontos),
+  };
+
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const hoje = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `backup-lusca-academy-${hoje}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// =============================================================
+// RANKING SEMANAL
+// =============================================================
+function _rankingSemanalHtml(alunos) {
+  const semana = _semanaISO();
+  // ranking conta APENAS missões com status 'completed' — não iniciadas/entregues
+  const scores = alunos.map(a => {
+    let pts = 0;
+    try {
+      _missoesConcluidasNaSemana(a.id, semana).forEach(id => {
+        pts += (MISSOES_CATALOGO[id]?.pontos || 0);
+      });
+    } catch(e) {}
+    return { nome: a.nome, id: a.id, pts, nivel: a.nivel };
+  }).sort((a,b) => b.pts - a.pts).filter(x => x.pts > 0);
+
+  if (!scores.length) return '<div style="text-align:center;color:#94A3B8;padding:16px;font-size:13px;">Nenhuma missão concluída esta semana ainda.</div>';
+
+  const medalhas = ['🥇','🥈','🥉'];
+  return scores.map((s, i) => {
+    const pct = scores[0].pts ? Math.round(s.pts/scores[0].pts*100) : 0;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F5F9;">
+      <div style="font-size:20px;width:28px;text-align:center;">${medalhas[i] || `#${i+1}`}</div>
+      <img src="${avatarUrl(alunos.find(a=>a.id===s.id)||{nivel:s.nivel,nome:s.nome,id:s.id})}" style="width:36px;height:36px;border-radius:50%;background:#EEF2FF;" onerror="this.style.visibility='hidden'">
+      <div style="flex:1;">
+        <div style="font-weight:800;font-size:14px;color:#0F172A;">${escapeHtml(s.nome)}</div>
+        <div style="height:6px;background:#F1F5F9;border-radius:3px;overflow:hidden;margin-top:4px;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#6366F1,#34D399);border-radius:3px;"></div></div>
+      </div>
+      <div style="font-size:15px;font-weight:900;color:#F59E0B;">${s.pts} ⭐</div>
+    </div>`;
+  }).join('');
+}
+
 function renderPainelPro() {
+  _marcarAusentesRetroativos();
   const alunos = getAlunos();
   const statsEl = document.getElementById("painelStats");
   const alunosEl = document.getElementById("painelAlunos");
   const syncUrl = getSyncUrl();
   document.getElementById("painelSyncIndicator").textContent = "⟳ Atualizar";
+
+  // Render backup button
+  const backupEl = document.getElementById("painelBackupBtn");
+  if (backupEl) backupEl.onclick = _exportarBackup;
 
   // registra snapshot desta semana (constrói histórico daqui pra frente)
   const semanaAtual = ppRegistrarSemana(alunos);
@@ -7298,6 +7875,10 @@ function renderPainelPro() {
     ${ppStatCard(mediaWpm||"—", "WPM médio", "#3B82F6")}
   `;
 
+  // Ranking semanal de missões
+  const rankSemEl = document.getElementById('painelRankSemanal');
+  if (rankSemEl) rankSemEl.innerHTML = _rankingSemanalHtml(alunos);
+
   // ---- BANNER: FOCO DA SEMANA ----
   let focoHtml = "";
   if (foco.length) {
@@ -7337,9 +7918,8 @@ function renderPainelPro() {
     return;
   }
 
-  // ---- LISTA DE ALUNOS (resumida, clicável) ----
-  const ordenados = [...alunos].sort((a,b)=>ppSeveridade(b)-ppSeveridade(a)); // mais críticos primeiro
-  const linhas = ordenados.map(a=>{
+  // ---- helper: card de um aluno ----
+  function _ppAlunoCard(a) {
     const nivel = a.nivel || calcularNivel(a.idade);
     const sev = ppSeveridade(a);
     const diag = ppDiagnostico(a);
@@ -7349,7 +7929,6 @@ function renderPainelPro() {
     const statusTxt = sev===0?'Em dia': sev>=5?'Precisa de atenção':'Acompanhar';
     const dias = ppDiasDesde(ppUltimaAtividade(a));
     const inativo = dias!==null && dias>=7;
-    // health dots por módulo
     const dots = ORDEM_MODULOS.map(m=>{
       const pct = ppModuloPct(a,m);
       const cor = pct===null?'#E2E8F0': pct>=80?'#10B981': pct>=60?'#F59E0B':'#EF4444';
@@ -7376,11 +7955,186 @@ function renderPainelPro() {
         </div>
       </div>
     </button>`;
-  }).join("");
+  }
 
-  alunosEl.innerHTML = focoHtml + barras +
-    `<div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:1px;margin:4px 0 12px;">ALUNOS (${ordenados.length}) · ordenados por prioridade</div>` +
-    linhas;
+  // ---- LISTA DE ALUNOS AGRUPADA POR TURMA ----
+  const turmasData = getTurmas();
+  let turmasHtml = '';
+
+  const MODULOS_CONTEUDO = [
+    ...ORDEM_MODULOS.map(m=>({ key:m, label: PP_NOME_MOD[m]||m })),
+    { key:'prova', label:'Prova Final' },
+    { key:'digitacao', label:'Digitação' },
+  ];
+
+  for (const [tKey, tCfg] of Object.entries(TURMAS_CONFIG)) {
+    const ids = turmasData[tKey]?.ids || [];
+    const membros = [...alunos].filter(a => ids.includes(a.id)).sort((a,b)=>ppSeveridade(b)-ppSeveridade(a));
+    const conteudo = getTurmaConteudo(tKey);
+    const precisamAtencaoT = membros.filter(a=>ppSeveridade(a)>=5).length;
+
+    // tracker de conteúdo
+    const trackerHtml = MODULOS_CONTEUDO.map(mod => {
+      const ensinado = conteudo[mod.key];
+      return `<button onclick="toggleConteudoEnsinado('${tKey}','${mod.key}')" title="${ensinado?'Marcar como não ensinado':'Marcar como ensinado'}"
+        style="background:${ensinado?tCfg.cor:'#F1F5F9'};color:${ensinado?'#fff':'#94A3B8'};border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;">${ensinado?'✓ ':''} ${mod.label}</button>`;
+    }).join('');
+
+    turmasHtml += `
+    <div style="background:#fff;border-radius:18px;padding:0;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;border:2px solid ${tCfg.cor}22;">
+      <div style="background:${tCfg.corSoft};padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:26px;">${tCfg.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-size:17px;font-weight:900;color:${tCfg.cor};">${tCfg.nome} <span style="font-size:13px;font-weight:600;color:#64748B;">· ${membros.length} aluno${membros.length!==1?'s':''}</span></div>
+          <div style="font-size:12px;color:#64748B;">📅 ${tCfg.dias}</div>
+        </div>
+        ${precisamAtencaoT?`<div style="background:#FEF2F2;color:#B91C1C;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:800;">⚠️ ${precisamAtencaoT} precisam atenção</div>`:''}
+      </div>
+
+      <div style="padding:12px 18px 8px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#94A3B8;margin-bottom:8px;">CONTEÚDO ENSINADO PELO PROFESSOR</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">${trackerHtml}</div>
+      </div>
+
+      <div style="padding:8px 18px 14px;">
+        ${membros.length ? membros.map(_ppAlunoCard).join('') : `<div style="text-align:center;color:#94A3B8;padding:20px 0;font-size:14px;">Nenhum aluno nesta turma ainda.</div>`}
+      </div>
+    </div>`;
+  }
+
+  // Alunos sem turma
+  const todosIdsAtribuidos = Object.values(turmasData).flatMap(v=>v.ids||[]);
+  const semTurma = [...alunos].filter(a => !todosIdsAtribuidos.includes(a.id)).sort((a,b)=>ppSeveridade(b)-ppSeveridade(a));
+  if (semTurma.length) {
+    turmasHtml += `
+    <div style="background:#fff;border-radius:18px;padding:0;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;border:2px dashed #CBD5E1;">
+      <div style="background:#F8FAFC;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:24px;">❓</div>
+        <div><div style="font-size:16px;font-weight:800;color:#475569;">Sem turma (${semTurma.length})</div></div>
+      </div>
+      <div style="padding:8px 18px 14px;">${semTurma.map(_ppAlunoCard).join('')}</div>
+    </div>`;
+  }
+
+  // ---- PLANEJAMENTO + FREQUÊNCIA + RELATÓRIO POR TURMA ----
+  let ferramentasHtml = '';
+  for (const [tKey, tCfg] of Object.entries(TURMAS_CONFIG)) {
+    const turmasData2 = getTurmas();
+    const ids2 = turmasData2[tKey]?.ids || [];
+    const membros2 = alunos.filter(a => ids2.includes(a.id));
+    if (!membros2.length) continue;
+
+    // --- FREQUÊNCIA ---
+    const ultimasAulas = _ultimasAulas(tKey, 6);
+    const freqGrid = ultimasAulas.length ? `
+      <div style="overflow-x:auto;margin-bottom:10px;">
+        <table style="border-collapse:collapse;width:100%;font-size:12px;">
+          <thead><tr>
+            <th style="text-align:left;padding:4px 8px;color:#64748B;font-weight:700;">Aluno</th>
+            ${ultimasAulas.map(d=>`<th style="padding:4px 6px;color:#64748B;font-weight:700;text-align:center;white-space:nowrap;">${d.slice(5).replace('-','/')}</th>`).join('')}
+            <th style="padding:4px 8px;color:#64748B;font-weight:700;text-align:center;">%</th>
+          </tr></thead>
+          <tbody>
+            ${membros2.map(a=>{
+              const fq = _freqGet()[a.id] || {};
+              const pcts = _freqAluno(a.id);
+              const cor = pcts.pct===null?'#94A3B8': pcts.pct>=75?'#10B981': pcts.pct>=50?'#F59E0B':'#EF4444';
+              return `<tr style="border-top:1px solid #F1F5F9;">
+                <td style="padding:5px 8px;font-weight:700;color:#0F172A;">${escapeHtml(a.nome)}</td>
+                ${ultimasAulas.map(d=>{
+                  const v = fq[d];
+                  const bg = v==='P'?'#D1FAE5': v==='A'?'#FEE2E2':'#F8FAFC';
+                  const txt = v==='P'?'✓': v==='A'?'✗':'—';
+                  const c = v==='P'?'#065F46': v==='A'?'#B91C1C':'#CBD5E1';
+                  return `<td style="text-align:center;padding:4px 6px;"><span style="background:${bg};color:${c};border-radius:6px;padding:2px 7px;font-weight:800;font-size:11px;">${txt}</span></td>`;
+                }).join('')}
+                <td style="text-align:center;padding:4px 8px;font-weight:800;color:${cor};">${pcts.pct!==null?pcts.pct+'%':'—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>` : '<div style="color:#94A3B8;font-size:13px;padding:8px 0;">Nenhuma aula registrada ainda.</div>';
+
+    // --- PLANEJAMENTO AUTOMÁTICO ---
+    const modStatus = ORDEM_MODULOS.map(m => {
+      const feitos = membros2.filter(a=>a.progresso?.[m]?.quizDone);
+      const media = feitos.length ? Math.round(feitos.reduce((s,a)=>s+ppModuloPct(a,m),0)/feitos.length) : null;
+      const conteudoEnsinado = getTurmaConteudo(tKey)[m];
+      const status = !conteudoEnsinado ? 'nao_ensinado' : feitos.length===0 ? 'nao_feito' : media>=80 ? 'ok' : media>=50 ? 'revisar' : 'critico';
+      return { m, label: PP_NOME_MOD[m]||m, media, feitos: feitos.length, total: membros2.length, status, conteudoEnsinado };
+    });
+    const insights = [];
+    modStatus.forEach(s => {
+      if (s.status==='nao_ensinado') insights.push({ cor:'#94A3B8', bg:'#F8FAFC', icon:'📌', txt:`<b>${s.label}</b> ainda não foi ensinado` });
+      else if (s.status==='nao_feito') insights.push({ cor:'#B45309', bg:'#FFFBEB', icon:'⚠️', txt:`<b>${s.label}</b> foi ensinado mas ninguém fez o quiz ainda` });
+      else if (s.status==='critico') insights.push({ cor:'#B91C1C', bg:'#FEF2F2', icon:'🚨', txt:`<b>${s.label}</b> com média ${s.media}% — turma precisa rever` });
+      else if (s.status==='revisar') insights.push({ cor:'#92400E', bg:'#FFFBEB', icon:'🔁', txt:`<b>${s.label}</b> média ${s.media}% — reforçar com ${s.total-s.feitos} aluno${s.total-s.feitos!==1?'s':''} que não fez` });
+      else insights.push({ cor:'#065F46', bg:'#ECFDF5', icon:'✅', txt:`<b>${s.label}</b> ok — ${s.feitos}/${s.total} fizeram, média ${s.media}%` });
+    });
+    const insightsHtml = insights.map(i=>`<div style="background:${i.bg};border-radius:10px;padding:8px 12px;font-size:12px;color:${i.cor};display:flex;gap:8px;align-items:flex-start;">${i.icon} <span>${i.txt}</span></div>`).join('');
+
+    const planNota = _planGet(tKey);
+    const planId = `planNota_${tKey}`;
+
+    // --- RELATÓRIO WHATSAPP ---
+    const wppId = `wppOut_${tKey}`;
+
+    ferramentasHtml += `
+    <div style="background:#fff;border-radius:18px;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;border:1px solid ${tCfg.cor}33;">
+      <div style="background:${tCfg.corSoft};padding:12px 18px;border-bottom:1px solid ${tCfg.cor}22;">
+        <span style="font-size:16px;font-weight:900;color:${tCfg.cor};">${tCfg.emoji} ${tCfg.nome} — Ferramentas</span>
+      </div>
+      <div style="padding:16px 18px;display:flex;flex-direction:column;gap:18px;">
+
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#64748B;margin-bottom:10px;">📋 FREQUÊNCIA (últimas aulas)</div>
+          ${freqGrid}
+        </div>
+
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#64748B;margin-bottom:10px;">🗓️ PLANEJAMENTO DA PRÓXIMA AULA</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">${insightsHtml}</div>
+          <textarea id="${planId}" onchange="_planSave('${tKey}',this.value)" oninput="_planSave('${tKey}',this.value)"
+            style="width:100%;min-height:80px;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;resize:vertical;color:#0F172A;"
+            placeholder="Suas notas para a próxima aula da ${tCfg.nome}...">${escapeHtml(planNota)}</textarea>
+        </div>
+
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#64748B;margin-bottom:8px;">📊 RELATÓRIO WHATSAPP</div>
+          <button onclick="_gerarRelatorioWpp('${tKey}')" style="background:${tCfg.cor};color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:800;cursor:pointer;">📋 Gerar relatório</button>
+          <textarea id="${wppId}" readonly style="display:none;width:100%;min-height:120px;margin-top:8px;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:12px;font-family:monospace;resize:vertical;color:#0F172A;background:#F8FAFC;"></textarea>
+        </div>
+
+      </div>
+    </div>`;
+  }
+
+  alunosEl.innerHTML = focoHtml + barras + turmasHtml + ferramentasHtml;
+}
+
+function _gerarRelatorioWpp(turmaKey) {
+  const tCfg = TURMAS_CONFIG[turmaKey];
+  const alunos = getAlunos();
+  const turmasData = getTurmas();
+  const ids = turmasData[turmaKey]?.ids || [];
+  const membros = alunos.filter(a => ids.includes(a.id));
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  let txt = `📊 *Relatório ${tCfg.nome} — ${hoje}*\n📅 ${tCfg.dias}\n\n`;
+  membros.forEach(a => {
+    const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso?.[m]?.quizDone).length;
+    const pts = calcularPontos(a);
+    const fq = _freqAluno(a.id);
+    const wpm = a.progresso?.digitacaoMelhorWpm || 0;
+    txt += `👤 *${a.nome}* (Nível ${a.nivel})\n`;
+    txt += `   📚 Módulos: ${modulosFeitos}/${ORDEM_MODULOS.length}  ⭐ ${pts} pts\n`;
+    txt += `   ⌨️ Digitação: ${wpm ? wpm+' WPM' : 'não iniciou'}\n`;
+    txt += `   📋 Freq: ${fq.pct !== null ? fq.presentes+'/'+fq.total+' aulas ('+fq.pct+'%)' : 'sem dados'}\n\n`;
+  });
+  const planNota = _planGet(turmaKey);
+  if (planNota) txt += `📌 *Próxima aula:*\n${planNota}\n`;
+  const el = document.getElementById('wppOut_' + turmaKey);
+  if (el) { el.style.display = 'block'; el.value = txt; el.select(); }
+  try { document.execCommand('copy'); } catch(e) {}
 }
 
 function ppStatCard(valor, label, cor){
