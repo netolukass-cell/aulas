@@ -3252,6 +3252,95 @@ function toggleConteudoEnsinado(turmaKey, modulo) {
   renderPainelPro();
 }
 
+// =============================================================
+// FREQUÊNCIA AUTOMÁTICA
+// lusca_frequencia: { [alunoId]: { 'YYYY-MM-DD': 'P' | 'A' } }
+// =============================================================
+const FREQ_KEY = 'lusca_frequencia';
+// Dias de aula por turma (getDay(): 0=Dom,1=Seg,2=Ter,3=Qua,4=Qui,5=Sex,6=Sáb)
+const TURMAS_DIAS = { T1: [4, 5], T2: [1], T3: [3, 6] };
+
+function _freqGet() {
+  try { return JSON.parse(localStorage.getItem(FREQ_KEY)) || {}; } catch(e) { return {}; }
+}
+function _freqSave(d) { localStorage.setItem(FREQ_KEY, JSON.stringify(d)); }
+
+function _isoDate(dt) {
+  return dt.toISOString().slice(0, 10);
+}
+
+// Chamado quando aluno abre o dashboard — marca P se hoje é dia de aula dele
+function _registrarPresenca(alunoId) {
+  const turmaKey = getTurmaDeAluno(alunoId);
+  if (!turmaKey || !TURMAS_DIAS[turmaKey]) return;
+  const hoje = new Date();
+  const diaSemana = hoje.getDay();
+  if (!TURMAS_DIAS[turmaKey].includes(diaSemana)) return; // não é dia de aula
+  const data = _isoDate(hoje);
+  const d = _freqGet();
+  if (!d[alunoId]) d[alunoId] = {};
+  if (!d[alunoId][data]) { d[alunoId][data] = 'P'; _freqSave(d); }
+}
+
+// Chamado quando professor abre o painel — preenche ausências retroativas (últimos 60 dias)
+function _marcarAusentesRetroativos() {
+  const d = _freqGet();
+  const alunos = getAlunos();
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  let changed = false;
+  for (const [tk, dias] of Object.entries(TURMAS_DIAS)) {
+    const turmas = getTurmas();
+    const ids = turmas[tk]?.ids || [];
+    // percorre últimos 60 dias
+    for (let back = 1; back <= 60; back++) {
+      const d2 = new Date(hoje); d2.setDate(hoje.getDate() - back);
+      if (!dias.includes(d2.getDay())) continue;
+      const iso = _isoDate(d2);
+      ids.forEach(id => {
+        if (!d[id]) d[id] = {};
+        if (!d[id][iso]) { d[id][iso] = 'A'; changed = true; }
+      });
+    }
+  }
+  if (changed) _freqSave(d);
+}
+
+// Retorna dados de frequência de um aluno: { total, presentes, ausentes, pct }
+function _freqAluno(alunoId) {
+  const d = _freqGet()[alunoId] || {};
+  const vals = Object.values(d);
+  const total = vals.length;
+  const presentes = vals.filter(v => v === 'P').length;
+  return { total, presentes, ausentes: total - presentes, pct: total ? Math.round(presentes/total*100) : null };
+}
+
+// Últimas N aulas de uma turma (datas ISO, mais recente primeiro)
+function _ultimasAulas(turmaKey, n) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const dias = TURMAS_DIAS[turmaKey] || [];
+  const datas = [];
+  for (let back = 0; back <= 120 && datas.length < n; back++) {
+    const d2 = new Date(hoje); d2.setDate(hoje.getDate() - back);
+    if (dias.includes(d2.getDay())) datas.push(_isoDate(d2));
+  }
+  return datas;
+}
+
+// =============================================================
+// PLANEJAMENTO DE AULA
+// lusca_planejamento: { T1: "texto...", T2: "...", T3: "..." }
+// =============================================================
+const PLAN_KEY = 'lusca_planejamento';
+function _planGet(turmaKey) {
+  try { const d = JSON.parse(localStorage.getItem(PLAN_KEY)) || {}; return d[turmaKey] || ''; } catch(e) { return ''; }
+}
+function _planSave(turmaKey, texto) {
+  let d; try { d = JSON.parse(localStorage.getItem(PLAN_KEY)) || {}; } catch(e) { d = {}; }
+  d[turmaKey] = texto;
+  localStorage.setItem(PLAN_KEY, JSON.stringify(d));
+}
+
 // pré-carrega as turmas fixas se ainda não atribuídas
 // Roda toda vez que renderHome é chamado — atribui apenas alunos ainda sem turma
 function _seedTurmasAuto() {
@@ -3501,6 +3590,7 @@ function goCadastro() {
 
 function goDashboard() {
   if (!alunoAtivo) return goHome();
+  _registrarPresenca(alunoAtivo.id);
   renderDashboard();
   showScreen("dashboard");
   iniciarTimerHacker();
@@ -7383,6 +7473,7 @@ function ppRegistrarSemana(alunos){ const h=ppHistGet(); const wk=ppIsoWeek(new 
 function ppEvolucao(a){ const h=ppHistGet(); const reg=h[a.id]||{}; const wks=Object.keys(reg).sort(); const wk=ppIsoWeek(new Date()); const curr=reg[wk]||ppSnap(a); const prevKey=wks.filter(k=>k<wk).pop(); const prev=prevKey?reg[prevKey]:null; return {curr,prev,prevKey}; }
 
 function renderPainelPro() {
+  _marcarAusentesRetroativos();
   const alunos = getAlunos();
   const statsEl = document.getElementById("painelStats");
   const alunosEl = document.getElementById("painelAlunos");
@@ -7577,35 +7668,125 @@ function renderPainelPro() {
     </div>`;
   }
 
-  // ---- FERRAMENTAS DE GESTÃO ----
-  const ferramentasHtml = `
-  <div style="background:linear-gradient(135deg,#0F172A,#1E293B);border-radius:18px;padding:20px 24px;margin-bottom:20px;color:#fff;">
-    <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.5);margin-bottom:14px;">💡 SUGESTÕES DE FERRAMENTAS</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
-      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
-        <div style="font-size:20px;margin-bottom:6px;">💰</div>
-        <div style="font-weight:800;font-size:14px;">Controle de Pagamento</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Use <strong>Planilha Google</strong> ou <strong>Notion</strong> para registrar mensalidades por turma.</div>
+  // ---- PLANEJAMENTO + FREQUÊNCIA + RELATÓRIO POR TURMA ----
+  let ferramentasHtml = '';
+  for (const [tKey, tCfg] of Object.entries(TURMAS_CONFIG)) {
+    const turmasData2 = getTurmas();
+    const ids2 = turmasData2[tKey]?.ids || [];
+    const membros2 = alunos.filter(a => ids2.includes(a.id));
+    if (!membros2.length) continue;
+
+    // --- FREQUÊNCIA ---
+    const ultimasAulas = _ultimasAulas(tKey, 6);
+    const freqGrid = ultimasAulas.length ? `
+      <div style="overflow-x:auto;margin-bottom:10px;">
+        <table style="border-collapse:collapse;width:100%;font-size:12px;">
+          <thead><tr>
+            <th style="text-align:left;padding:4px 8px;color:#64748B;font-weight:700;">Aluno</th>
+            ${ultimasAulas.map(d=>`<th style="padding:4px 6px;color:#64748B;font-weight:700;text-align:center;white-space:nowrap;">${d.slice(5).replace('-','/')}</th>`).join('')}
+            <th style="padding:4px 8px;color:#64748B;font-weight:700;text-align:center;">%</th>
+          </tr></thead>
+          <tbody>
+            ${membros2.map(a=>{
+              const fq = _freqGet()[a.id] || {};
+              const pcts = _freqAluno(a.id);
+              const cor = pcts.pct===null?'#94A3B8': pcts.pct>=75?'#10B981': pcts.pct>=50?'#F59E0B':'#EF4444';
+              return `<tr style="border-top:1px solid #F1F5F9;">
+                <td style="padding:5px 8px;font-weight:700;color:#0F172A;">${escapeHtml(a.nome)}</td>
+                ${ultimasAulas.map(d=>{
+                  const v = fq[d];
+                  const bg = v==='P'?'#D1FAE5': v==='A'?'#FEE2E2':'#F8FAFC';
+                  const txt = v==='P'?'✓': v==='A'?'✗':'—';
+                  const c = v==='P'?'#065F46': v==='A'?'#B91C1C':'#CBD5E1';
+                  return `<td style="text-align:center;padding:4px 6px;"><span style="background:${bg};color:${c};border-radius:6px;padding:2px 7px;font-weight:800;font-size:11px;">${txt}</span></td>`;
+                }).join('')}
+                <td style="text-align:center;padding:4px 8px;font-weight:800;color:${cor};">${pcts.pct!==null?pcts.pct+'%':'—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>` : '<div style="color:#94A3B8;font-size:13px;padding:8px 0;">Nenhuma aula registrada ainda.</div>';
+
+    // --- PLANEJAMENTO AUTOMÁTICO ---
+    const modStatus = ORDEM_MODULOS.map(m => {
+      const feitos = membros2.filter(a=>a.progresso?.[m]?.quizDone);
+      const media = feitos.length ? Math.round(feitos.reduce((s,a)=>s+ppModuloPct(a,m),0)/feitos.length) : null;
+      const conteudoEnsinado = getTurmaConteudo(tKey)[m];
+      const status = !conteudoEnsinado ? 'nao_ensinado' : feitos.length===0 ? 'nao_feito' : media>=80 ? 'ok' : media>=50 ? 'revisar' : 'critico';
+      return { m, label: PP_NOME_MOD[m]||m, media, feitos: feitos.length, total: membros2.length, status, conteudoEnsinado };
+    });
+    const insights = [];
+    modStatus.forEach(s => {
+      if (s.status==='nao_ensinado') insights.push({ cor:'#94A3B8', bg:'#F8FAFC', icon:'📌', txt:`<b>${s.label}</b> ainda não foi ensinado` });
+      else if (s.status==='nao_feito') insights.push({ cor:'#B45309', bg:'#FFFBEB', icon:'⚠️', txt:`<b>${s.label}</b> foi ensinado mas ninguém fez o quiz ainda` });
+      else if (s.status==='critico') insights.push({ cor:'#B91C1C', bg:'#FEF2F2', icon:'🚨', txt:`<b>${s.label}</b> com média ${s.media}% — turma precisa rever` });
+      else if (s.status==='revisar') insights.push({ cor:'#92400E', bg:'#FFFBEB', icon:'🔁', txt:`<b>${s.label}</b> média ${s.media}% — reforçar com ${s.total-s.feitos} aluno${s.total-s.feitos!==1?'s':''} que não fez` });
+      else insights.push({ cor:'#065F46', bg:'#ECFDF5', icon:'✅', txt:`<b>${s.label}</b> ok — ${s.feitos}/${s.total} fizeram, média ${s.media}%` });
+    });
+    const insightsHtml = insights.map(i=>`<div style="background:${i.bg};border-radius:10px;padding:8px 12px;font-size:12px;color:${i.cor};display:flex;gap:8px;align-items:flex-start;">${i.icon} <span>${i.txt}</span></div>`).join('');
+
+    const planNota = _planGet(tKey);
+    const planId = `planNota_${tKey}`;
+
+    // --- RELATÓRIO WHATSAPP ---
+    const wppId = `wppOut_${tKey}`;
+
+    ferramentasHtml += `
+    <div style="background:#fff;border-radius:18px;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;border:1px solid ${tCfg.cor}33;">
+      <div style="background:${tCfg.corSoft};padding:12px 18px;border-bottom:1px solid ${tCfg.cor}22;">
+        <span style="font-size:16px;font-weight:900;color:${tCfg.cor};">${tCfg.emoji} ${tCfg.nome} — Ferramentas</span>
       </div>
-      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
-        <div style="font-size:20px;margin-bottom:6px;">📱</div>
-        <div style="font-weight:800;font-size:14px;">Comunicação</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;"><strong>WhatsApp Groups</strong> por turma — um grupo por linha acima.</div>
+      <div style="padding:16px 18px;display:flex;flex-direction:column;gap:18px;">
+
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#64748B;margin-bottom:10px;">📋 FREQUÊNCIA (últimas aulas)</div>
+          ${freqGrid}
+        </div>
+
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#64748B;margin-bottom:10px;">🗓️ PLANEJAMENTO DA PRÓXIMA AULA</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">${insightsHtml}</div>
+          <textarea id="${planId}" onchange="_planSave('${tKey}',this.value)" oninput="_planSave('${tKey}',this.value)"
+            style="width:100%;min-height:80px;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;resize:vertical;color:#0F172A;"
+            placeholder="Suas notas para a próxima aula da ${tCfg.nome}...">${escapeHtml(planNota)}</textarea>
+        </div>
+
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#64748B;margin-bottom:8px;">📊 RELATÓRIO WHATSAPP</div>
+          <button onclick="_gerarRelatorioWpp('${tKey}')" style="background:${tCfg.cor};color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:800;cursor:pointer;">📋 Gerar relatório</button>
+          <textarea id="${wppId}" readonly style="display:none;width:100%;min-height:120px;margin-top:8px;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:12px;font-family:monospace;resize:vertical;color:#0F172A;background:#F8FAFC;"></textarea>
+        </div>
+
       </div>
-      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
-        <div style="font-size:20px;margin-bottom:6px;">📋</div>
-        <div style="font-weight:800;font-size:14px;">Frequência</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Use <strong>Google Forms</strong> de check-in ou lista em papel digitalizada.</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:14px;">
-        <div style="font-size:20px;margin-bottom:6px;">📊</div>
-        <div style="font-weight:800;font-size:14px;">Relatórios</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Tire um print desta tela para enviar no WhatsApp dos responsáveis.</div>
-      </div>
-    </div>
-  </div>`;
+    </div>`;
+  }
 
   alunosEl.innerHTML = focoHtml + barras + turmasHtml + ferramentasHtml;
+}
+
+function _gerarRelatorioWpp(turmaKey) {
+  const tCfg = TURMAS_CONFIG[turmaKey];
+  const alunos = getAlunos();
+  const turmasData = getTurmas();
+  const ids = turmasData[turmaKey]?.ids || [];
+  const membros = alunos.filter(a => ids.includes(a.id));
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  let txt = `📊 *Relatório ${tCfg.nome} — ${hoje}*\n📅 ${tCfg.dias}\n\n`;
+  membros.forEach(a => {
+    const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso?.[m]?.quizDone).length;
+    const pts = calcularPontos(a);
+    const fq = _freqAluno(a.id);
+    const wpm = a.progresso?.digitacaoMelhorWpm || 0;
+    txt += `👤 *${a.nome}* (Nível ${a.nivel})\n`;
+    txt += `   📚 Módulos: ${modulosFeitos}/${ORDEM_MODULOS.length}  ⭐ ${pts} pts\n`;
+    txt += `   ⌨️ Digitação: ${wpm ? wpm+' WPM' : 'não iniciou'}\n`;
+    txt += `   📋 Freq: ${fq.pct !== null ? fq.presentes+'/'+fq.total+' aulas ('+fq.pct+'%)' : 'sem dados'}\n\n`;
+  });
+  const planNota = _planGet(turmaKey);
+  if (planNota) txt += `📌 *Próxima aula:*\n${planNota}\n`;
+  const el = document.getElementById('wppOut_' + turmaKey);
+  if (el) { el.style.display = 'block'; el.value = txt; el.select(); }
+  try { document.execCommand('copy'); } catch(e) {}
 }
 
 function ppStatCard(valor, label, cor){
