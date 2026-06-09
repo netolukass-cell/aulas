@@ -498,6 +498,7 @@ function atualizarStatsDigitacao() {
   }
 
   const palavras = digState.pos / 5; // padrão WPM = 5 chars = 1 palavra
+  const tempoSeg = digState.inicio ? (Date.now() - digState.inicio) / 1000 : 0;
   const wpm = tempoSeg > 0 ? Math.round((palavras / tempoSeg) * 60) : 0;
   document.getElementById('digWpm').textContent = wpm;
 
