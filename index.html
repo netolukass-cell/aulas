@@ -6770,91 +6770,18 @@ function renderTecladoLicao() {
 
 function renderGuiaMao() {
   const licao = licaoState.licao;
-  // determine which fingers are needed
-  const dedosNecessarios = new Set();
-  (licao.teclas || []).forEach(k => {
-    if (FINGER_MAP[k] !== undefined) dedosNecessarios.add(FINGER_MAP[k]);
-  });
-
-  // finger names
-  const nomes = ['', 'Mínimo', 'Anelar', 'Médio', 'Indicador', 'Polegar'];
+  const nomes = ['', '🤙 Mindinho', '💜 Anelar', '💚 Médio', '💛 Indicador', '🔴 Polegar'];
   const cores = ['', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 
-  function buildHand(side) {
-    // Friendly top-down hand (palm-down, back view). Designed as a RIGHT hand,
-    // mirrored for the left. fingers: 1 pinky, 2 ring, 3 middle, 4 index, 5 thumb.
-    // viewBox 0 0 200 250 — wrist bottom-center, fingers pointing up.
-    const fingers = {
-      4: { cx: 72,  tipY: 44, w: 26 },  // index
-      3: { cx: 104, tipY: 30, w: 27 },  // middle (longest)
-      2: { cx: 135, tipY: 46, w: 26 },  // ring
-      1: { cx: 162, tipY: 66, w: 23 },  // pinky (shortest)
-    };
-    const knuckleY = 118;
-    const thumb = { bx: 58, by: 150, tx: 22, ty: 188, w: 30 };
+  const dedos = new Set();
+  (licao.teclas || []).forEach(k => { if (FINGER_MAP[k] !== undefined) dedos.add(FINGER_MAP[k]); });
 
-    let shapes = '';
-    const labels = []; // {x,y,txt} in right-hand coords (drawn upright)
-
-    // palm — rounded shape fanning from wrist up to the knuckle line
-    const palm = `M58,150 C48,128 50,118 60,114 L168,114 C178,118 180,130 174,150
-      C172,196 150,224 116,228 C86,231 64,214 58,184 Z`;
-    shapes += `<path d="${palm}" fill="#334155" stroke="#475569" stroke-width="2"/>`;
-
-    // four fingers as rounded capsules from the knuckle line to the tip
-    for (const f of [4,3,2,1]) {
-      const fg = fingers[f];
-      const on = dedosNecessarios.has(f);
-      const col = on ? cores[f] : '#334155';
-      const edge = on ? col : '#475569';
-      const half = fg.w/2, top = fg.tipY, bot = knuckleY + 6;
-      shapes += `<rect x="${fg.cx-half}" y="${top}" width="${fg.w}" height="${bot-top}" rx="${half}" fill="${col}" stroke="${edge}" stroke-width="2"/>`;
-      shapes += `<line x1="${fg.cx-half+4}" y1="${knuckleY}" x2="${fg.cx+half-4}" y2="${knuckleY}" stroke="#1E293B" stroke-width="2" stroke-linecap="round" opacity="0.5"/>`;
-      if (on) labels.push({ x: fg.cx, y: top+19, txt: f });
-    }
-    // thumb — angled capsule off the side
-    {
-      const on = dedosNecessarios.has(5);
-      const col = on ? cores[5] : '#334155';
-      const edge = on ? col : '#475569';
-      const dx = thumb.tx-thumb.bx, dy = thumb.ty-thumb.by;
-      const len = Math.hypot(dx,dy), ang = Math.atan2(dy,dx)*180/Math.PI;
-      shapes += `<g transform="translate(${thumb.bx},${thumb.by}) rotate(${ang})"><rect x="0" y="${-thumb.w/2}" width="${len}" height="${thumb.w}" rx="${thumb.w/2}" fill="${col}" stroke="${edge}" stroke-width="2"/></g>`;
-      if (on) labels.push({ x: (thumb.bx+thumb.tx)/2, y: (thumb.by+thumb.ty)/2+5, txt: 5 });
-    }
-
-    const flip = side === 'left';
-    const shapeTransform = flip ? 'scale(-1,1) translate(-200,0)' : '';
-    const labelSvg = labels.map(l => {
-      const x = flip ? 200 - l.x : l.x;
-      return `<text x="${x}" y="${l.y}" text-anchor="middle" fill="#0F172A" font-size="15" font-weight="900" font-family="system-ui">${l.txt}</text>`;
-    }).join('');
-
-    return `<svg width="132" height="165" viewBox="0 0 200 250" style="filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5))">
-      <g transform="${shapeTransform}">${shapes}</g>
-      ${labelSvg}
-    </svg>`;
-  }
-
-  const legendItems = Array.from(dedosNecessarios).map(f =>
-    `<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:${cores[f]};font-weight:700;background:${cores[f]}18;border:1px solid ${cores[f]}40;border-radius:20px;padding:3px 8px;">
-      <span style="width:8px;height:8px;border-radius:50%;background:${cores[f]};display:inline-block;box-shadow:0 0 6px ${cores[f]};"></span>${nomes[f]}
-    </span>`
+  const chips = Array.from(dedos).map(f =>
+    `<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:${cores[f]};background:${cores[f]}18;border:2px solid ${cores[f]}60;border-radius:20px;padding:5px 14px;">${nomes[f]}</span>`
   ).join('');
 
-  const html = `<div style="background:#0F172A;border-radius:16px;padding:16px;margin:12px 0 8px;box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-    <div style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center;">Posição dos Dedos</div>
-    <div style="display:flex;gap:16px;align-items:flex-end;justify-content:center;">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;">Esquerda</span>
-        ${buildHand('left')}
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;">Direita</span>
-        ${buildHand('right')}
-      </div>
-    </div>
-    <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">${legendItems}</div>
+  const html = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0 4px;">
+    <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">Dedos:</span>${chips}
   </div>`;
 
   let guia = document.getElementById('licaoGuiaMao');
@@ -6878,6 +6805,7 @@ function listenerLicao(e) {
   if (licaoState.finalizado) return;
   if (e.key === 'Escape') { voltarParaFileiras(); return; }
   if (e.key.length !== 1) return;
+  e.preventDefault();
 
   if (licaoState.pos === 0 && !licaoState.inicio) {
     licaoState.inicio = Date.now();
