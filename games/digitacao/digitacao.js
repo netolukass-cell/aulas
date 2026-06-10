@@ -348,9 +348,9 @@ function iniciarDigitacao(modo, progressao) {
       digState.dif = _digDifRecomendada(_digGetRanking().mmr);
     }
   }
-  // sorteia texto da dificuldade
+  // sorteia texto da dificuldade (remove \n para evitar bug do Enter)
   const textos = TEXTOS_DIGITACAO[digState.dif];
-  digState.texto = textos[Math.floor(Math.random() * textos.length)];
+  digState.texto = textos[Math.floor(Math.random() * textos.length)].replace(/\n+/g, ' ').replace(/  +/g, ' ').trim();
   digState.pos = 0;
   digState.erros = 0;
   digState.caracteresErrados = 0;
