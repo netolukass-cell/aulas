@@ -105,20 +105,20 @@ const TEXTOS_DIGITACAO = {
   ],
   dificil: [
     "Um sistema operacional como Windows ou Linux gerencia todo o hardware e permite que aplicativos como Word, Photoshop e navegadores funcionem corretamente em harmonia.",
-    "A diferenca essencial entre hardware e software esta na sua natureza: o primeiro e fisico e tangivel, enquanto o segundo e abstrato, formado por instrucoes que controlam o comportamento da maquina.",
-    "Phishing e uma tecnica de engenharia social na qual criminosos enviam emails falsos imitando empresas conhecidas para roubar senhas, dados bancarios e informacoes pessoais dos usuarios.",
-    "A memoria RAM e volatil e funciona como espaco temporario para o processador acessar dados em uso. Quando o computador desliga, todo conteudo e perdido instantaneamente.",
-    "Navegadores modernos como Chrome, Edge e Firefox utilizam motores de renderizacao distintos para interpretar HTML, CSS e JavaScript, afetando velocidade e compatibilidade com padroes web.",
-    "O protocolo TCP/IP e a base de comunicacao da internet moderna.\nO TCP garante que os pacotes de dados cheguem corretamente ao destino, retransmitindo os que forem perdidos.\nO IP define o esquema de enderecamento unico de cada dispositivo conectado a rede global.",
-    "Criptografia assimetrica utiliza um par de chaves matematicamente relacionadas: publica e privada.\nA chave publica criptografa os dados e pode ser compartilhada com qualquer pessoa livremente.\nSomente a chave privada correspondente e capaz de descriptografar a mensagem com seguranca.",
-    "Algoritmos de machine learning se dividem em categorias com abordagens bem distintas.\nNo aprendizado supervisionado, o modelo treina com dados rotulados e aprende a reconhecer padroes.\nNo nao-supervisionado, ele descobre estruturas ocultas nos dados sem qualquer rotulo pre-definido.",
-    "A virtualizacao permite executar multiplos sistemas operacionais em uma unica maquina fisica.\nO hypervisor gerencia os recursos de hardware e isola cada maquina virtual das demais.\nAmazon EC2 e Google Compute Engine sao servicos de nuvem baseados diretamente nesse principio.",
-    "Estruturas de dados como listas, filas, pilhas e arvores sao fundamentais em programacao.\nCada estrutura possui caracteristicas proprias de insercao, remocao e busca de elementos.\nEscolher a estrutura adequada e decisivo para garantir a eficiencia do algoritmo desenvolvido.",
-    "O conceito de DevOps integra desenvolvimento e operacoes de software em um ciclo continuo de melhoria.\nPraticas como integracao continua e entrega continua automatizam os processos de teste e deploy.\nIsso reduz erros humanos, acelera as entregas e aumenta a confiabilidade geral dos sistemas.",
-    "Redes neurais convolucionais sao especializadas no processamento e analise de imagens digitais.\nCamadas de convolucao extraem caracteristicas hierarquicas como bordas, formas e texturas.\nElas formam a base dos sistemas modernos de reconhecimento facial e classificacao de objetos.",
-    "O conceito de complexidade de algoritmos e medido pela notacao Big-O, que descreve crescimento.\nUm algoritmo O(n) tem tempo linear, enquanto O(n²) cresce quadraticamente com a entrada.\nEscolher o algoritmo certo pode fazer a diferenca entre segundos e horas de processamento.",
-    "Containers Docker encapsulam aplicacoes com todas as suas dependencias em um ambiente isolado.\nIsso garante que o software rode de forma identica em qualquer maquina ou servidor de producao.\nOrquestradores como Kubernetes gerenciam dezenas ou centenas de containers em clusters distribuidos.",
-    "O modelo OSI divide a comunicacao em redes em sete camadas com funcoes bem definidas.\nCada camada interage apenas com a camada imediatamente acima ou abaixo na hierarquia.\nEssa abstracao facilita o desenvolvimento de protocolos e a resolucao de problemas em redes complexas."
+    "A diferença essencial entre hardware e software está na sua natureza: o primeiro é físico e tangível, enquanto o segundo é abstrato, formado por instruções que controlam o comportamento da máquina.",
+    "Phishing é uma técnica de engenharia social na qual criminosos enviam e-mails falsos imitando empresas conhecidas para roubar senhas, dados bancários e informações pessoais dos usuários.",
+    "A memória RAM é volátil e funciona como espaço temporário para o processador acessar dados em uso. Quando o computador desliga, todo conteúdo é perdido instantaneamente.",
+    "Navegadores modernos como Chrome, Edge e Firefox utilizam motores de renderização distintos para interpretar HTML, CSS e JavaScript, afetando velocidade e compatibilidade com padrões web.",
+    "O protocolo TCP/IP é a base de comunicação da internet moderna. O TCP garante que os pacotes de dados cheguem corretamente ao destino, retransmitindo os que forem perdidos. O IP define o esquema de endereçamento único de cada dispositivo conectado à rede global.",
+    "Criptografia assimétrica utiliza um par de chaves matematicamente relacionadas: pública e privada. A chave pública criptografa os dados e pode ser compartilhada com qualquer pessoa livremente. Somente a chave privada correspondente é capaz de descriptografar a mensagem com segurança.",
+    "Algoritmos de machine learning se dividem em categorias com abordagens bem distintas. No aprendizado supervisionado, o modelo treina com dados rotulados e aprende a reconhecer padrões. No não-supervisionado, ele descobre estruturas ocultas nos dados sem qualquer rótulo pré-definido.",
+    "A virtualização permite executar múltiplos sistemas operacionais em uma única máquina física. O hypervisor gerencia os recursos de hardware e isola cada máquina virtual das demais. Amazon EC2 e Google Compute Engine são serviços de nuvem baseados diretamente nesse princípio.",
+    "Estruturas de dados como listas, filas, pilhas e árvores são fundamentais em programação. Cada estrutura possui características próprias de inserção, remoção e busca de elementos. Escolher a estrutura adequada é decisivo para garantir a eficiência do algoritmo desenvolvido.",
+    "O conceito de DevOps integra desenvolvimento e operações de software em um ciclo contínuo de melhoria. Práticas como integração contínua e entrega contínua automatizam os processos de teste e deploy. Isso reduz erros humanos, acelera as entregas e aumenta a confiabilidade geral dos sistemas.",
+    "Redes neurais convolucionais são especializadas no processamento e análise de imagens digitais. Camadas de convolução extraem características hierárquicas como bordas, formas e texturas. Elas formam a base dos sistemas modernos de reconhecimento facial e classificação de objetos.",
+    "O conceito de complexidade de algoritmos é medido pela notação Big-O, que descreve crescimento. Um algoritmo O(n) tem tempo linear, enquanto O(n²) cresce quadraticamente com a entrada. Escolher o algoritmo certo pode fazer a diferença entre segundos e horas de processamento.",
+    "Containers Docker encapsulam aplicações com todas as suas dependências em um ambiente isolado. Isso garante que o software rode de forma idêntica em qualquer máquina ou servidor de produção. Orquestradores como Kubernetes gerenciam dezenas ou centenas de containers em clusters distribuídos.",
+    "O modelo OSI divide a comunicação em redes em sete camadas com funções bem definidas. Cada camada interage apenas com a camada imediatamente acima ou abaixo na hierarquia. Essa abstração facilita o desenvolvimento de protocolos e a resolução de problemas em redes complexas."
   ]
 };
 
@@ -190,6 +190,30 @@ function _digDifPermitida(dif, mmr) {
   return DIF_ORDER.indexOf(dif) >= DIF_ORDER.indexOf(_digDifMinima(mmr));
 }
 
+const DICAS_DIGITACAO = {
+  facil: [
+    "🖐️ Mantenha os dedos na posição inicial: F e J têm relevos para guiar sem olhar.",
+    "👀 Tente não olhar para o teclado — treine os dedos a memorizarem as posições.",
+    "🎯 Precisão primeiro, velocidade depois. É melhor ir devagar e não errar.",
+    "⌨️ Use os dois polegares no Espaço, nunca apenas um.",
+    "🔁 Repita os textos que você errou — a repetição é o segredo da memorização.",
+  ],
+  medio: [
+    "🏃 Tente manter um ritmo constante — velocidade irregular gera mais erros.",
+    "🧠 Leia 2-3 palavras à frente do que está digitando para antecipar movimentos.",
+    "🔙 Use o Backspace com sabedoria: corrigir reduz o impacto do erro em 2/3.",
+    "💪 Treino diário de 10 minutos supera maratonas semanais de 1 hora.",
+    "📍 Indicador esquerdo no F, indicador direito no J — nunca mude essa base.",
+  ],
+  dificil: [
+    "🔡 Nível Difícil exige acentos corretos: á, ã, é, ç fazem diferença na pontuação.",
+    "⇧ Preste atenção nas maiúsculas — cada letra no começo de frase conta.",
+    "🎮 Jogadores de nível Difícil leem o texto por blocos, não letra por letra.",
+    "🧘 Respire fundo entre erros — pânico aumenta a taxa de erro exponencialmente.",
+    "⚡ Para chegar a 60+ WPM, os dedos precisam se mover SEM que o cérebro pense em cada tecla.",
+  ],
+};
+
 // resultado: 1=vitória, 0.5=empate, 0=derrota
 function _digResultadoMMR(wpm, precisao, completou) {
   const velNorm = Math.min(1, wpm / 40); // 40 WPM = velocidade máxima
@@ -199,13 +223,13 @@ function _digResultadoMMR(wpm, precisao, completou) {
   return 0;
 }
 
-function _digAtualizarMMR(wpm, precisao, completou, dif) {
+function _digAtualizarMMR(wpm, precisao, completou, dif, forcarDerrota) {
   const ranking = _digGetRanking();
   const difMMR  = DIF_MMR[dif] || 1000;
   const K       = ranking.partidas < 10 ? 32 : ranking.partidas < 30 ? 24 : 16;
 
   const chance    = 1 / (1 + Math.pow(10, (difMMR - ranking.mmr) / 400));
-  const resultado = _digResultadoMMR(wpm, precisao, completou);
+  const resultado = forcarDerrota ? 0 : _digResultadoMMR(wpm, precisao, completou);
   const deltaMmr  = Math.round(K * (resultado - chance));
   const novoMMR   = Math.max(200, ranking.mmr + deltaMmr);
 
@@ -500,9 +524,10 @@ function listenerDigitacao(e) {
   const digitado = isEnter ? '\n' : e.key;
   flashTecla(digitado);
 
+  const exato = digState.dif === 'dificil';
   const certo = esperado === '\n'
     ? isEnter
-    : normalizarChar(esperado) === normalizarChar(digitado);
+    : normalizarChar(esperado, exato) === normalizarChar(digitado, exato);
 
   const spans = document.querySelectorAll('#digTextoBox .dig-char');
   if (certo) {
@@ -557,7 +582,7 @@ function falharDigitacao() {
     const wpmAtual = tSeg > 0 ? Math.round((digState.pos / 5 / tSeg) * 60) : 0;
     const total = digState.pos + digState.caracteresErrados;
     const precAtual = total > 0 ? Math.round(digState.pos / total * 100) : 0;
-    const mmrRes = _digAtualizarMMR(wpmAtual, precAtual, false, digState.dif);
+    const mmrRes = _digAtualizarMMR(wpmAtual, precAtual, false, digState.dif, true);
     const { novoRanking, lpDelta } = mmrRes;
     const tier = RANK_TIERS[novoRanking.tier] || RANK_TIERS[0];
     const lpSinal = lpDelta >= 0 ? `+${lpDelta}` : `${lpDelta}`;
@@ -575,22 +600,32 @@ function falharDigitacao() {
       </div>`;
   }
 
+  const dicasDif = DICAS_DIGITACAO[digState.dif] || DICAS_DIGITACAO.facil;
+  const dicasEscolhidas = dicasDif.sort(() => Math.random() - 0.5).slice(0, 2);
+  const dicasHtml = `
+    <div style="margin-top:14px;background:rgba(0,0,0,0.2);border-radius:14px;padding:14px 16px;text-align:left;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;opacity:0.7;margin-bottom:10px;text-align:center;">💡 DICAS PARA MELHORAR</div>
+      ${dicasEscolhidas.map(d => `<div style="font-size:13px;line-height:1.6;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.1);border-radius:8px;border-left:3px solid rgba(255,255,255,0.4);">${d}</div>`).join('')}
+    </div>`;
+
   document.getElementById('digResultado').innerHTML = `
     <div class="dig-completo" style="background:linear-gradient(135deg,#EF4444,#B91C1C);">
       <div style="font-size:64px; margin-bottom:8px;">⏱️</div>
       <div style="font-size:28px; font-weight:800; margin-bottom:8px;">Tempo esgotado!</div>
       <div style="font-size:16px; opacity:0.9; margin-bottom:8px;">
-        Chegou em ${Math.round(digState.pos/digState.texto.length*100)}% do texto · ${digState.erros} erros
+        Chegou em ${Math.round(digState.pos/digState.texto.length*100)}% do texto · ${Math.round(digState.erros * 10) / 10} erros
       </div>
       ${mmrPenalidadeHtml}
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+      ${dicasHtml}
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
         <button class="btn ghost" style="background:white;color:#EF4444;" onclick="iniciarDigitacao('ranqueado')">↻ Tentar de novo</button>
         <button class="btn" style="background:white;color:var(--ink);" onclick="abrirMenuDigitacao()">Menu</button>
       </div>
     </div>`;
 }
 
-function normalizarChar(c) {
+function normalizarChar(c, exato) {
+  if (exato) return c; // modo dif\u00edcil: compara\u00e7\u00e3o exata (mai\u00fasculas e acentos obrigat\u00f3rios)
   return c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
