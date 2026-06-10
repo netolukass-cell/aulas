@@ -1245,93 +1245,21 @@ function renderTecladoLicao() {
 
 function renderGuiaMao() {
   const licao = licaoState.licao;
-  // determine which fingers are needed
-  const dedosNecessarios = new Set();
-  (licao.teclas || []).forEach(k => {
-    if (FINGER_MAP[k] !== undefined) dedosNecessarios.add(FINGER_MAP[k]);
-  });
-
-  // finger names
-  const nomes = ['', 'Mínimo', 'Anelar', 'Médio', 'Indicador', 'Polegar'];
+  const nomes = ['', '🤙 Mindinho', '💜 Anelar', '💚 Médio', '💛 Indicador', '🔴 Polegar'];
   const cores = ['', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 
-  function buildHand(side) {
-    // Detailed hand SVG with dark theme, 120x160 viewBox
-    // fingers: 1(pinky), 2(ring), 3(middle), 4(index), 5(thumb)
-    let fingerPos, fingerLen;
-    if (side === 'left') {
-      // [tipX, tipY, baseX, baseY] for each finger
-      fingerPos = {
-        1:{tx:88,ty:75, bx:84,by:108}, // pinky
-        2:{tx:70,ty:55, bx:68,by:105}, // ring
-        3:{tx:52,ty:46, bx:52,by:105}, // middle
-        4:{tx:34,ty:53, bx:36,by:105}, // index
-        5:{tx:14,ty:108,bx:28,by:120}  // thumb
-      };
-    } else {
-      fingerPos = {
-        1:{tx:32,ty:75, bx:36,by:108}, // pinky
-        2:{tx:50,ty:55, bx:52,by:105}, // ring
-        3:{tx:68,ty:46, bx:68,by:105}, // middle
-        4:{tx:86,ty:53, bx:84,by:105}, // index
-        5:{tx:106,ty:108,bx:92,by:120} // thumb
-      };
-    }
-    const palmPath = side === 'left'
-      ? `M22,128 Q18,100 22,85 L36,112 L52,112 L68,112 L84,112 L90,90 Q95,105 92,128 Q78,136 52,136 Q28,136 22,128 Z`
-      : `M98,128 Q102,100 98,85 L84,112 L68,112 L52,112 L36,112 L30,90 Q25,105 28,128 Q42,136 68,136 Q92,136 98,128 Z`;
-    // finger rectangles with rounded caps
-    let fingers = '';
-    for (let f = 1; f <= 5; f++) {
-      const p = fingerPos[f];
-      const ativo = dedosNecessarios.has(f);
-      const col = ativo ? cores[f] : '#334155';
-      const glowId = `glow-${side}-${f}`;
-      // draw finger as rounded rect from base to tip
-      const dx = p.tx - p.bx, dy = p.ty - p.by;
-      const len = Math.sqrt(dx*dx+dy*dy);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      const w = f === 5 ? 14 : 12; // thumb wider
-      fingers += `<g transform="translate(${p.bx},${p.by}) rotate(${angle})">
-        <rect x="${-w/2}" y="${-len}" width="${w}" height="${len}" rx="${w/2}" fill="${col}" opacity="${ativo ? 1 : 0.6}"/>
-        ${ativo ? `<rect x="${-w/2}" y="${-len}" width="${w}" height="${len}" rx="${w/2}" fill="url(#${glowId})" opacity="0.5"/>` : ''}
-      </g>`;
-      if (ativo) {
-        fingers = `<defs><radialGradient id="${glowId}"><stop offset="0%" stop-color="${col}" stop-opacity="0.8"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient></defs>` + fingers;
-      }
-      // fingertip circle with number
-      fingers += `<circle cx="${p.tx}" cy="${p.ty}" r="${f===5?9:8}" fill="${col}" opacity="${ativo?1:0.7}"/>`;
-      if (ativo) {
-        fingers += `<circle cx="${p.tx}" cy="${p.ty}" r="${f===5?13:12}" fill="none" stroke="${col}" stroke-width="2" opacity="0.4" class="guia-pulse-${side}-${f}"/>`;
-      }
-      fingers += `<text x="${p.tx}" y="${p.ty+4}" text-anchor="middle" fill="white" font-size="8" font-weight="800" font-family="sans-serif">${f}</text>`;
-    }
-    const svgW = side === 'left' ? 120 : 120;
-    return `<svg width="${svgW}" height="145" viewBox="0 0 120 145" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))">
-      <path d="${palmPath}" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
-      ${fingers}
-    </svg>`;
-  }
+  const dedos = new Set();
+  (licao.teclas || []).forEach(k => { if (FINGER_MAP[k] !== undefined) dedos.add(FINGER_MAP[k]); });
 
-  const legendItems = Array.from(dedosNecessarios).map(f =>
-    `<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:${cores[f]};font-weight:700;background:${cores[f]}18;border:1px solid ${cores[f]}40;border-radius:20px;padding:3px 8px;">
-      <span style="width:8px;height:8px;border-radius:50%;background:${cores[f]};display:inline-block;box-shadow:0 0 6px ${cores[f]};"></span>${nomes[f]}
+  const chips = Array.from(dedos).map(f =>
+    `<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:${cores[f]};background:${cores[f]}18;border:2px solid ${cores[f]}60;border-radius:20px;padding:5px 14px;">
+      ${nomes[f]}
     </span>`
   ).join('');
 
-  const html = `<div style="background:#0F172A;border-radius:16px;padding:16px;margin:12px 0 8px;box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-    <div style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center;">Posição dos Dedos</div>
-    <div style="display:flex;gap:16px;align-items:flex-end;justify-content:center;">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;">Esquerda</span>
-        ${buildHand('left')}
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <span style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;">Direita</span>
-        ${buildHand('right')}
-      </div>
-    </div>
-    <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">${legendItems}</div>
+  const html = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0 4px;">
+    <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">Dedos:</span>
+    ${chips}
   </div>`;
 
   let guia = document.getElementById('licaoGuiaMao');
@@ -1355,6 +1283,7 @@ function listenerLicao(e) {
   if (licaoState.finalizado) return;
   if (e.key === 'Escape') { voltarParaFileiras(); return; }
   if (e.key.length !== 1) return;
+  e.preventDefault();
 
   if (licaoState.pos === 0 && !licaoState.inicio) {
     licaoState.inicio = Date.now();
