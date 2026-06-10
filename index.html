@@ -3197,10 +3197,107 @@ const MODULOS = {
         { tipo:"vf", q:"ISPs medem velocidade em bits, não bytes.", correct:true }
       ]
     }
+  },
+
+  redes: {
+    titulo: "Redes e Internet",
+    icone: "🌐",
+    desc: "Como os computadores se comunicam e como a internet realmente funciona.",
+    paginas: {
+      1: [
+        { tipo: "hero", emoji: "🌐", titulo: "O que é a Internet?",
+          texto: "A internet é tipo uma teia gigante que conecta <strong data-n='1'>todos os computadores do mundo</strong>. 🕸️ Imagina que cada casa, escola e empresa tem um fio invisível que vai até todo mundo ao mesmo tempo. Quando você assiste YouTube, manda mensagem no WhatsApp ou joga online — você tá usando essa teia enorme!" },
+        { tipo: "items", items: [{icone:"📡",label:"Roteador"},{icone:"💻",label:"Seu PC"},{icone:"📱",label:"Celular"},{icone:"🖥️",label:"Servidor"}],
+          titulo: "Como chega a internet na sua casa?",
+          texto: "A internet vem de fora pela rua (pelo fio da operadora ou sinal de antena) até o <strong data-n='1'>roteador</strong> da sua casa. O roteador é igual a um chefe de correio — ele recebe tudo e distribui pra cada aparelho! Computador, celular, TV… o roteador manda o sinal pra todo mundo ao mesmo tempo." },
+        { tipo: "items", items: [{icone:"📶",label:"Wi-Fi"},{icone:"🔌",label:"Cabo"}],
+          titulo: "Wi-Fi e Cabo",
+          texto: "Dá pra conectar na internet de dois jeitos: pelo <strong data-n='1'>Wi-Fi</strong> (sem fio, pelo ar, igual rádio) ou pelo <strong data-n='1'>cabo</strong> (fio direto no PC). O Wi-Fi é mais prático porque você anda pela casa. O cabo é mais estável e rápido porque o sinal não cai. Em casa a gente usa Wi-Fi quase sempre!" },
+        { tipo: "hero", emoji: "📬", titulo: "Como a internet envia mensagens?",
+          texto: "Quando você manda uma mensagem, ela vira um <strong data-n='1'>pacotinho de dados</strong>. Igual uma carta! Esse pacote viaja por vários computadores até chegar no destino. Se for pra alguém do Brasil, chega em milissegundos. Se for pra outro país, vai mais longe mas ainda é rapidíssimo — igual a velocidade da luz!" },
+        { tipo: "callout", emoji: "🚦", titulo: "Internet tem endereço!",
+          texto: "Cada aparelho que entra na internet ganha um <strong data-n='1'>endereço IP</strong> — é igual o endereço da sua casa, mas em números. Assim a internet sabe pra onde mandar cada coisa. Quando você acessa o Google, seu IP vai junto pra dizer 'sou eu que tô pedindo'.",
+          callout: "💡 IP = endereço do computador na internet. Todo mundo tem um diferente." }
+      ],
+      2: [
+        { tipo: "hero", emoji: "🌐", titulo: "Redes de computadores",
+          texto: "Uma <strong data-n='2'>rede</strong> é um conjunto de dispositivos conectados para compartilhar dados. A rede de casa (com Wi-Fi) é uma <strong data-n='2'>LAN</strong> (Local Area Network — rede local). A internet é a maior rede do mundo, chamada de <strong data-n='2'>WAN</strong> (Wide Area Network — rede de longa distância). Praticamente todo serviço digital depende de alguma rede funcionando." },
+        { tipo: "items", items: [{icone:"📡",label:"Roteador"},{icone:"🔄",label:"Switch"},{icone:"📶",label:"Access Point"},{icone:"🔌",label:"Modem"}],
+          titulo: "Equipamentos de rede",
+          texto: "O <strong data-n='2'>modem</strong> recebe o sinal da operadora e converte para digital. O <strong data-n='2'>roteador</strong> distribui a conexão entre os dispositivos e gerencia o tráfego. O <strong data-n='2'>switch</strong> conecta vários computadores por cabo dentro de uma rede local. O <strong data-n='2'>access point</strong> expande o sinal Wi-Fi para locais mais distantes do roteador." },
+        { tipo: "items", items: [{icone:"🏠",label:"IP Privado"},{icone:"🌍",label:"IP Público"},{icone:"🔢",label:"IPv4"},{icone:"🆕",label:"IPv6"}],
+          titulo: "Endereço IP",
+          texto: "Cada dispositivo na rede tem um <strong data-n='2'>endereço IP</strong>. O <strong data-n='2'>IP privado</strong> (ex: 192.168.1.5) identifica o aparelho dentro da sua rede doméstica. O <strong data-n='2'>IP público</strong> é o que a internet vê — é o endereço da sua casa para o mundo. O <strong data-n='2'>IPv4</strong> usa 4 blocos de números (acabando). O <strong data-n='2'>IPv6</strong> é o novo formato, com muito mais endereços disponíveis." },
+        { tipo: "hero", emoji: "📶", titulo: "Wi-Fi: como funciona?",
+          texto: "O Wi-Fi transmite dados pelo ar usando <strong data-n='2'>ondas de rádio</strong> em frequências específicas: 2.4 GHz (alcança mais longe, penetra paredes) e 5 GHz (muito mais rápido, mas alcance menor). O roteador transmite e os dispositivos recebem. Quanto mais paredes e distância, mais fraco fica o sinal. Por isso o roteador no centro da casa funciona melhor!" },
+        { tipo: "items", items: [{icone:"⬇️",label:"Download"},{icone:"⬆️",label:"Upload"},{icone:"⏱️",label:"Latência"},{icone:"📊",label:"Banda"}],
+          titulo: "Velocidade de internet",
+          texto: "<strong data-n='2'>Download</strong> é a velocidade de receber dados (assistir vídeo, baixar arquivos). <strong data-n='2'>Upload</strong> é a velocidade de enviar dados (mandar foto, fazer videochamada). A <strong data-n='2'>latência</strong> (ping) é o tempo de resposta — importante pra jogos online. A <strong data-n='2'>banda</strong> é a capacidade total — quanto mais dispositivos na rede, mais divide a velocidade." },
+        { tipo: "callout", emoji: "🔐", titulo: "Rede segura vs aberta",
+          texto: "Redes Wi-Fi com <strong data-n='2'>senha e criptografia</strong> (WPA2 ou WPA3) são seguras — seus dados viajam codificados. Redes abertas (sem senha, em shoppings e aeroportos) são perigosas: qualquer pessoa na mesma rede pode interceptar seus dados. Nunca acesse banco ou faça login em Wi-Fi público sem VPN!",
+          callout: "💡 Wi-Fi com cadeado = criptografado. Wi-Fi sem cadeado = todo mundo vê seus dados." }
+      ],
+      3: [
+        { tipo: "hero", emoji: "⚙️", titulo: "Protocolo TCP/IP",
+          texto: "A internet funciona graças ao protocolo <strong data-n='3'>TCP/IP</strong> — um conjunto de regras que todos os dispositivos seguem. O <strong data-n='3'>IP</strong> (Internet Protocol) define o endereçamento e o roteamento dos pacotes. O <strong data-n='3'>TCP</strong> (Transmission Control Protocol) garante a entrega confiável: confirma recebimento, reordena pacotes fora de ordem e retransmite os perdidos. É a base de toda comunicação na internet." },
+        { tipo: "items", items: [{icone:"📦",label:"Pacotes"},{icone:"🔀",label:"Roteamento"},{icone:"✅",label:"ACK"},{icone:"🔁",label:"Retransmissão"}],
+          titulo: "Como os dados viajam",
+          texto: "Dados são quebrados em <strong data-n='3'>pacotes</strong> antes de serem enviados. Cada pacote viaja de forma independente pela rede, podendo tomar caminhos diferentes. Os <strong data-n='3'>roteadores</strong> na rede decidem o melhor caminho para cada pacote em tempo real (roteamento dinâmico). No destino, o TCP reagrupa os pacotes na ordem correta. Um arquivo de 10MB pode ser dividido em milhares de pacotes." },
+        { tipo: "items", items: [{icone:"🌍",label:"DNS"},{icone:"🔒",label:"HTTPS"},{icone:"📡",label:"HTTP"},{icone:"📧",label:"SMTP"}],
+          titulo: "Protocolos de aplicação",
+          texto: "Sobre o TCP/IP rodam protocolos específicos: <strong data-n='3'>DNS</strong> traduz nomes (google.com) em IPs numéricos — é a agenda de contatos da internet. <strong data-n='3'>HTTP/HTTPS</strong> é o protocolo de transferência de páginas web (o S é de seguro, com criptografia TLS). <strong data-n='3'>SMTP/IMAP</strong> gerenciam e-mails. <strong data-n='3'>FTP</strong> transfere arquivos. Cada protocolo tem uma porta padrão (HTTP=80, HTTPS=443, SMTP=25)." },
+        { tipo: "hero", emoji: "🔢", titulo: "IPv4 e IPv6",
+          texto: "O <strong data-n='3'>IPv4</strong> usa endereços de 32 bits (ex: 192.168.0.1), suportando cerca de 4,3 bilhões de endereços únicos — número insuficiente para o mundo atual. O <strong data-n='3'>IPv6</strong> usa 128 bits (ex: 2001:db8::1), com 340 undecilhões de endereços. A transição está em andamento. O <strong data-n='3'>NAT</strong> (Network Address Translation) permite que vários dispositivos compartilhem um único IP público, adiantando o esgotamento do IPv4." },
+        { tipo: "items", items: [{icone:"📊",label:"Largura de Banda"},{icone:"⏱️",label:"Latência"},{icone:"📉",label:"Jitter"},{icone:"❌",label:"Packet Loss"}],
+          titulo: "Qualidade de rede",
+          texto: "Quatro métricas definem a qualidade de uma conexão: <strong data-n='3'>Largura de banda</strong> (Mbps — capacidade total), <strong data-n='3'>Latência</strong> (ms — tempo de ida e volta de um pacote, o 'ping'), <strong data-n='3'>Jitter</strong> (variação na latência — ruim para videoconferências), <strong data-n='3'>Packet Loss</strong> (% de pacotes perdidos — qualquer valor acima de 1% degrada chamadas e jogos). Ferramentas como speedtest.net medem todas essas métricas." },
+        { tipo: "callout", emoji: "🔐", titulo: "Segurança em redes",
+          texto: "Principais ameaças em redes: <strong data-n='3'>Man-in-the-Middle</strong> (interceptação de tráfego não criptografado), <strong data-n='3'>ARP Spoofing</strong> (falsificação de identidade na rede local), <strong data-n='3'>DDoS</strong> (sobrecarga de um servidor com tráfego massivo), <strong data-n='3'>Port Scanning</strong> (varredura de portas abertas). Proteções: firewall, VPN (túnel criptografado), WPA3, HTTPS em todos os sites.",
+          callout: "💡 Criptografia end-to-end garante que nem o provedor de internet consegue ler seus dados." }
+      ]
+    },
+    quiz: {
+      1: [
+        { tipo: "mc", q: "O que é a internet?", options: ["Uma teia que conecta computadores do mundo inteiro", "Um programa instalado no PC", "A memória do computador"], correct: 0 },
+        { tipo: "mc", q: "O que faz o roteador (Wi-Fi) em casa?", options: ["Imprime documentos", "Distribui a internet para os aparelhos da casa", "Guarda os arquivos do computador"], correct: 1 },
+        { tipo: "mc", q: "Wi-Fi é uma conexão…", options: ["Com fio, pelo cabo", "Sem fio, pelo ar", "Por Bluetooth"], correct: 1 },
+        { tipo: "vf", q: "O cabo de rede é mais estável que o Wi-Fi.", correct: true },
+        { tipo: "vf", q: "Quando você manda uma mensagem, ela vai pelos fios igual uma carta.", correct: true },
+        { tipo: "mc", q: "O endereço IP serve pra…", options: ["Identificar o computador na internet", "Aumentar a velocidade da internet", "Instalar jogos no PC"], correct: 0 },
+        { tipo: "mc", q: "O sinal de Wi-Fi fica mais fraco quando…", options: ["Tem muitas paredes entre o aparelho e o roteador", "O PC está ligado há muito tempo", "A memória RAM está cheia"], correct: 0 },
+        { tipo: "vf", q: "Celular e computador podem usar a mesma rede Wi-Fi ao mesmo tempo.", correct: true },
+        { tipo: "mc", q: "Download é…", options: ["Enviar fotos pra alguém", "Receber dados da internet pro seu aparelho", "Conectar o cabo de rede"], correct: 1 },
+        { tipo: "mc", q: "Uma rede Wi-Fi SEM SENHA é…", options: ["Mais segura pois todos entram", "Perigosa — qualquer um pode entrar e ver seus dados", "Mais rápida que Wi-Fi com senha"], correct: 1 }
+      ],
+      2: [
+        { tipo: "mc", q: "O que é uma LAN?", options: ["Rede local (casa, escola, empresa)", "A internet inteira", "Um tipo de cabo de rede"], correct: 0 },
+        { tipo: "mc", q: "Qual equipamento converte o sinal da operadora para digital?", options: ["Roteador", "Switch", "Modem"], correct: 2 },
+        { tipo: "mc", q: "Qual frequência de Wi-Fi tem MAIOR alcance?", options: ["5 GHz", "2.4 GHz", "As duas têm o mesmo alcance"], correct: 1 },
+        { tipo: "mc", q: "O que é latência (ping)?", options: ["A velocidade de download", "O tempo de resposta entre enviar e receber dados", "A quantidade de dispositivos na rede"], correct: 1 },
+        { tipo: "vf", q: "O IP público é o mesmo para todos os dispositivos dentro da sua casa.", correct: true },
+        { tipo: "vf", q: "IPv6 foi criado para resolver a falta de endereços IPv4.", correct: true },
+        { tipo: "mc", q: "Download rápido mas upload lento prejudica principalmente qual atividade?", options: ["Assistir Netflix", "Fazer videochamada ou transmitir ao vivo", "Navegar em sites"], correct: 1 },
+        { tipo: "mc", q: "WPA3 é um padrão de…", options: ["Velocidade de Wi-Fi", "Segurança (criptografia) do Wi-Fi", "Tipo de cabo de rede"], correct: 1 },
+        { tipo: "vf", q: "Em uma rede Wi-Fi aberta (sem senha), seus dados trafegam sem criptografia.", correct: true },
+        { tipo: "mc", q: "O que faz um Switch de rede?", options: ["Conecta a rede local à internet", "Conecta vários computadores por cabo dentro de uma rede local", "Amplifica o sinal Wi-Fi"], correct: 1 }
+      ],
+      3: [
+        { tipo: "mc", q: "Qual função o protocolo TCP desempenha na comunicação?", options: ["Define o endereço IP de cada dispositivo", "Garante a entrega confiável dos pacotes, retransmitindo os perdidos", "Traduz domínios em endereços IP"], correct: 1 },
+        { tipo: "mc", q: "O DNS resolve qual problema?", options: ["Traduz nomes de domínio (google.com) em endereços IP numéricos", "Criptografa o tráfego entre cliente e servidor", "Distribui largura de banda igualmente entre dispositivos"], correct: 0 },
+        { tipo: "mc", q: "Qual porta padrão o protocolo HTTPS utiliza?", options: ["80", "443", "25"], correct: 1 },
+        { tipo: "vf", q: "O NAT permite que vários dispositivos compartilhem um único IP público.", correct: true },
+        { tipo: "mc", q: "Jitter elevado impacta principalmente qual tipo de aplicação?", options: ["Download de arquivos grandes", "Navegação em sites estáticos", "Videoconferências e jogos online em tempo real"], correct: 2 },
+        { tipo: "mc", q: "Um ataque DDoS tem como objetivo…", options: ["Roubar senhas por força bruta", "Sobrecarregar um servidor com tráfego massivo até derrubar o serviço", "Interceptar pacotes em redes não criptografadas"], correct: 1 },
+        { tipo: "vf", q: "O IPv6 usa endereços de 128 bits, permitindo muito mais endereços únicos que o IPv4.", correct: true },
+        { tipo: "mc", q: "O que diferencia HTTP de HTTPS?", options: ["HTTPS usa porta 80 e HTTP usa porta 443", "HTTPS inclui criptografia TLS para proteger os dados em trânsito", "HTTP é mais rápido pois não tem autenticação"], correct: 1 },
+        { tipo: "mc", q: "Em roteamento dinâmico, o que decide o caminho dos pacotes?", options: ["O usuário escolhe manualmente a rota", "Os roteadores calculam automaticamente o melhor caminho em tempo real", "O ISP define uma rota fixa para cada cliente"], correct: 1 },
+        { tipo: "vf", q: "Packet loss acima de 1% pode causar travamentos visíveis em chamadas de vídeo.", correct: true }
+      ]
+    }
   }
 };
 
-const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria"];
+const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria", "redes"];
 
 // =============================================================
 // TURMAS — configuração e persistência (additive, chave separada)
@@ -3365,6 +3462,7 @@ const MISSOES_CATALOGO = {
   'quiz-nav':      { titulo:'Quiz de Navegadores',      tipo:'quiz',      emoji:'🌐', desc:'Chrome, Edge, Firefox — você entende?',          pontos:25,  acao:"iniciarQuizModulo('navegadores')",   completionTrigger:'quiz_finish' },
   'quiz-av':       { titulo:'Quiz de Antivírus',        tipo:'quiz',      emoji:'🛡️', desc:'Segurança digital e proteção do PC.',            pontos:25,  acao:"iniciarQuizModulo('antivirus')",     completionTrigger:'quiz_finish' },
   'quiz-mem':      { titulo:'Quiz de Memória',          tipo:'quiz',      emoji:'🧠', desc:'RAM, HD, SSD — armazenamento do PC.',            pontos:25,  acao:"iniciarQuizModulo('memoria')",       completionTrigger:'quiz_finish' },
+  'quiz-redes':    { titulo:'Quiz de Redes',            tipo:'quiz',      emoji:'🌐', desc:'Internet, Wi-Fi, IP — como tudo se conecta.',   pontos:25,  acao:"iniciarQuizModulo('redes')",         completionTrigger:'quiz_finish' },
   'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return' },
   'jogo-rede':     { titulo:'Reparar a Rede',           tipo:'jogo',      emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30,  acao:"iniciarRedePuzzle()",                completionTrigger:'activity_return' },
   'jogo-atirador': { titulo:'Atirador de Palavras',     tipo:'jogo',      emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!',       pontos:20,  acao:"iniciarAtiradorPalavras()",          completionTrigger:'activity_return' },
@@ -3382,10 +3480,10 @@ const PLANO_SEMANA = {
   T3:       ['dig-treino',   'quiz-mem', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
   SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
   // T3 — planos individuais por nível (aula de hoje 17/06)
-  // Nível 1: João (8a) e Guilherme (10a) — sem ranqueado, foco em quizzes + digitação + atirador
-  'T3_n1':  ['quiz-mem', 'quiz-hw', 'dig-fileiras', 'jogo-atirador', 'quiz-sw', 'dig-treino', 'quiz-nav'],
-  // Nível 3: Luiz (15a) — quizzes completos + ranqueado + atirador
-  'T3_n3':  ['quiz-mem', 'quiz-av', 'quiz-nav', 'quiz-sw', 'quiz-hw', 'dig-rank', 'jogo-atirador'],
+  // Nível 1: João (8a) e Guilherme (10a) — sem ranqueado, foco em redes + quizzes + atirador
+  'T3_n1':  ['quiz-redes', 'quiz-hw', 'dig-fileiras', 'jogo-atirador', 'quiz-sw', 'dig-treino', 'quiz-nav'],
+  // Nível 3: Luiz (15a) — redes + quizzes completos + ranqueado + atirador
+  'T3_n3':  ['quiz-redes', 'quiz-av', 'quiz-nav', 'quiz-sw', 'quiz-hw', 'dig-rank', 'jogo-atirador'],
 };
 
 // Plano adaptado por nível — sobrescreve o plano da turma quando o nível não bate.
