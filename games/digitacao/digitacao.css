@@ -357,6 +357,29 @@ html, body {
   }
   .dig-licao-header.superior { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
   .dig-licao-header.inferior { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+  /* Caixas de caracteres da lição */
+  .char-boxes {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    padding: 24px; font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 22px; line-height: 1.4;
+    background: var(--bg-2); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--line);
+    min-height: 120px;
+  }
+  .char-box {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 38px; border-radius: 6px;
+    color: var(--ink-light); transition: background 0.08s, color 0.08s;
+    border: 2px solid transparent;
+  }
+  .char-box.space-char { width: 18px; }
+  .char-box.done { color: #065F46; background: #D1FAE5; }
+  .char-box.wrong { color: white; background: var(--red); }
+  .char-box.current {
+    background: var(--ink); color: white; border-color: var(--ink);
+    animation: piscar 0.9s infinite;
+  }
+
   .dig-licao-header-num {
     width: 56px; height: 56px; background: rgba(255,255,255,0.2);
     border-radius: var(--radius-sm); display: flex; align-items: center;
