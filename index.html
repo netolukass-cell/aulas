@@ -6034,6 +6034,19 @@ function iniciarTimerHacker() {
   if (_hackerTimer) clearTimeout(_hackerTimer);
   if (!alunoAtivo) return;
   _hackerTimer = setTimeout(dispararHackerAlert, HACKER_INTERVALO);
+  // poll a cada 15s para detectar ATK manual do professor
+  if (window._atkPollId) clearInterval(window._atkPollId);
+  window._atkPollId = setInterval(() => {
+    if (!alunoAtivo) return clearInterval(window._atkPollId);
+    const fresh = getAlunos().find(a => a.id === alunoAtivo.id);
+    if (fresh?.progresso?.atkHackerManual) {
+      fresh.progresso.atkHackerManual = false;
+      salvarAluno(fresh);
+      alunoAtivo = fresh;
+      clearTimeout(_hackerTimer);
+      dispararHackerAlert();
+    }
+  }, 15000);
 }
 function pararTimerHacker() {
   if (_hackerTimer) { clearTimeout(_hackerTimer); _hackerTimer = null; }
@@ -7901,6 +7914,23 @@ async function painelRefresh() {
   renderPainelPro();
 }
 
+function ativarAtkHacker(alunoId) {
+  const alunos = getAlunos();
+  const aluno = alunos.find(a => a.id === alunoId);
+  if (!aluno) return;
+  aluno.progresso = aluno.progresso || {};
+  aluno.progresso.atkHackerManual = true;
+  salvarAluno(aluno);
+  // feedback visual no botão
+  const btn = document.getElementById('atk_' + alunoId);
+  if (btn) {
+    btn.textContent = '✅ Enviado!';
+    btn.style.background = '#10B981';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = '⚡ ATK'; btn.style.background = '#EF4444'; btn.disabled = false; }, 3000);
+  }
+}
+
 // ---- Helpers do diagnóstico ----
 const PP_NOME_MOD = { hardware:'Hardware', software:'Word', navegadores:'Navegadores', antivirus:'Antivírus', memoria:'Memória' };
 const PP_WPM_BAIXO = 15;
@@ -8159,23 +8189,28 @@ function renderPainelPro() {
       ? plano.map(p=>`<span style="background:${statusBg};color:${p.cor};border:1px solid ${p.cor}55;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">${p.materia}</span>`).join("")
       : `<span style="color:#10B981;font-size:12px;font-weight:700;">Tudo em dia! 🎉</span>`;
     return `
-    <button type="button" onclick="abrirFichaAluno('${a.id}')" style="all:unset;cursor:pointer;display:block;width:100%;background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:5px solid ${statusCor};transition:transform .12s ease, box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.05)'">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <img src="${avatarUrl(a)}" style="width:46px;height:46px;border-radius:50%;background:#EEF2FF;flex-shrink:0;" onerror="this.style.visibility='hidden'">
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-weight:800;font-size:16px;color:#0F172A;">${escapeHtml(a.nome)}</span>
-            <span style="font-size:11px;color:#64748B;">${a.idade} anos · Nível ${nivel}</span>
-            ${inativo?`<span style="font-size:10px;font-weight:800;color:#B45309;background:#FEF3C7;border-radius:20px;padding:2px 8px;">${dias}d sem atividade</span>`:''}
+    <div style="position:relative;margin-bottom:10px;">
+      <button type="button" onclick="abrirFichaAluno('${a.id}')" style="all:unset;cursor:pointer;display:block;width:100%;background:#fff;border-radius:16px;padding:14px 16px;padding-right:90px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:5px solid ${statusCor};transition:transform .12s ease, box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.05)'">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <img src="${avatarUrl(a)}" style="width:46px;height:46px;border-radius:50%;background:#EEF2FF;flex-shrink:0;" onerror="this.style.visibility='hidden'">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-weight:800;font-size:16px;color:#0F172A;">${escapeHtml(a.nome)}</span>
+              <span style="font-size:11px;color:#64748B;">${a.idade} anos · Nível ${nivel}</span>
+              ${inativo?`<span style="font-size:10px;font-weight:800;color:#B45309;background:#FEF3C7;border-radius:20px;padding:2px 8px;">${dias}d sem atividade</span>`:''}
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;">${dots} <span style="margin-left:6px;display:inline-flex;gap:6px;flex-wrap:wrap;">${planoTxt}</span></div>
           </div>
-          <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;">${dots} <span style="margin-left:6px;display:inline-flex;gap:6px;flex-wrap:wrap;">${planoTxt}</span></div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.5px;color:${statusCor};background:${statusBg};border-radius:20px;padding:3px 10px;">${statusTxt}</div>
+            <div style="font-size:12px;color:#94A3B8;margin-top:6px;">Ver ficha →</div>
+          </div>
         </div>
-        <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:10px;font-weight:800;letter-spacing:.5px;color:${statusCor};background:${statusBg};border-radius:20px;padding:3px 10px;">${statusTxt}</div>
-          <div style="font-size:12px;color:#94A3B8;margin-top:6px;">Ver ficha →</div>
-        </div>
-      </div>
-    </button>`;
+      </button>
+      <button id="atk_${a.id}" onclick="event.stopPropagation();ativarAtkHacker('${a.id}')"
+        style="position:absolute;top:50%;right:14px;transform:translateY(-50%);background:#EF4444;color:white;border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:900;cursor:pointer;letter-spacing:.5px;box-shadow:0 2px 8px rgba(239,68,68,.4);transition:all .15s;"
+        title="Dispara pergunta surpresa na tela do aluno">⚡ ATK</button>
+    </div>`;
   }
 
   // ---- LISTA DE ALUNOS AGRUPADA POR TURMA ----
