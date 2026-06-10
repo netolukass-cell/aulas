@@ -3377,25 +3377,25 @@ const MISSOES_CATALOGO = {
 // Cada array lista missaoIds em ordem de execução.
 // Turma é o plano base. Nível adapta o conteúdo dentro da turma.
 const PLANO_SEMANA = {
-  T1:       ['dig-fileiras', 'quiz-hw',  'quiz-sw',  'jogo-memoria',  'dig-rank'],
-  T2:       ['dig-fileiras', 'quiz-nav', 'quiz-av',  'jogo-rede',     'dig-rank'],
+  T1:       ['dig-fileiras', 'quiz-hw',  'quiz-sw',  'jogo-atirador', 'dig-rank'],
+  T2:       ['dig-fileiras', 'quiz-nav', 'quiz-av',  'jogo-atirador', 'dig-rank'],
   T3:       ['dig-treino',   'quiz-mem', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
-  SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-memoria', 'dig-rank'],
+  SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
   // T3 — planos individuais por nível (aula de hoje 17/06)
-  // Nível 1: João (8a) e Guilherme (10a) — sem ranqueado, foco em aprender jogando
-  'T3_n1':  ['quiz-mem', 'quiz-hw', 'dig-fileiras', 'jogo-memoria', 'jogo-runner', 'jogo-atirador', 'quiz-sw', 'dig-treino'],
-  // Nível 3: Luiz (15a) — cobertura total: todos os quizzes + jogos difíceis + ranqueado
-  'T3_n3':  ['quiz-mem', 'quiz-av', 'quiz-nav', 'quiz-sw', 'dig-rank', 'jogo-ram', 'jogo-rede', 'jogo-atirador'],
+  // Nível 1: João (8a) e Guilherme (10a) — sem ranqueado, foco em quizzes + digitação + atirador
+  'T3_n1':  ['quiz-mem', 'quiz-hw', 'dig-fileiras', 'jogo-atirador', 'quiz-sw', 'dig-treino', 'quiz-nav'],
+  // Nível 3: Luiz (15a) — quizzes completos + ranqueado + atirador
+  'T3_n3':  ['quiz-mem', 'quiz-av', 'quiz-nav', 'quiz-sw', 'quiz-hw', 'dig-rank', 'jogo-atirador'],
 };
 
 // Plano adaptado por nível — sobrescreve o plano da turma quando o nível não bate.
 // Nível 1 (≤10 anos): foco em fileiras e quizzes básicos, sem cronômetro.
 // Nível 2 (11-13): mix — alguns quizzes e jogo com ranqueado opcional.
-// Nível 3 (14+): desafios avançados, cronômetro, puzzles de rede.
+// Nível 3 (14+): desafios avançados, cronômetro, quizzes completos.
 const PLANO_NIVEL = {
-  1: ['dig-fileiras', 'quiz-hw',  'jogo-memoria',  'dig-treino'],
-  2: ['dig-treino',   'quiz-sw',  'quiz-nav',       'jogo-rede',     'dig-rank'],
-  3: ['dig-rank',     'quiz-av',  'quiz-mem',       'jogo-atirador', 'jogo-ram'],
+  1: ['dig-fileiras', 'quiz-hw',  'jogo-atirador', 'dig-treino'],
+  2: ['dig-treino',   'quiz-sw',  'quiz-nav',       'jogo-atirador', 'dig-rank'],
+  3: ['dig-rank',     'quiz-av',  'quiz-mem',       'jogo-atirador', 'quiz-nav'],
 };
 
 // Retorna o plano certo para o aluno: turma+nível específico > nível > turma
