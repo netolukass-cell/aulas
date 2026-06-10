@@ -1035,11 +1035,14 @@
   .word-prompt-title { font-weight: 800; font-size: 12px; letter-spacing: 1.5px; margin-bottom: 4px; color: #92400E; }
   .word-prompt-text { color: #78350F; font-size: 14px; line-height: 1.5; }
   #wordEditor {
-    background: white; min-height: 480px; padding: 36px 44px;
-    border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    font-size: 16px; line-height: 1.6; outline: none;
-    font-family: Georgia, "Times New Roman", serif; border: 1px solid var(--line);
+    background: white; min-height: 600px; padding: 3cm 2cm 2cm 3cm;
+    border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    font-size: 12pt; line-height: 1.5; outline: none;
+    font-family: 'Times New Roman', Times, serif; border: 1px solid var(--line);
+    color: #111;
   }
+  #wordEditor img { max-width: 100%; height: auto; display: block; margin: 12px auto; border-radius: 4px; cursor: pointer; }
+  #wordEditor .abnt-citacao { margin: 16px 40px; font-size: 10pt; line-height: 1.2; color: #374151; }
 
   /* ===== RAM Arcade Game ===== */
   @keyframes ramPulse { from { opacity:1; } to { opacity:0.5; } }
@@ -2016,7 +2019,6 @@
   <div class="container">
     <div class="top-bar">
       <button class="btn ghost" onclick="goHome()">← Trocar de aluno</button>
-      <button class="btn ghost" onclick="confirmarExcluir()" style="color: var(--red); border-color: var(--red);">Excluir meu cadastro</button>
     </div>
 
     <div class="dash-header">
@@ -2595,42 +2597,78 @@
   <div class="container">
     <div class="top-bar">
       <button class="btn ghost" onclick="goDashboard()">← Voltar</button>
-      <div class="top-bar-title">📝 Texto</div>
+      <div class="top-bar-title">📝 Editor de Texto</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn ghost" onclick="wordABNT()" style="height:36px;padding:0 12px;font-size:13px;">📐 ABNT</button>
+        <button class="btn success" onclick="saveWord()" style="height:36px;padding:0 14px;">💾 Salvar</button>
+      </div>
     </div>
     <div class="word-prompt">
-      <div class="word-prompt-title">SUGESTÃO</div>
+      <div class="word-prompt-title">✏️ TEMA DO TRABALHO</div>
       <div class="word-prompt-text" id="wordPromptText"></div>
     </div>
     <div class="word-toolbar">
-      <button class="word-btn" onclick="formatDoc('bold')"><b>N</b></button>
-      <button class="word-btn" onclick="formatDoc('italic')"><i>I</i></button>
-      <button class="word-btn" onclick="formatDoc('underline')"><u>S</u></button>
+      <!-- Formatação básica -->
+      <button class="word-btn" title="Negrito" onclick="formatDoc('bold')"><b>N</b></button>
+      <button class="word-btn" title="Itálico" onclick="formatDoc('italic')"><i>I</i></button>
+      <button class="word-btn" title="Sublinhado" onclick="formatDoc('underline')"><u>S</u></button>
       <div class="word-divider"></div>
+      <!-- Estilos de parágrafo -->
+      <select class="word-select" style="width:130px;" onchange="wordEstilo(this.value);this.value=''">
+        <option value="">Estilo...</option>
+        <option value="titulo">Título (capa)</option>
+        <option value="h1">Seção 1</option>
+        <option value="h2">Seção 2</option>
+        <option value="normal">Parágrafo normal</option>
+        <option value="citacao">Citação longa</option>
+      </select>
+      <div class="word-divider"></div>
+      <!-- Fonte e tamanho -->
       <select class="word-select" onchange="changeFontSize(this.value)">
-        <option value="">Tamanho</option>
-        <option value="2">Pequeno</option>
-        <option value="3" selected>Normal</option>
-        <option value="5">Grande</option>
-        <option value="6">Muito grande</option>
+        <option value="">Tam.</option>
+        <option value="2">10pt</option>
+        <option value="3" selected>12pt</option>
+        <option value="4">14pt</option>
+        <option value="5">18pt</option>
+        <option value="6">24pt</option>
       </select>
       <select class="word-select" onchange="changeFontFamily(this.value)">
-        <option value="">Fonte</option>
-        <option value="Georgia, serif" selected>Georgia</option>
+        <option value="'Times New Roman', serif" selected>Times New Roman</option>
         <option value="Arial, sans-serif">Arial</option>
+        <option value="Georgia, serif">Georgia</option>
         <option value="'Courier New', monospace">Courier</option>
-        <option value="'Comic Sans MS', cursive">Comic Sans</option>
       </select>
-      <input type="color" class="word-color-input" oninput="formatDoc('foreColor', this.value)" value="#000000">
+      <input type="color" class="word-color-input" title="Cor do texto" oninput="formatDoc('foreColor', this.value)" value="#000000">
       <div class="word-divider"></div>
-      <button class="word-btn" onclick="formatDoc('justifyLeft')">⫷</button>
-      <button class="word-btn" onclick="formatDoc('justifyCenter')">≡</button>
-      <button class="word-btn" onclick="formatDoc('justifyRight')">⫸</button>
+      <!-- Alinhamento -->
+      <button class="word-btn" title="Esquerda" onclick="formatDoc('justifyLeft')">⫷</button>
+      <button class="word-btn" title="Centralizar" onclick="formatDoc('justifyCenter')">≡</button>
+      <button class="word-btn" title="Direita" onclick="formatDoc('justifyRight')">⫸</button>
+      <button class="word-btn" title="Justificado" onclick="formatDoc('justifyFull')" style="font-size:12px;">▤</button>
       <div class="word-divider"></div>
-      <button class="word-btn" onclick="formatDoc('insertUnorderedList')">•</button>
+      <!-- Espaçamento -->
+      <select class="word-select" style="width:100px;" onchange="wordEspacamento(this.value)">
+        <option value="">Espaçam.</option>
+        <option value="1">Simples</option>
+        <option value="1.5" selected>1,5 linhas</option>
+        <option value="2">Duplo</option>
+      </select>
       <div class="word-divider"></div>
-      <button class="btn success" onclick="saveWord()" style="height: 38px; padding: 0 14px;">💾 Salvar</button>
+      <!-- Lista e imagem -->
+      <button class="word-btn" title="Lista" onclick="formatDoc('insertUnorderedList')">•</button>
+      <button class="word-btn" title="Lista numerada" onclick="formatDoc('insertOrderedList')" style="font-size:12px;">1.</button>
+      <button class="word-btn" title="Inserir imagem" onclick="document.getElementById('wordImgInput').click()" style="font-size:16px;">🖼️</button>
+      <input type="file" id="wordImgInput" accept="image/*" style="display:none" onchange="wordInsertImage(this)">
     </div>
-    <div id="wordEditor" contenteditable="true"></div>
+    <!-- Régua ABNT visual -->
+    <div id="wordAbntInfo" style="display:none;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 16px;margin-bottom:12px;font-size:12px;color:#1E40AF;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+      <span>📐 <strong>ABNT ativo</strong></span>
+      <span>Fonte: Times New Roman 12pt</span>
+      <span>Espaçamento: 1,5</span>
+      <span>Margens: 3cm esq/sup · 2cm dir/inf</span>
+      <span>Parágrafos: 1,25cm recuo</span>
+    </div>
+    <div id="wordEditor" contenteditable="true" spellcheck="true"></div>
   </div>
 </div>
 
@@ -5407,20 +5445,139 @@ function saveCanvas() {
 // =============================================================
 function goWord() {
   document.getElementById("wordPromptText").textContent = WORD_PROMPTS[alunoAtivo.nivel];
+  // Aplica padrão ABNT ao abrir
+  const ed = document.getElementById("wordEditor");
+  ed.style.fontFamily = "'Times New Roman', Times, serif";
+  ed.style.fontSize = "12pt";
+  ed.style.lineHeight = "1.5";
+  if (!ed.innerHTML.trim() || ed.innerHTML === '<br>') ed.innerHTML = '';
   showScreen("word");
 }
-function formatDoc(cmd, val = null) { document.execCommand(cmd, false, val); document.getElementById("wordEditor").focus(); }
+
+function formatDoc(cmd, val = null) {
+  document.execCommand(cmd, false, val);
+  document.getElementById("wordEditor").focus();
+}
 function changeFontSize(s) { if (s) { document.execCommand("fontSize", false, s); document.getElementById("wordEditor").focus(); } }
 function changeFontFamily(f) { if (f) { document.execCommand("fontName", false, f); document.getElementById("wordEditor").focus(); } }
+
+function wordEspacamento(val) {
+  if (!val) return;
+  document.getElementById("wordEditor").style.lineHeight = val;
+  document.getElementById("wordEditor").focus();
+}
+
+function wordEstilo(estilo) {
+  if (!estilo) return;
+  const ed = document.getElementById("wordEditor");
+  ed.focus();
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  let node;
+  if (estilo === 'titulo') {
+    document.execCommand('fontSize', false, '6');
+    document.execCommand('bold', false, null);
+    document.execCommand('justifyCenter', false, null);
+    document.execCommand('fontName', false, "'Times New Roman', serif");
+  } else if (estilo === 'h1') {
+    document.execCommand('fontSize', false, '5');
+    document.execCommand('bold', false, null);
+    document.execCommand('justifyLeft', false, null);
+  } else if (estilo === 'h2') {
+    document.execCommand('fontSize', false, '4');
+    document.execCommand('bold', false, null);
+    document.execCommand('justifyLeft', false, null);
+  } else if (estilo === 'normal') {
+    document.execCommand('fontSize', false, '3');
+    document.execCommand('removeFormat', false, null);
+    document.execCommand('justifyFull', false, null);
+    document.execCommand('fontName', false, "'Times New Roman', serif");
+  } else if (estilo === 'citacao') {
+    // Envolve em div com classe citação
+    const texto = sel.toString() || 'Cole a citação aqui.';
+    const div = document.createElement('div');
+    div.className = 'abnt-citacao';
+    div.textContent = texto;
+    range.deleteContents();
+    range.insertNode(div);
+  }
+  ed.focus();
+}
+
+function wordABNT() {
+  const ed = document.getElementById("wordEditor");
+  // Aplica configurações ABNT ao editor
+  ed.style.fontFamily = "'Times New Roman', Times, serif";
+  ed.style.fontSize = "12pt";
+  ed.style.lineHeight = "1.5";
+  ed.style.padding = "3cm 2cm 2cm 3cm";
+  // Seleciona tudo e aplica fonte padrão
+  ed.focus();
+  document.execCommand('selectAll', false, null);
+  document.execCommand('fontName', false, "'Times New Roman', serif");
+  document.execCommand('fontSize', false, '3');
+  document.execCommand('justifyFull', false, null);
+  // Deseleciona
+  window.getSelection()?.removeAllRanges();
+  const info = document.getElementById('wordAbntInfo');
+  if (info) { info.style.display = 'flex'; setTimeout(() => info.style.display = 'none', 4000); }
+  ed.focus();
+}
+
+function wordInsertImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const ed = document.getElementById("wordEditor");
+    ed.focus();
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    img.style.maxWidth = '100%';
+    img.style.display = 'block';
+    img.style.margin = '12px auto';
+    // legenda clicável
+    img.title = 'Clique para adicionar legenda';
+    img.onclick = function() {
+      const leg = prompt('Legenda da imagem (ABNT: Figura X — Descrição, Fonte: ...):');
+      if (leg) {
+        const p = document.createElement('p');
+        p.style.cssText = 'text-align:center;font-size:10pt;color:#374151;margin-top:4px;';
+        p.textContent = leg;
+        img.insertAdjacentElement('afterend', p);
+      }
+    };
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      range.collapse(false);
+      range.insertNode(img);
+    } else {
+      ed.appendChild(img);
+    }
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
 function saveWord() {
   const content = document.getElementById("wordEditor").innerHTML;
   if (!content.trim() || content === "<br>") { alert("Escreva algo antes de salvar."); return; }
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Texto - ${escapeHtml(alunoAtivo.nome)}</title>
-    <style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.6;}</style>
+  const nome = alunoAtivo ? alunoAtivo.nome : 'aluno';
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Trabalho — ${escapeHtml(nome)}</title>
+    <style>
+      @page { margin: 3cm 2cm 2cm 3cm; }
+      body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5;
+             max-width: 21cm; margin: 3cm auto 2cm; padding: 0 2cm; color: #111; }
+      img { max-width: 100%; display: block; margin: 12px auto; }
+      .abnt-citacao { margin: 16px 40px; font-size: 10pt; line-height: 1.2; color: #374151; }
+    </style>
     </head><body>${content}</body></html>`;
   const blob = new Blob([html], { type: "text/html" });
   const link = document.createElement("a");
-  link.download = `texto_${alunoAtivo.nome.replace(/\s/g,'_')}_${Date.now()}.html`;
+  link.download = `trabalho_${nome.replace(/\s/g,'_')}_${Date.now()}.html`;
   link.href = URL.createObjectURL(blob);
   link.click();
 }
