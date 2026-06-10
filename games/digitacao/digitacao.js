@@ -348,9 +348,9 @@ function iniciarDigitacao(modo, progressao) {
       digState.dif = _digDifRecomendada(_digGetRanking().mmr);
     }
   }
-  // sorteia texto da dificuldade (remove \n para evitar bug do Enter)
+  // sorteia texto da dificuldade
   const textos = TEXTOS_DIGITACAO[digState.dif];
-  digState.texto = textos[Math.floor(Math.random() * textos.length)].replace(/\n+/g, ' ').replace(/  +/g, ' ').trim();
+  digState.texto = textos[Math.floor(Math.random() * textos.length)];
   digState.pos = 0;
   digState.erros = 0;
   digState.caracteresErrados = 0;
@@ -473,7 +473,10 @@ function listenerDigitacao(e) {
   const digitado = isEnter ? '\n' : e.key;
   flashTecla(digitado);
 
-  const certo = normalizarChar(esperado) === normalizarChar(digitado);
+  // comparação explícita para \n — evita problemas com normalizarChar em certos browsers
+  const certo = esperado === '\n'
+    ? isEnter
+    : normalizarChar(esperado) === normalizarChar(digitado);
 
   if (certo) {
     // marca como done
