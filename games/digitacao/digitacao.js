@@ -615,7 +615,7 @@ function atualizarStatsDigitacao() {
   const precisao = totalDigitado > 0 ? Math.round((digState.pos / totalDigitado) * 100) : 100;
   document.getElementById('digPrecisao').textContent = precisao + '%';
 
-  document.getElementById('digErros').textContent = digState.erros;
+  document.getElementById('digErros').textContent = Math.round(digState.erros * 10) / 10;
   document.getElementById('digProgresso').textContent =
     Math.round((digState.pos / digState.texto.length) * 100) + '%';
 }
