@@ -127,6 +127,7 @@ html, body {
   .dig-char { color: var(--ink-light); transition: background 0.08s, color 0.08s; border-radius: 3px; }
   .dig-char.done { color: #065F46; background: #D1FAE5; }
   .dig-char.wrong { color: white; background: var(--red); }
+  .dig-char.wrong-pass { color: #B91C1C; background: #FEE2E2; }
   .dig-char.current {
     background: var(--ink); color: white;
     animation: piscar 0.9s infinite;

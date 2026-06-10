@@ -350,7 +350,9 @@ function iniciarDigitacao(modo, progressao) {
   }
   // sorteia texto da dificuldade
   const textos = TEXTOS_DIGITACAO[digState.dif];
-  digState.texto = textos[Math.floor(Math.random() * textos.length)];
+  const textoRaw = textos[Math.floor(Math.random() * textos.length)];
+  // remove quebras de linha — digitação contínua sem precisar pressionar Enter
+  digState.texto = textoRaw.replace(/\n+/g, ' ').replace(/  +/g, ' ').trim();
   digState.pos = 0;
   digState.erros = 0;
   digState.caracteresErrados = 0;
@@ -451,8 +453,33 @@ function flashTecla(char) {
 function listenerDigitacao(e) {
   if (digState.finalizado) return;
   if (e.key === 'Escape') { sairDigitacao(); return; }
+
+  // Backspace: volta para corrigir caractere errado
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    if (digState.pos > 0) {
+      const spans = document.querySelectorAll('#digTextoBox .dig-char');
+      spans[digState.pos]?.classList.remove('current');
+      digState.pos--;
+      const span = spans[digState.pos];
+      if (span && span.classList.contains('wrong-pass')) {
+        span.classList.remove('wrong-pass', 'done');
+        span.classList.add('current');
+        // reduz peso do erro em 2/3 ao voltar para corrigir
+        digState.erros = Math.max(0, digState.erros - 0.667);
+        digState.caracteresErrados = Math.max(0, digState.caracteresErrados - 1);
+      } else {
+        span?.classList.remove('done');
+        span?.classList.add('current');
+      }
+      destacarProximaTecla();
+      atualizarStatsDigitacao();
+    }
+    return;
+  }
+
   const isEnter = e.key === 'Enter';
-  if (e.key.length !== 1 && !isEnter) return; // ignora setas, F1, etc
+  if (e.key.length !== 1 && !isEnter) return;
   e.preventDefault();
 
   if (digState.pos === 0 && !digState.inicio && digState.modo === 'ranqueado') {
@@ -473,16 +500,14 @@ function listenerDigitacao(e) {
   const digitado = isEnter ? '\n' : e.key;
   flashTecla(digitado);
 
-  // comparação explícita para \n — evita problemas com normalizarChar em certos browsers
   const certo = esperado === '\n'
     ? isEnter
     : normalizarChar(esperado) === normalizarChar(digitado);
 
+  const spans = document.querySelectorAll('#digTextoBox .dig-char');
   if (certo) {
-    // marca como done
-    const spans = document.querySelectorAll('#digTextoBox .dig-char');
     if (spans[digState.pos]) {
-      spans[digState.pos].classList.remove('current', 'wrong');
+      spans[digState.pos].classList.remove('current', 'wrong', 'wrong-pass');
       spans[digState.pos].classList.add('done');
     }
     digState.pos++;
@@ -495,13 +520,22 @@ function listenerDigitacao(e) {
     }
     destacarProximaTecla();
   } else {
+    // avança com letra errada marcada em vermelho persistente
     digState.erros++;
     digState.caracteresErrados++;
-    const spans = document.querySelectorAll('#digTextoBox .dig-char');
     if (spans[digState.pos]) {
-      spans[digState.pos].classList.add('wrong');
-      setTimeout(() => spans[digState.pos]?.classList.remove('wrong'), 400);
+      spans[digState.pos].classList.remove('current', 'wrong');
+      spans[digState.pos].classList.add('wrong-pass');
     }
+    digState.pos++;
+    if (digState.pos >= digState.texto.length) {
+      finalizarDigitacao();
+      return;
+    }
+    if (spans[digState.pos]) {
+      spans[digState.pos].classList.add('current');
+    }
+    destacarProximaTecla();
     if (digState.modo === 'ranqueado' && digState.inicio) {
       digState.tempoRestante = Math.max(0, digState.tempoRestante - digState.penalidade);
       if (digState.tempoRestante <= 0) { falharDigitacao(); return; }
