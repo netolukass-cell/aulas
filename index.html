@@ -3865,9 +3865,30 @@ function renderAulaHoje() {
   </div>`;
 }
 
+// Garante que o aluno Miguel existe no localStorage
+function _seedAlunoFixo(nome, idade, avatarIdx) {
+  const alunos = getAlunosLocal();
+  const nomeLower = nome.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const jaExiste = alunos.some(a => (a.nome||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').includes(nomeLower));
+  if (jaExiste) return;
+  const novo = {
+    id: nomeLower + '_seed',
+    nome: nome,
+    idade: idade,
+    nivel: calcularNivel(idade),
+    avatar: avatarIdx || 0,
+    progresso: {},
+    historico: [],
+    pontos: 0
+  };
+  alunos.push(novo);
+  saveAlunosLocal(alunos);
+}
+
 // pré-carrega as turmas fixas se ainda não atribuídas
 // Roda toda vez que renderHome é chamado — atribui apenas alunos ainda sem turma
 function _seedTurmasAuto() {
+  _seedAlunoFixo('Miguel', 10, 3);
   const SEED = {
     T1: ['miguel','pedro'],
     T2: ['diego','theo','gabriel'],
