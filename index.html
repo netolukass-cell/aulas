@@ -3335,7 +3335,7 @@ const MODULOS = {
   }
 };
 
-const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria", "redes"];
+const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria", "redes", "excel-basico", "excel-inter"];
 
 // =============================================================
 // TURMAS — configuração e persistência (additive, chave separada)
@@ -3347,12 +3347,13 @@ const TURMAS_CONFIG = {
   T1: { nome: 'Turma 1', emoji: '📘', cor: '#6366F1', corSoft: '#EEF2FF', dias: 'Quinta e Sexta · 18h', turno: 'Tarde/Noite' },
   T2: { nome: 'Turma 2', emoji: '📗', cor: '#10B981', corSoft: '#ECFDF5', dias: 'Segunda · 18h', turno: 'Noite' },
   T3: { nome: 'Turma 3', emoji: '📙', cor: '#F59E0B', corSoft: '#FFFBEB', dias: 'Quarta · 18h  ·  Sábado · 8h', turno: 'Manhã/Noite' },
+  T4: { nome: 'Turma Miguel', emoji: '🌟', cor: '#8B5CF6', corSoft: '#F5F3FF', dias: 'A combinar', turno: 'Particular' },
 };
 
 // Estrutura: { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }
 function getTurmas() {
-  try { return JSON.parse(localStorage.getItem(TURMAS_KEY)) || { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }; }
-  catch(e) { return { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]} }; }
+  try { return JSON.parse(localStorage.getItem(TURMAS_KEY)) || { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]}, T4:{ids:[]} }; }
+  catch(e) { return { T1:{ids:[]}, T2:{ids:[]}, T3:{ids:[]}, T4:{ids:[]} }; }
 }
 function saveTurmas(t) { localStorage.setItem(TURMAS_KEY, JSON.stringify(t)); }
 
@@ -3400,7 +3401,7 @@ function toggleConteudoEnsinado(turmaKey, modulo) {
 // =============================================================
 const FREQ_KEY = 'lusca_frequencia';
 // Dias de aula por turma (getDay(): 0=Dom,1=Seg,2=Ter,3=Qua,4=Qui,5=Sex,6=Sáb)
-const TURMAS_DIAS = { T1: [4, 5], T2: [1], T3: [3, 6] };
+const TURMAS_DIAS = { T1: [4, 5], T2: [1], T3: [3, 6], T4: [] };
 
 function _freqGet() {
   try { return JSON.parse(localStorage.getItem(FREQ_KEY)) || {}; } catch(e) { return {}; }
@@ -3507,6 +3508,9 @@ const MISSOES_CATALOGO = {
   'jogo-runner':   { titulo:'Hacker Runner',            tipo:'jogo',      emoji:'🎮', desc:'Fase de plataforma pixel art.',                  pontos:20,  acao:"abrirJogo('hacker-runner','hardware')", completionTrigger:'activity_return' },
   'jogo-ram':      { titulo:'Gerenciador de RAM',       tipo:'jogo',      emoji:'⚙️',  desc:'Processos invadem a memória — encerre-os.',     pontos:20,  acao:"abrirJogo('ram-manager','memoria')",    completionTrigger:'activity_return' },
   'prova-final':   { titulo:'Prova Final',              tipo:'boss',      emoji:'🏅', desc:'Desafio completo! Só para quem concluiu todos os módulos.', pontos:100, acao:"iniciarProva()", completionTrigger:'quiz_finish' },
+  'quiz-excel-basico': { titulo:'Quiz Excel Básico',    tipo:'quiz',      emoji:'📊', desc:'SOMA, MÉDIA e as primeiras fórmulas da planilha.', pontos:30, acao:"iniciarQuizModulo('excel-basico')", completionTrigger:'quiz_finish' },
+  'quiz-excel-inter':  { titulo:'Quiz Excel Intermediário', tipo:'quiz',  emoji:'🚀', desc:'=SE, =CONT.SE, condições e análise avançada.', pontos:35, acao:"iniciarQuizModulo('excel-inter')", completionTrigger:'quiz_finish' },
+  'jogo-excel':        { titulo:'Planilha Interativa',  tipo:'jogo',      emoji:'🧩', desc:'Monte planilhas reais com fórmulas e ganhe pontos!', pontos:50, acao:"iniciarJogoExcel()", completionTrigger:'activity_return' },
 };
 
 // Plano semanal por turma — professor atualiza aqui conforme o andamento da turma.
@@ -3522,6 +3526,8 @@ const PLANO_SEMANA = {
   'T3_n1':  ['quiz-redes', 'quiz-hw', 'dig-fileiras', 'jogo-atirador', 'quiz-sw', 'dig-treino', 'quiz-nav'],
   // Nível 3: Luiz (15a) — redes + quizzes completos + ranqueado + atirador
   'T3_n3':  ['quiz-redes', 'quiz-av', 'quiz-nav', 'quiz-sw', 'quiz-hw', 'dig-rank', 'jogo-atirador'],
+  // T4 — Turma Miguel (10 anos, nível avançado particular)
+  T4:       ['quiz-excel-basico', 'jogo-excel', 'quiz-excel-inter', 'quiz-redes', 'jogo-atirador', 'dig-rank'],
 };
 
 // Plano adaptado por nível — sobrescreve o plano da turma quando o nível não bate.
@@ -7932,7 +7938,7 @@ function ativarAtkHacker(alunoId) {
 }
 
 // ---- Helpers do diagnóstico ----
-const PP_NOME_MOD = { hardware:'Hardware', software:'Word', navegadores:'Navegadores', antivirus:'Antivírus', memoria:'Memória' };
+const PP_NOME_MOD = { hardware:'Hardware', software:'Word', navegadores:'Navegadores', antivirus:'Antivírus', memoria:'Memória', redes:'Redes', 'excel-basico':'Excel Básico', 'excel-inter':'Excel Inter.' };
 const PP_WPM_BAIXO = 15;
 
 function ppBestWpm(a){
