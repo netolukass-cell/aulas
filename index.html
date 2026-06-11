@@ -3374,93 +3374,94 @@ const MODULOS = {
   ,
   'excel-basico': {
     titulo: 'Excel Básico',
-    emoji: '📊',
-    descricao: 'Descubra o Excel: planilhas, células e suas primeiras fórmulas!',
-    niveis: {
+    icone: '📊',
+    desc: 'Descubra planilhas, células e suas primeiras fórmulas!',
+    paginas: {
       1: [
         { tipo:'texto', titulo:'O que é o Excel? 🤔', conteudo:'Imagina uma folha quadriculada gigante no computador — cada quadradinho é uma <strong>célula</strong>! O Excel é exatamente isso: uma planilha eletrônica onde você organiza números, nomes, listas... e até faz contas automáticas. Ele é usado por empresas, professores, cientistas e até para controlar uma mesada! 💰' },
         { tipo:'texto', titulo:'Linhas, Colunas e Células 🗂️', conteudo:'As <strong>colunas</strong> têm letras: A, B, C, D... As <strong>linhas</strong> têm números: 1, 2, 3, 4... Cada <strong>célula</strong> tem um endereço que mistura os dois. A célula no cruzamento da coluna B com a linha 3 se chama <strong>B3</strong>. É como latitude e longitude num mapa — toda célula tem seu endereço único!' },
-        { tipo:'texto', titulo:'Fórmulas: a magia do Excel ✨', conteudo:'A diferença entre Excel e uma calculadora simples é que o Excel <strong>lembra os valores</strong> nas células. Quando você digita <code>=A1+B1</code> em C1, ele some os dois números e mostra o resultado. Se você mudar A1, C1 atualiza <em>automaticamente</em>! É como ter um assistente que recalcula tudo pra você.' },
-        { tipo:'texto', titulo:'Sua primeira fórmula: =SOMA 🧮', conteudo:'<strong>=SOMA(A1:A5)</strong> soma todos os valores de A1 até A5. O símbolo <strong>:</strong> significa "até" — então A1:A5 são as células A1, A2, A3, A4 e A5 juntas. Experimente: coloque os números 10, 20, 30, 40, 50 em A1 até A5 e escreva =SOMA(A1:A5) em A6. O resultado será <strong>150</strong>! 🎉' },
-        { tipo:'texto', titulo:'Segunda fórmula: =MÉDIA 📈', conteudo:'<strong>=MÉDIA(A1:A5)</strong> calcula a média aritmética dos valores. Se você tem as notas 8, 7, 9, 6 e 10 em A1 até A5, a fórmula =MÉDIA(A1:A5) devolve <strong>8</strong> — a média da turma! É a mesma conta que o professor faz, mas o Excel faz em um segundo.' },
-        { tipo:'texto', titulo:'Banco de Fórmulas 📚', conteudo:'<div style="background:#F0FDF4;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#BBF7D0;"><th style="padding:8px;text-align:left;border-radius:6px 0 0 6px;">Fórmula</th><th style="padding:8px;text-align:left;">O que faz</th><th style="padding:8px;text-align:left;border-radius:0 6px 6px 0;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#166534;">=SOMA</td><td style="padding:8px;">Soma os valores</td><td style="padding:8px;">=SOMA(A1:A5)</td></tr><tr style="background:#F0FDF4;"><td style="padding:8px;font-weight:700;color:#166534;">=MÉDIA</td><td style="padding:8px;">Calcula a média</td><td style="padding:8px;">=MÉDIA(B1:B4)</td></tr><tr><td style="padding:8px;font-weight:700;color:#166534;">+, -, *, /</td><td style="padding:8px;">Operações básicas</td><td style="padding:8px;">=A1*B1</td></tr></table></div>' }
+        { tipo:'texto', titulo:'Fórmulas: a magia do Excel ✨', conteudo:'A diferença entre Excel e uma calculadora simples é que o Excel <strong>lembra os valores</strong> nas células. Quando você digita <code>=A1+B1</code> em C1, ele soma os dois números e mostra o resultado. Se você mudar A1, C1 atualiza <em>automaticamente</em>! É como ter um assistente que recalcula tudo pra você.' },
+        { tipo:'texto', titulo:'Sua primeira fórmula: =SOMA 🧮', conteudo:'<strong>=SOMA(A1:A5)</strong> soma todos os valores de A1 até A5. O símbolo <strong>:</strong> significa "até" — A1:A5 são A1, A2, A3, A4 e A5 juntas. Coloque os números 10, 20, 30, 40, 50 em A1 até A5 e escreva =SOMA(A1:A5) em A6. Resultado: <strong>150</strong>! 🎉' },
+        { tipo:'texto', titulo:'Segunda fórmula: =MÉDIA 📈', conteudo:'<strong>=MÉDIA(A1:A5)</strong> calcula a média aritmética. Se você tem as notas 8, 7, 9, 6 e 10 em A1 até A5, a fórmula =MÉDIA(A1:A5) devolve <strong>8</strong>. É a mesma conta que o professor faz, mas o Excel faz em um segundo.' },
+        { tipo:'texto', titulo:'Banco de Fórmulas 📚', conteudo:'<div style="background:#F0FDF4;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#BBF7D0;"><th style="padding:8px;text-align:left;">Fórmula</th><th style="padding:8px;text-align:left;">O que faz</th><th style="padding:8px;text-align:left;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#166534;">=SOMA</td><td style="padding:8px;">Soma os valores</td><td style="padding:8px;">=SOMA(A1:A5)</td></tr><tr style="background:#F0FDF4;"><td style="padding:8px;font-weight:700;color:#166534;">=MÉDIA</td><td style="padding:8px;">Calcula a média</td><td style="padding:8px;">=MÉDIA(B1:B4)</td></tr><tr><td style="padding:8px;font-weight:700;color:#166534;">+, -, *, /</td><td style="padding:8px;">Operações básicas</td><td style="padding:8px;">=A1*B1</td></tr></table></div>' }
       ],
       2: [
-        { tipo:'texto', titulo:'Formatando sua planilha 🎨', conteudo:'Uma planilha bonita comunica melhor! Você pode deixar a primeira linha em <strong>negrito</strong> para indicar os títulos das colunas, pintar o fundo de células importantes e ajustar a largura das colunas. No Excel de verdade, tudo isso fica em <em>Página Inicial</em> na barra de ferramentas.' },
-        { tipo:'texto', titulo:'Referências Relativas e Absolutas 📌', conteudo:'Quando você copia uma fórmula para outra célula, as referências mudam automaticamente. Isso se chama <strong>referência relativa</strong>. Se quiser que uma célula não mude, use <strong>$</strong>: <code>=A1*$B$1</code> — o $B$1 sempre aponta para B1, mesmo copiando a fórmula. Útil para usar uma taxa fixa em vários cálculos!' },
-        { tipo:'texto', titulo:'=MÁX e =MÍN 🏆', conteudo:'<strong>=MÁX(A1:A10)</strong> encontra o maior número da lista. <strong>=MÍN(A1:A10)</strong> encontra o menor. Em uma lista de notas, =MÁX diz quem foi o melhor e =MÍN diz onde precisa melhorar. Simples e poderoso!' },
-        { tipo:'texto', titulo:'Banco de Fórmulas — Nível 2 📚', conteudo:'<div style="background:#EFF6FF;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#BFDBFE;"><th style="padding:8px;text-align:left;">Fórmula</th><th style="padding:8px;text-align:left;">O que faz</th><th style="padding:8px;text-align:left;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#1E40AF;">=MÁX</td><td style="padding:8px;">Maior valor</td><td style="padding:8px;">=MÁX(B1:B10)</td></tr><tr style="background:#EFF6FF;"><td style="padding:8px;font-weight:700;color:#1E40AF;">=MÍN</td><td style="padding:8px;">Menor valor</td><td style="padding:8px;">=MÍN(B1:B10)</td></tr><tr><td style="padding:8px;font-weight:700;color:#1E40AF;">=CONT.NÚM</td><td style="padding:8px;">Conta células com número</td><td style="padding:8px;">=CONT.NÚM(A1:A20)</td></tr></table></div>' }
+        { tipo:'texto', titulo:'Formatando sua planilha 🎨', conteudo:'Uma planilha bonita comunica melhor! Deixe a primeira linha em <strong>negrito</strong> para indicar títulos das colunas, pinte células importantes e ajuste larguras. No Excel, tudo isso fica em <em>Página Inicial</em>.' },
+        { tipo:'texto', titulo:'Referências Relativas e Absolutas 📌', conteudo:'Quando você copia uma fórmula, as referências mudam — isso se chama <strong>referência relativa</strong>. Para travar uma célula, use <strong>$</strong>: <code>=A1*$B$1</code> — $B$1 sempre aponta para B1, mesmo ao copiar a fórmula para outras linhas.' },
+        { tipo:'texto', titulo:'=MÁX e =MÍN 🏆', conteudo:'<strong>=MÁX(A1:A10)</strong> encontra o maior número da lista. <strong>=MÍN(A1:A10)</strong> encontra o menor. Em uma lista de notas, =MÁX diz quem foi o melhor e =MÍN diz onde precisa melhorar.' },
+        { tipo:'texto', titulo:'Banco de Fórmulas Nível 2 📚', conteudo:'<div style="background:#EFF6FF;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#BFDBFE;"><th style="padding:8px;text-align:left;">Fórmula</th><th style="padding:8px;text-align:left;">O que faz</th><th style="padding:8px;text-align:left;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#1E40AF;">=MÁX</td><td style="padding:8px;">Maior valor</td><td style="padding:8px;">=MÁX(B1:B10)</td></tr><tr style="background:#EFF6FF;"><td style="padding:8px;font-weight:700;color:#1E40AF;">=MÍN</td><td style="padding:8px;">Menor valor</td><td style="padding:8px;">=MÍN(B1:B10)</td></tr><tr><td style="padding:8px;font-weight:700;color:#1E40AF;">=CONT.NÚM</td><td style="padding:8px;">Conta células com número</td><td style="padding:8px;">=CONT.NÚM(A1:A20)</td></tr></table></div>' }
       ],
       3: [
-        { tipo:'texto', titulo:'Gráficos: dados viram imagens 📊', conteudo:'O Excel transforma seus números em gráficos de barras, pizza, linhas... Você seleciona os dados, clica em <em>Inserir → Gráfico</em> e pronto! Um gráfico conta uma história que uma tabela de números não consegue. Empresas usam isso em apresentações para convencer clientes e investidores.' },
-        { tipo:'texto', titulo:'=PROCV: encontre qualquer dado 🔍', conteudo:'<strong>=PROCV(valor, tabela, coluna, 0)</strong> é uma das fórmulas mais usadas no mundo profissional. Ela busca um valor em uma tabela e retorna o que está na coluna que você escolheu. Pense em uma lista de produtos com preços: =PROCV("Banana", A1:B10, 2, 0) encontra "Banana" e devolve o preço.' },
-        { tipo:'texto', titulo:'Tabelas Dinâmicas 🌀', conteudo:'Imagina que você tem 500 vendas registradas. A Tabela Dinâmica resume isso automaticamente: total por vendedor, por mês, por produto... Em segundos. É considerada a ferramenta mais poderosa do Excel e separa quem conhece o básico de quem é um verdadeiro especialista.' }
+        { tipo:'texto', titulo:'Gráficos 📊', conteudo:'O Excel transforma seus números em gráficos de barras, pizza, linhas... Selecione os dados, clique em <em>Inserir → Gráfico</em>. Um gráfico conta uma história que uma tabela de números não consegue.' },
+        { tipo:'texto', titulo:'=PROCV: encontre qualquer dado 🔍', conteudo:'<strong>=PROCV(valor, tabela, coluna, 0)</strong> é uma das fórmulas mais usadas no mundo profissional. Ela busca um valor em uma tabela e retorna o que está na coluna que você escolheu. Ex: =PROCV("Banana", A1:B10, 2, 0) encontra "Banana" e devolve o preço.' },
+        { tipo:'texto', titulo:'Tabelas Dinâmicas 🌀', conteudo:'Imagina 500 vendas registradas. A Tabela Dinâmica resume automaticamente: total por vendedor, por mês, por produto... Em segundos. É a ferramenta mais poderosa do Excel.' }
+      ]
+    },
+    quiz: {
+      1: [
+        { tipo:'mc', q:'O que é uma célula no Excel?', options:['Uma linha inteira da planilha', 'O cruzamento de uma coluna com uma linha, como B3', 'O nome do arquivo salvo'], correct:1 },
+        { tipo:'mc', q:'O que faz =SOMA(A1:A5)?', options:['Mostra o maior valor entre A1 e A5', 'Soma todos os valores de A1 até A5', 'Calcula a média dos valores'], correct:1 },
+        { tipo:'vf', q:'Toda fórmula no Excel começa com o sinal de = (igual).', correct:true },
+        { tipo:'mc', q:'Se A1=10 e B1=20, qual é o resultado de =A1+B1?', options:['1020', '30', '10'], correct:1 },
+        { tipo:'mc', q:'O que =MÉDIA(B1:B4) calcula?', options:['A soma de B1 até B4', 'O maior valor entre B1 e B4', 'A média aritmética dos valores de B1 até B4'], correct:2 },
+        { tipo:'vf', q:'Colunas no Excel são identificadas por letras (A, B, C...).', correct:true }
       ],
-      quiz: {
-        1: [
-          { tipo:'mc', q:'O que é uma célula no Excel?', options:['Uma linha inteira da planilha', 'O cruzamento de uma coluna com uma linha, como B3', 'O nome do arquivo salvo'], correct:1 },
-          { tipo:'mc', q:'O que faz a fórmula =SOMA(A1:A5)?', options:['Mostra o maior valor entre A1 e A5', 'Soma todos os valores de A1 até A5', 'Calcula a média dos valores'], correct:1 },
-          { tipo:'vf', q:'Toda fórmula no Excel começa com o sinal de = (igual).', correct:true },
-          { tipo:'mc', q:'Se A1=10 e B1=20, qual é o resultado de =A1+B1?', options:['1020', '30', '10'], correct:1 },
-          { tipo:'mc', q:'O que =MÉDIA(B1:B4) calcula?', options:['A soma de B1 até B4', 'O maior valor entre B1 e B4', 'A média aritmética dos valores de B1 até B4'], correct:2 },
-          { tipo:'vf', q:'Colunas no Excel são identificadas por letras (A, B, C...).', correct:true }
-        ],
-        2: [
-          { tipo:'mc', q:'O que =MÁX(A1:A10) retorna?', options:['A soma de todos os valores', 'O maior valor no intervalo A1 até A10', 'O número de células preenchidas'], correct:1 },
-          { tipo:'mc', q:'Uma referência absoluta usa qual símbolo para "travar" a célula?', options:['#', '$', '@'], correct:1 },
-          { tipo:'vf', q:'=MÍN(A1:A5) encontra o menor valor no intervalo.', correct:true },
-          { tipo:'mc', q:'Se você copiar =A1*2 para baixo, a próxima linha terá:', options:['=A1*2', '=A2*2', '=B1*2'], correct:1 }
-        ],
-        3: [
-          { tipo:'mc', q:'Para que serve o =PROCV?', options:['Calcular médias automaticamente', 'Buscar um valor em uma tabela e retornar dado de outra coluna', 'Criar gráficos coloridos'], correct:1 },
-          { tipo:'vf', q:'Tabelas Dinâmicas resumem grandes volumes de dados automaticamente.', correct:true },
-          { tipo:'mc', q:'Qual recurso transforma dados numéricos em gráficos visuais?', options:['Fórmulas', 'Formatação condicional', 'Gráficos (Inserir → Gráfico)'], correct:2 }
-        ]
-      }
+      2: [
+        { tipo:'mc', q:'O que =MÁX(A1:A10) retorna?', options:['A soma de todos os valores', 'O maior valor no intervalo A1 até A10', 'O número de células preenchidas'], correct:1 },
+        { tipo:'mc', q:'Uma referência absoluta usa qual símbolo para travar a célula?', options:['#', '$', '@'], correct:1 },
+        { tipo:'vf', q:'=MÍN(A1:A5) encontra o menor valor no intervalo.', correct:true },
+        { tipo:'mc', q:'Se você copiar =A1*2 para baixo, a próxima linha terá:', options:['=A1*2', '=A2*2', '=B1*2'], correct:1 }
+      ],
+      3: [
+        { tipo:'mc', q:'Para que serve o =PROCV?', options:['Calcular médias automaticamente', 'Buscar um valor em uma tabela e retornar dado de outra coluna', 'Criar gráficos coloridos'], correct:1 },
+        { tipo:'vf', q:'Tabelas Dinâmicas resumem grandes volumes de dados automaticamente.', correct:true },
+        { tipo:'mc', q:'Qual recurso transforma dados numéricos em gráficos visuais?', options:['Fórmulas', 'Formatação condicional', 'Gráficos (Inserir → Gráfico)'], correct:2 }
+      ]
     }
   },
   'excel-inter': {
     titulo: 'Excel Intermediário',
-    emoji: '🚀',
-    descricao: 'Fórmulas avançadas, condições e análise de dados!',
-    niveis: {
+    icone: '🚀',
+    desc: 'Fórmulas avançadas: =SE, =CONT.SE e análise de dados!',
+    paginas: {
       1: [
-        { tipo:'texto', titulo:'Revisão Rápida ⚡', conteudo:'Antes de avançar, vamos revisar: lembra que =SOMA soma, =MÉDIA calcula média, =MÁX pega o maior e =MÍN o menor? Agora vamos aprender fórmulas que tomam <strong>decisões</strong>! O Excel vai conseguir dizer "se a nota é maior que 7, então passou, senão reprovou." Isso muda tudo.' },
-        { tipo:'texto', titulo:'=SE: o Excel pensa por você 🤖', conteudo:'<strong>=SE(condição, valor_se_verdadeiro, valor_se_falso)</strong><br><br>Exemplo: <code>=SE(A1>=7, "Aprovado", "Reprovado")</code><br><br>O Excel testa: A1 é maior ou igual a 7? Se sim, escreve "Aprovado". Se não, escreve "Reprovado". É como um semáforo: a condição diz se é verde ou vermelho! 🚦' },
+        { tipo:'texto', titulo:'Revisão Rápida ⚡', conteudo:'Antes de avançar: =SOMA soma, =MÉDIA calcula média, =MÁX pega o maior e =MÍN o menor. Agora vamos aprender fórmulas que tomam <strong>decisões</strong>! O Excel vai conseguir dizer "se a nota é maior que 7, passou, senão reprovou." Isso muda tudo.' },
+        { tipo:'texto', titulo:'=SE: o Excel pensa por você 🤖', conteudo:'<strong>=SE(condição, valor_se_verdadeiro, valor_se_falso)</strong><br><br>Exemplo: <code>=SE(A1&gt;=7, "Aprovado", "Reprovado")</code><br><br>O Excel testa: A1 é maior ou igual a 7? Se sim, "Aprovado". Se não, "Reprovado". É como um semáforo! 🚦' },
         { tipo:'texto', titulo:'Operadores de Comparação 🔍', conteudo:'<div style="background:#FFF7ED;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#FED7AA;"><th style="padding:8px;text-align:left;">Símbolo</th><th style="padding:8px;text-align:left;">Significado</th><th style="padding:8px;text-align:left;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#9A3412;">=</td><td style="padding:8px;">Igual a</td><td style="padding:8px;">A1=10</td></tr><tr style="background:#FFF7ED;"><td style="padding:8px;font-weight:700;color:#9A3412;">&gt;</td><td style="padding:8px;">Maior que</td><td style="padding:8px;">A1&gt;5</td></tr><tr><td style="padding:8px;font-weight:700;color:#9A3412;">&lt;</td><td style="padding:8px;">Menor que</td><td style="padding:8px;">A1&lt;100</td></tr><tr style="background:#FFF7ED;"><td style="padding:8px;font-weight:700;color:#9A3412;">&gt;=</td><td style="padding:8px;">Maior ou igual</td><td style="padding:8px;">A1&gt;=7</td></tr><tr><td style="padding:8px;font-weight:700;color:#9A3412;">&lt;&gt;</td><td style="padding:8px;">Diferente de</td><td style="padding:8px;">A1&lt;&gt;0</td></tr></table></div>' },
-        { tipo:'texto', titulo:'=CONT.SE: conta com condição 🧮', conteudo:'<strong>=CONT.SE(intervalo, critério)</strong> conta quantas células atendem a uma condição.<br><br>Exemplo: <code>=CONT.SE(B1:B10, ">=7")</code> conta quantos alunos tiraram 7 ou mais. <code>=CONT.SE(C1:C20, "Sim")</code> conta quantas células contêm a palavra "Sim". Poderoso para relatórios!' },
-        { tipo:'texto', titulo:'=SOMASE: soma com condição 💡', conteudo:'<strong>=SOMASE(intervalo, critério, intervalo_soma)</strong> soma apenas os valores que atendem a uma condição.<br><br>Exemplo: Coluna A tem categorias ("Frutas", "Verduras") e coluna B tem preços. <code>=SOMASE(A1:A10, "Frutas", B1:B10)</code> soma apenas os preços das frutas. Ótimo para fazer subtotais!' }
+        { tipo:'texto', titulo:'=CONT.SE: conta com condição 🧮', conteudo:'<strong>=CONT.SE(intervalo, critério)</strong> conta quantas células atendem a uma condição.<br><br>Ex: <code>=CONT.SE(B1:B10, "&gt;=7")</code> conta quantos alunos tiraram 7 ou mais.' },
+        { tipo:'texto', titulo:'=SOMASE: soma com condição 💡', conteudo:'<strong>=SOMASE(intervalo, critério, intervalo_soma)</strong> soma apenas os valores que atendem a uma condição.<br><br>Ex: <code>=SOMASE(A1:A10, "Frutas", B1:B10)</code> soma apenas os preços das frutas.' }
       ],
       2: [
-        { tipo:'texto', titulo:'=SE aninhado: várias decisões 🧩', conteudo:'Você pode colocar um =SE dentro de outro para criar mais opções:<br><br><code>=SE(A1>=9, "Excelente", SE(A1>=7, "Bom", SE(A1>=5, "Regular", "Reprovado")))</code><br><br>Isso cria 4 possibilidades! Pense como uma árvore de decisões — cada galho leva a um resultado diferente.' },
-        { tipo:'texto', titulo:'=E e =OU: combinar condições 🔗', conteudo:'<strong>=E(condição1, condição2)</strong> — verdadeiro só se AMBAS forem verdadeiras.<br><strong>=OU(condição1, condição2)</strong> — verdadeiro se PELO MENOS UMA for verdadeira.<br><br>Exemplo com =SE e =E:<br><code>=SE(E(A1>=7, B1>="Feito"), "Aprovado", "Pendente")</code><br>O aluno precisa ter nota boa E tarefa feita para ser aprovado.' },
-        { tipo:'texto', titulo:'Formatação Condicional 🎨', conteudo:'A Formatação Condicional pinta células automaticamente com base nos valores! Configure: células maiores que 7 ficam verdes, menores que 5 ficam vermelhas. A planilha fica visual e fácil de ler — você identifica problemas em segundos sem precisar ler número por número.' }
+        { tipo:'texto', titulo:'=SE aninhado: várias decisões 🧩', conteudo:'Coloque um =SE dentro de outro para criar mais opções:<br><br><code>=SE(A1&gt;=9, "Excelente", SE(A1&gt;=7, "Bom", SE(A1&gt;=5, "Regular", "Reprovado")))</code><br><br>4 possibilidades! Pense como uma árvore de decisões.' },
+        { tipo:'texto', titulo:'=E e =OU: combinar condições 🔗', conteudo:'<strong>=E(cond1, cond2)</strong> — verdadeiro só se AMBAS forem verdadeiras.<br><strong>=OU(cond1, cond2)</strong> — verdadeiro se PELO MENOS UMA for verdadeira.<br><br>Ex: <code>=SE(E(A1&gt;=7, B1="Feito"), "Aprovado", "Pendente")</code>' },
+        { tipo:'texto', titulo:'Formatação Condicional 🎨', conteudo:'A Formatação Condicional pinta células automaticamente com base nos valores. Configure: células maiores que 7 ficam verdes, menores que 5 ficam vermelhas. Você identifica problemas em segundos.' }
       ],
       3: [
-        { tipo:'texto', titulo:'=ÍNDICE e =CORRESP 🎯', conteudo:'A dupla =ÍNDICE + =CORRESP é considerada superior ao =PROCV por ser mais flexível. <strong>=CORRESP</strong> encontra a posição de um valor numa lista. <strong>=ÍNDICE</strong> retorna o valor na posição escolhida. Juntos, eles buscam dados em qualquer direção da tabela.' },
-        { tipo:'texto', titulo:'Macros: automatize tudo ⚙️', conteudo:'Macros são sequências de ações gravadas que podem ser executadas com um clique. Em vez de repetir 50 passos toda semana, você grava uma vez e repete infinitamente. Macros são escritas em VBA (Visual Basic for Applications) — sua primeira linguagem de programação dentro do Excel!' },
-        { tipo:'texto', titulo:'Excel no Mundo Real 🌍', conteudo:'Com o que você aprendeu, já consegue: controlar gastos pessoais, calcular notas de uma turma, fazer relatórios de vendas, criar dashboards coloridos e automatizar tarefas repetitivas. O Excel é a segunda habilidade mais pedida em currículos no Brasil, logo atrás de Word. Você está na frente da maioria!' }
+        { tipo:'texto', titulo:'=ÍNDICE e =CORRESP 🎯', conteudo:'A dupla =ÍNDICE + =CORRESP é superior ao =PROCV por ser mais flexível. <strong>=CORRESP</strong> encontra a posição de um valor numa lista. <strong>=ÍNDICE</strong> retorna o valor na posição escolhida. Juntos buscam dados em qualquer direção.' },
+        { tipo:'texto', titulo:'Macros: automatize tudo ⚙️', conteudo:'Macros são sequências de ações gravadas executadas com um clique. Em vez de repetir 50 passos toda semana, você grava uma vez e repete infinitamente. Macros são escritas em VBA — sua primeira linguagem de programação dentro do Excel!' },
+        { tipo:'texto', titulo:'Excel no Mundo Real 🌍', conteudo:'Com o que você aprendeu, já consegue: controlar gastos, calcular notas, fazer relatórios de vendas, criar dashboards coloridos e automatizar tarefas. O Excel é a segunda habilidade mais pedida em currículos no Brasil. Você está na frente!' }
+      ]
+    },
+    quiz: {
+      1: [
+        { tipo:'mc', q:'O que =SE(A1>=7, "Aprovado", "Reprovado") faz quando A1=8?', options:['Escreve "Reprovado"', 'Escreve "Aprovado"', 'Devolve 8'], correct:1 },
+        { tipo:'mc', q:'O que =CONT.SE(B1:B10, ">5") faz?', options:['Soma os valores maiores que 5', 'Conta quantas células têm valor maior que 5', 'Encontra o maior valor acima de 5'], correct:1 },
+        { tipo:'vf', q:'Na fórmula =SE, se a condição for falsa, o terceiro argumento é usado.', correct:true },
+        { tipo:'mc', q:'Qual operador significa "diferente de" no Excel?', options:['!=', '<>', '=/='], correct:1 },
+        { tipo:'mc', q:'=SOMASE(A1:A5, ">10", B1:B5) — o que faz?', options:['Soma todas as células de B', 'Soma os valores em B onde A é maior que 10', 'Conta quantos valores de A são maiores que 10'], correct:1 }
       ],
-      quiz: {
-        1: [
-          { tipo:'mc', q:'O que =SE(A1>=7, "Aprovado", "Reprovado") faz quando A1=8?', options:['Escreve "Reprovado"', 'Escreve "Aprovado"', 'Devolve 8'], correct:1 },
-          { tipo:'mc', q:'O que =CONT.SE(B1:B10, ">5") faz?', options:['Soma os valores maiores que 5', 'Conta quantas células têm valor maior que 5', 'Encontra o maior valor acima de 5'], correct:1 },
-          { tipo:'vf', q:'Na fórmula =SE, se a condição for falsa, o terceiro argumento é usado.', correct:true },
-          { tipo:'mc', q:'Qual operador significa "diferente de" no Excel?', options:['!=', '<>', '=/='], correct:1 },
-          { tipo:'mc', q:'=SOMASE(A1:A5, ">10", B1:B5) faz o quê?', options:['Soma todas as células de B1 a B5', 'Soma os valores em B correspondentes a células de A maiores que 10', 'Conta quantos valores de A são maiores que 10'], correct:1 }
-        ],
-        2: [
-          { tipo:'vf', q:'=E(A1>5, B1>5) é verdadeiro apenas se AMBAS as condições forem verdadeiras.', correct:true },
-          { tipo:'mc', q:'Para que serve a Formatação Condicional?', options:['Imprimir a planilha colorida', 'Pintar células automaticamente com base nos valores', 'Criar gráficos automáticos'], correct:1 },
-          { tipo:'mc', q:'=OU(A1>10, B1>10) — quando isso é verdadeiro?', options:['Só quando ambos A1 e B1 são maiores que 10', 'Quando pelo menos um dos dois é maior que 10', 'Quando nenhum é maior que 10'], correct:1 }
-        ],
-        3: [
-          { tipo:'mc', q:'O que são Macros no Excel?', options:['Atalhos de teclado padrão do programa', 'Sequências de ações automatizadas escritas em VBA', 'Tipos especiais de gráficos'], correct:1 },
-          { tipo:'vf', q:'=ÍNDICE + =CORRESP pode buscar dados em qualquer direção da tabela, ao contrário do =PROCV.', correct:true }
-        ]
-      }
+      2: [
+        { tipo:'vf', q:'=E(A1>5, B1>5) é verdadeiro apenas se AMBAS as condições forem verdadeiras.', correct:true },
+        { tipo:'mc', q:'Para que serve a Formatação Condicional?', options:['Imprimir a planilha colorida', 'Pintar células automaticamente com base nos valores', 'Criar gráficos automáticos'], correct:1 },
+        { tipo:'mc', q:'=OU(A1>10, B1>10) — quando é verdadeiro?', options:['Só quando ambos são maiores que 10', 'Quando pelo menos um dos dois é maior que 10', 'Quando nenhum é maior que 10'], correct:1 }
+      ],
+      3: [
+        { tipo:'mc', q:'O que são Macros no Excel?', options:['Atalhos de teclado padrão', 'Sequências de ações automatizadas escritas em VBA', 'Tipos especiais de gráficos'], correct:1 },
+        { tipo:'vf', q:'=ÍNDICE + =CORRESP pode buscar dados em qualquer direção, ao contrário do =PROCV.', correct:true }
+      ]
     }
   }
+
 };
 
 const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria", "redes"];
