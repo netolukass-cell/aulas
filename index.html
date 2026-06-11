@@ -6186,8 +6186,9 @@ function iniciarTimerHacker() {
   _hackerTimer = setTimeout(dispararHackerAlert, HACKER_INTERVALO);
   // poll a cada 15s para detectar ATK manual do professor
   if (window._atkPollId) clearInterval(window._atkPollId);
-  window._atkPollId = setInterval(() => {
+  window._atkPollId = setInterval(async () => {
     if (!alunoAtivo) return clearInterval(window._atkPollId);
+    await syncPull();
     const fresh = getAlunos().find(a => a.id === alunoAtivo.id);
     if (fresh?.progresso?.atkHackerManual) {
       fresh.progresso.atkHackerManual = false;
