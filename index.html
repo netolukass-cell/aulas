@@ -4484,10 +4484,9 @@ function renderDashboard() {
     let liberado = i === 0 || (a.progresso[_ordemMods[i - 1]]?.quizDone);
 
     if (prog.quizDone) {
-      // módulo concluído — guarda para mostrar compacto abaixo, não na grade principal
-      modulosConcluidos.push({ m, mod, prog, i });
-      if (!prog.quizDone || (prog.quizScore / prog.quizTotal) < 0.5) podeProva = false;
-      return;
+      const scorePctDone = Math.round((prog.quizScore / prog.quizTotal) * 100);
+      const estrelas = scorePctDone >= 90 ? '⭐⭐⭐' : scorePctDone >= 70 ? '⭐⭐' : '⭐';
+      statusHtml = `<span class="modulo-status" style="color:#065F46;background:#D1FAE5;border-radius:6px;padding:2px 8px;">${estrelas} Concluído · ${scorePctDone}% — <strong>Refazer</strong></span>`;
     } else if (prog.aulaVista) {
       statusHtml = `<span class="modulo-status in-progress"><iconify-icon icon="ph:play-circle-fill"></iconify-icon> Aula vista — falta o quiz</span>`;
     } else if (!liberado) {
@@ -4591,29 +4590,9 @@ function renderDashboard() {
   }
   grid.innerHTML = html;
 
-  // seção compacta de módulos concluídos
-  let concGrid = document.getElementById('modulosConcluidos');
-  if (!concGrid) {
-    concGrid = document.createElement('div');
-    concGrid.id = 'modulosConcluidos';
-    grid.parentNode.insertBefore(concGrid, grid.nextSibling);
-  }
-  if (modulosConcluidos.length > 0) {
-    concGrid.innerHTML = `
-      <div style="margin-top:16px;">
-        <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--ink-soft);margin-bottom:10px;">✅ MÓDULOS CONCLUÍDOS (${modulosConcluidos.length})</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${modulosConcluidos.map(({m,mod,prog,i})=>`
-            <div onclick="iniciarModulo('${m}')" style="display:flex;align-items:center;gap:8px;background:var(--green-soft);border:1.5px solid var(--green);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:700;color:#065F46;">
-              <iconify-icon icon="ph:check-circle-fill" style="color:var(--green);font-size:16px;"></iconify-icon>
-              Módulo ${i+1} · ${mod.titulo}
-              <span style="font-size:11px;opacity:0.8;margin-left:4px;">${prog.quizScore}/${prog.quizTotal}</span>
-            </div>`).join('')}
-        </div>
-      </div>`;
-  } else {
-    concGrid.innerHTML = '';
-  }
+  // limpa seção antiga de concluídos (caso exista de versão anterior)
+  const concGrid = document.getElementById('modulosConcluidos');
+  if (concGrid) concGrid.innerHTML = '';
 
   // prova
   const provaCard = document.getElementById("provaCard");
