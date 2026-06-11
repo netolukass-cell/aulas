@@ -4481,7 +4481,7 @@ function renderDashboard() {
     const mod = MODULOS[m];
     const prog = a.progresso[m] || {};
     let statusHtml = "", classes = "modulo-card";
-    let liberado = i === 0 || (a.progresso[_ordemMods[i - 1]]?.quizDone);
+    let liberado = i === 0 || (a.progresso[_ordemMods[i - 1]]?.quizDone) || prog.quizDone;
 
     if (prog.quizDone) {
       const scorePctDone = Math.round((prog.quizScore / prog.quizTotal) * 100);
