@@ -3463,7 +3463,20 @@ const MODULOS = {
   }
 };
 
-const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria", "redes", "excel-basico", "excel-inter"];
+const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memoria", "redes"];
+
+// Sequências de módulos por turma+nível — sobrescreve ORDEM_MODULOS quando definida
+const ORDEM_MODULOS_TURMA = {
+  'T1_n1': ["excel-basico", "excel-inter", "redes"],
+};
+
+function _getOrdemModulos(turmaKey, nivel) {
+  if (turmaKey && nivel) {
+    const chave = turmaKey + '_n' + nivel;
+    if (ORDEM_MODULOS_TURMA[chave]) return ORDEM_MODULOS_TURMA[chave];
+  }
+  return ORDEM_MODULOS;
+}
 
 // =============================================================
 // TURMAS — configuração e persistência (additive, chave separada)
@@ -4289,11 +4302,12 @@ function renderHome() {
 
   alunosDaTurma.forEach(a => {
     const n = a.nivel;
+    const _om = _getOrdemModulos(_homeTurma, n);
     const pontos = calcularPontos(a);
     const medalhas = calcularMedalhas(a);
-    const modulosFeitos = ORDEM_MODULOS.filter(m => a.progresso[m]?.quizDone).length;
+    const modulosFeitos = _om.filter(m => a.progresso[m]?.quizDone).length;
     const provaFeita = a.progresso.prova?.done ? 1 : 0;
-    const totalEtapas = ORDEM_MODULOS.length + 1;
+    const totalEtapas = _om.length + 1;
     const progresso = Math.round(((modulosFeitos + provaFeita) / totalEtapas) * 100);
     const badgesHtml = medalhas.slice(0, 5).map(m =>
       `<div class="aluno-badge" title="${m.texto}">${m.emoji}</div>`
@@ -4419,6 +4433,8 @@ function renderDashboard() {
   const a = alunoAtivo;
   if (!a) return goHome();
   const n = a.nivel;
+  const _turmaAluno = getTurmaDeAluno(a.id);
+  const _ordemMods = _getOrdemModulos(_turmaAluno, n);
 
   renderAulaHoje();
   document.getElementById("dashAvatarImg").src = avatarUrl(a);
@@ -4444,9 +4460,9 @@ function renderDashboard() {
   }
 
   // progresso total
-  const totalAtividades = ORDEM_MODULOS.length + 1; // 4 módulos + prova
+  const totalAtividades = _ordemMods.length + 1;
   let concluidas = 0;
-  ORDEM_MODULOS.forEach(m => {
+  _ordemMods.forEach(m => {
     if (a.progresso[m]?.quizDone) concluidas++;
   });
   if (a.progresso.prova?.done) concluidas++;
@@ -4461,11 +4477,11 @@ function renderDashboard() {
   let podeProva = true;
 
   const modulosConcluidos = [];
-  ORDEM_MODULOS.forEach((m, i) => {
+  _ordemMods.forEach((m, i) => {
     const mod = MODULOS[m];
     const prog = a.progresso[m] || {};
     let statusHtml = "", classes = "modulo-card";
-    let liberado = i === 0 || (a.progresso[ORDEM_MODULOS[i - 1]]?.quizDone);
+    let liberado = i === 0 || (a.progresso[_ordemMods[i - 1]]?.quizDone);
 
     if (prog.quizDone) {
       // módulo concluído — guarda para mostrar compacto abaixo, não na grade principal
