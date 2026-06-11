@@ -2672,6 +2672,44 @@
   </div>
 </div>
 
+<!-- ====================== JOGO EXCEL ====================== -->
+<div class="screen" id="screen-excel">
+  <div class="container">
+    <div class="top-bar">
+      <button class="btn ghost" onclick="sairJogoExcel()">← Voltar</button>
+      <div class="top-bar-title">🧩 Planilha Interativa</div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:900;color:#8B5CF6;" id="excelPontos">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">PONTOS</div></div>
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:900;color:#10B981;" id="excelAcertos">0</div><div style="font-size:10px;color:#94A3B8;font-weight:700;">ACERTOS</div></div>
+      </div>
+    </div>
+    <!-- Tarefa atual -->
+    <div id="excelTarefaBox" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);border-radius:16px;padding:20px 24px;margin-bottom:16px;color:white;">
+      <div style="font-size:12px;font-weight:700;opacity:.7;letter-spacing:1px;margin-bottom:4px;" id="excelTarefaNum">TAREFA 1 de 5</div>
+      <div style="font-size:16px;font-weight:700;" id="excelTarefaTitulo">Carregando...</div>
+      <div style="font-size:13px;opacity:.85;margin-top:6px;" id="excelTarefaDesc"></div>
+    </div>
+    <!-- Feedback -->
+    <div id="excelFeedback" style="display:none;border-radius:12px;padding:12px 16px;margin-bottom:12px;font-weight:700;font-size:14px;"></div>
+    <!-- Planilha -->
+    <div style="overflow-x:auto;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+      <table id="excelGrid" style="border-collapse:collapse;background:white;min-width:600px;width:100%;"></table>
+    </div>
+    <!-- Barra de fórmula -->
+    <div style="display:flex;align-items:center;gap:8px;margin-top:12px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div id="excelCelNome" style="font-weight:700;color:#8B5CF6;min-width:36px;font-family:monospace;font-size:14px;">A1</div>
+      <div style="color:#94A3B8;font-size:18px;">fx</div>
+      <input id="excelFormulaBar" type="text" placeholder="Digite uma fórmula aqui... ex: =SOMA(B2:B6)"
+        style="flex:1;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:14px;color:#1E293B;"
+        onkeydown="excelFormulaKeydown(event)">
+      <button class="btn success" onclick="excelConfirmar()" style="height:36px;padding:0 16px;font-size:13px;">✓ Confirmar</button>
+    </div>
+    <div style="font-size:12px;color:#94A3B8;margin-top:6px;padding:0 4px;">💡 Clique em uma célula amarela para editá-la, depois escreva sua fórmula e confirme.</div>
+    <!-- Progresso das tarefas -->
+    <div id="excelProgresso" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;"></div>
+  </div>
+</div>
+
 <!-- ====================== REPARAR A REDE ====================== -->
 <div class="screen" id="screen-rede-puzzle">
   <div style="max-width:900px;margin:0 auto;">
@@ -3331,6 +3369,96 @@ const MODULOS = {
         { tipo: "mc", q: "Em roteamento dinâmico, o que decide o caminho dos pacotes?", options: ["O usuário escolhe manualmente a rota", "Os roteadores calculam automaticamente o melhor caminho em tempo real", "O ISP define uma rota fixa para cada cliente"], correct: 1 },
         { tipo: "vf", q: "Packet loss acima de 1% pode causar travamentos visíveis em chamadas de vídeo.", correct: true }
       ]
+    }
+  }
+  ,
+  'excel-basico': {
+    titulo: 'Excel Básico',
+    emoji: '📊',
+    descricao: 'Descubra o Excel: planilhas, células e suas primeiras fórmulas!',
+    niveis: {
+      1: [
+        { tipo:'texto', titulo:'O que é o Excel? 🤔', conteudo:'Imagina uma folha quadriculada gigante no computador — cada quadradinho é uma <strong>célula</strong>! O Excel é exatamente isso: uma planilha eletrônica onde você organiza números, nomes, listas... e até faz contas automáticas. Ele é usado por empresas, professores, cientistas e até para controlar uma mesada! 💰' },
+        { tipo:'texto', titulo:'Linhas, Colunas e Células 🗂️', conteudo:'As <strong>colunas</strong> têm letras: A, B, C, D... As <strong>linhas</strong> têm números: 1, 2, 3, 4... Cada <strong>célula</strong> tem um endereço que mistura os dois. A célula no cruzamento da coluna B com a linha 3 se chama <strong>B3</strong>. É como latitude e longitude num mapa — toda célula tem seu endereço único!' },
+        { tipo:'texto', titulo:'Fórmulas: a magia do Excel ✨', conteudo:'A diferença entre Excel e uma calculadora simples é que o Excel <strong>lembra os valores</strong> nas células. Quando você digita <code>=A1+B1</code> em C1, ele some os dois números e mostra o resultado. Se você mudar A1, C1 atualiza <em>automaticamente</em>! É como ter um assistente que recalcula tudo pra você.' },
+        { tipo:'texto', titulo:'Sua primeira fórmula: =SOMA 🧮', conteudo:'<strong>=SOMA(A1:A5)</strong> soma todos os valores de A1 até A5. O símbolo <strong>:</strong> significa "até" — então A1:A5 são as células A1, A2, A3, A4 e A5 juntas. Experimente: coloque os números 10, 20, 30, 40, 50 em A1 até A5 e escreva =SOMA(A1:A5) em A6. O resultado será <strong>150</strong>! 🎉' },
+        { tipo:'texto', titulo:'Segunda fórmula: =MÉDIA 📈', conteudo:'<strong>=MÉDIA(A1:A5)</strong> calcula a média aritmética dos valores. Se você tem as notas 8, 7, 9, 6 e 10 em A1 até A5, a fórmula =MÉDIA(A1:A5) devolve <strong>8</strong> — a média da turma! É a mesma conta que o professor faz, mas o Excel faz em um segundo.' },
+        { tipo:'texto', titulo:'Banco de Fórmulas 📚', conteudo:'<div style="background:#F0FDF4;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#BBF7D0;"><th style="padding:8px;text-align:left;border-radius:6px 0 0 6px;">Fórmula</th><th style="padding:8px;text-align:left;">O que faz</th><th style="padding:8px;text-align:left;border-radius:0 6px 6px 0;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#166534;">=SOMA</td><td style="padding:8px;">Soma os valores</td><td style="padding:8px;">=SOMA(A1:A5)</td></tr><tr style="background:#F0FDF4;"><td style="padding:8px;font-weight:700;color:#166534;">=MÉDIA</td><td style="padding:8px;">Calcula a média</td><td style="padding:8px;">=MÉDIA(B1:B4)</td></tr><tr><td style="padding:8px;font-weight:700;color:#166534;">+, -, *, /</td><td style="padding:8px;">Operações básicas</td><td style="padding:8px;">=A1*B1</td></tr></table></div>' }
+      ],
+      2: [
+        { tipo:'texto', titulo:'Formatando sua planilha 🎨', conteudo:'Uma planilha bonita comunica melhor! Você pode deixar a primeira linha em <strong>negrito</strong> para indicar os títulos das colunas, pintar o fundo de células importantes e ajustar a largura das colunas. No Excel de verdade, tudo isso fica em <em>Página Inicial</em> na barra de ferramentas.' },
+        { tipo:'texto', titulo:'Referências Relativas e Absolutas 📌', conteudo:'Quando você copia uma fórmula para outra célula, as referências mudam automaticamente. Isso se chama <strong>referência relativa</strong>. Se quiser que uma célula não mude, use <strong>$</strong>: <code>=A1*$B$1</code> — o $B$1 sempre aponta para B1, mesmo copiando a fórmula. Útil para usar uma taxa fixa em vários cálculos!' },
+        { tipo:'texto', titulo:'=MÁX e =MÍN 🏆', conteudo:'<strong>=MÁX(A1:A10)</strong> encontra o maior número da lista. <strong>=MÍN(A1:A10)</strong> encontra o menor. Em uma lista de notas, =MÁX diz quem foi o melhor e =MÍN diz onde precisa melhorar. Simples e poderoso!' },
+        { tipo:'texto', titulo:'Banco de Fórmulas — Nível 2 📚', conteudo:'<div style="background:#EFF6FF;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#BFDBFE;"><th style="padding:8px;text-align:left;">Fórmula</th><th style="padding:8px;text-align:left;">O que faz</th><th style="padding:8px;text-align:left;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#1E40AF;">=MÁX</td><td style="padding:8px;">Maior valor</td><td style="padding:8px;">=MÁX(B1:B10)</td></tr><tr style="background:#EFF6FF;"><td style="padding:8px;font-weight:700;color:#1E40AF;">=MÍN</td><td style="padding:8px;">Menor valor</td><td style="padding:8px;">=MÍN(B1:B10)</td></tr><tr><td style="padding:8px;font-weight:700;color:#1E40AF;">=CONT.NÚM</td><td style="padding:8px;">Conta células com número</td><td style="padding:8px;">=CONT.NÚM(A1:A20)</td></tr></table></div>' }
+      ],
+      3: [
+        { tipo:'texto', titulo:'Gráficos: dados viram imagens 📊', conteudo:'O Excel transforma seus números em gráficos de barras, pizza, linhas... Você seleciona os dados, clica em <em>Inserir → Gráfico</em> e pronto! Um gráfico conta uma história que uma tabela de números não consegue. Empresas usam isso em apresentações para convencer clientes e investidores.' },
+        { tipo:'texto', titulo:'=PROCV: encontre qualquer dado 🔍', conteudo:'<strong>=PROCV(valor, tabela, coluna, 0)</strong> é uma das fórmulas mais usadas no mundo profissional. Ela busca um valor em uma tabela e retorna o que está na coluna que você escolheu. Pense em uma lista de produtos com preços: =PROCV("Banana", A1:B10, 2, 0) encontra "Banana" e devolve o preço.' },
+        { tipo:'texto', titulo:'Tabelas Dinâmicas 🌀', conteudo:'Imagina que você tem 500 vendas registradas. A Tabela Dinâmica resume isso automaticamente: total por vendedor, por mês, por produto... Em segundos. É considerada a ferramenta mais poderosa do Excel e separa quem conhece o básico de quem é um verdadeiro especialista.' }
+      ],
+      quiz: {
+        1: [
+          { tipo:'mc', q:'O que é uma célula no Excel?', options:['Uma linha inteira da planilha', 'O cruzamento de uma coluna com uma linha, como B3', 'O nome do arquivo salvo'], correct:1 },
+          { tipo:'mc', q:'O que faz a fórmula =SOMA(A1:A5)?', options:['Mostra o maior valor entre A1 e A5', 'Soma todos os valores de A1 até A5', 'Calcula a média dos valores'], correct:1 },
+          { tipo:'vf', q:'Toda fórmula no Excel começa com o sinal de = (igual).', correct:true },
+          { tipo:'mc', q:'Se A1=10 e B1=20, qual é o resultado de =A1+B1?', options:['1020', '30', '10'], correct:1 },
+          { tipo:'mc', q:'O que =MÉDIA(B1:B4) calcula?', options:['A soma de B1 até B4', 'O maior valor entre B1 e B4', 'A média aritmética dos valores de B1 até B4'], correct:2 },
+          { tipo:'vf', q:'Colunas no Excel são identificadas por letras (A, B, C...).', correct:true }
+        ],
+        2: [
+          { tipo:'mc', q:'O que =MÁX(A1:A10) retorna?', options:['A soma de todos os valores', 'O maior valor no intervalo A1 até A10', 'O número de células preenchidas'], correct:1 },
+          { tipo:'mc', q:'Uma referência absoluta usa qual símbolo para "travar" a célula?', options:['#', '$', '@'], correct:1 },
+          { tipo:'vf', q:'=MÍN(A1:A5) encontra o menor valor no intervalo.', correct:true },
+          { tipo:'mc', q:'Se você copiar =A1*2 para baixo, a próxima linha terá:', options:['=A1*2', '=A2*2', '=B1*2'], correct:1 }
+        ],
+        3: [
+          { tipo:'mc', q:'Para que serve o =PROCV?', options:['Calcular médias automaticamente', 'Buscar um valor em uma tabela e retornar dado de outra coluna', 'Criar gráficos coloridos'], correct:1 },
+          { tipo:'vf', q:'Tabelas Dinâmicas resumem grandes volumes de dados automaticamente.', correct:true },
+          { tipo:'mc', q:'Qual recurso transforma dados numéricos em gráficos visuais?', options:['Fórmulas', 'Formatação condicional', 'Gráficos (Inserir → Gráfico)'], correct:2 }
+        ]
+      }
+    }
+  },
+  'excel-inter': {
+    titulo: 'Excel Intermediário',
+    emoji: '🚀',
+    descricao: 'Fórmulas avançadas, condições e análise de dados!',
+    niveis: {
+      1: [
+        { tipo:'texto', titulo:'Revisão Rápida ⚡', conteudo:'Antes de avançar, vamos revisar: lembra que =SOMA soma, =MÉDIA calcula média, =MÁX pega o maior e =MÍN o menor? Agora vamos aprender fórmulas que tomam <strong>decisões</strong>! O Excel vai conseguir dizer "se a nota é maior que 7, então passou, senão reprovou." Isso muda tudo.' },
+        { tipo:'texto', titulo:'=SE: o Excel pensa por você 🤖', conteudo:'<strong>=SE(condição, valor_se_verdadeiro, valor_se_falso)</strong><br><br>Exemplo: <code>=SE(A1>=7, "Aprovado", "Reprovado")</code><br><br>O Excel testa: A1 é maior ou igual a 7? Se sim, escreve "Aprovado". Se não, escreve "Reprovado". É como um semáforo: a condição diz se é verde ou vermelho! 🚦' },
+        { tipo:'texto', titulo:'Operadores de Comparação 🔍', conteudo:'<div style="background:#FFF7ED;border-radius:12px;padding:16px;"><table style="width:100%;border-collapse:collapse;font-size:14px;"><tr style="background:#FED7AA;"><th style="padding:8px;text-align:left;">Símbolo</th><th style="padding:8px;text-align:left;">Significado</th><th style="padding:8px;text-align:left;">Exemplo</th></tr><tr><td style="padding:8px;font-weight:700;color:#9A3412;">=</td><td style="padding:8px;">Igual a</td><td style="padding:8px;">A1=10</td></tr><tr style="background:#FFF7ED;"><td style="padding:8px;font-weight:700;color:#9A3412;">&gt;</td><td style="padding:8px;">Maior que</td><td style="padding:8px;">A1&gt;5</td></tr><tr><td style="padding:8px;font-weight:700;color:#9A3412;">&lt;</td><td style="padding:8px;">Menor que</td><td style="padding:8px;">A1&lt;100</td></tr><tr style="background:#FFF7ED;"><td style="padding:8px;font-weight:700;color:#9A3412;">&gt;=</td><td style="padding:8px;">Maior ou igual</td><td style="padding:8px;">A1&gt;=7</td></tr><tr><td style="padding:8px;font-weight:700;color:#9A3412;">&lt;&gt;</td><td style="padding:8px;">Diferente de</td><td style="padding:8px;">A1&lt;&gt;0</td></tr></table></div>' },
+        { tipo:'texto', titulo:'=CONT.SE: conta com condição 🧮', conteudo:'<strong>=CONT.SE(intervalo, critério)</strong> conta quantas células atendem a uma condição.<br><br>Exemplo: <code>=CONT.SE(B1:B10, ">=7")</code> conta quantos alunos tiraram 7 ou mais. <code>=CONT.SE(C1:C20, "Sim")</code> conta quantas células contêm a palavra "Sim". Poderoso para relatórios!' },
+        { tipo:'texto', titulo:'=SOMASE: soma com condição 💡', conteudo:'<strong>=SOMASE(intervalo, critério, intervalo_soma)</strong> soma apenas os valores que atendem a uma condição.<br><br>Exemplo: Coluna A tem categorias ("Frutas", "Verduras") e coluna B tem preços. <code>=SOMASE(A1:A10, "Frutas", B1:B10)</code> soma apenas os preços das frutas. Ótimo para fazer subtotais!' }
+      ],
+      2: [
+        { tipo:'texto', titulo:'=SE aninhado: várias decisões 🧩', conteudo:'Você pode colocar um =SE dentro de outro para criar mais opções:<br><br><code>=SE(A1>=9, "Excelente", SE(A1>=7, "Bom", SE(A1>=5, "Regular", "Reprovado")))</code><br><br>Isso cria 4 possibilidades! Pense como uma árvore de decisões — cada galho leva a um resultado diferente.' },
+        { tipo:'texto', titulo:'=E e =OU: combinar condições 🔗', conteudo:'<strong>=E(condição1, condição2)</strong> — verdadeiro só se AMBAS forem verdadeiras.<br><strong>=OU(condição1, condição2)</strong> — verdadeiro se PELO MENOS UMA for verdadeira.<br><br>Exemplo com =SE e =E:<br><code>=SE(E(A1>=7, B1>="Feito"), "Aprovado", "Pendente")</code><br>O aluno precisa ter nota boa E tarefa feita para ser aprovado.' },
+        { tipo:'texto', titulo:'Formatação Condicional 🎨', conteudo:'A Formatação Condicional pinta células automaticamente com base nos valores! Configure: células maiores que 7 ficam verdes, menores que 5 ficam vermelhas. A planilha fica visual e fácil de ler — você identifica problemas em segundos sem precisar ler número por número.' }
+      ],
+      3: [
+        { tipo:'texto', titulo:'=ÍNDICE e =CORRESP 🎯', conteudo:'A dupla =ÍNDICE + =CORRESP é considerada superior ao =PROCV por ser mais flexível. <strong>=CORRESP</strong> encontra a posição de um valor numa lista. <strong>=ÍNDICE</strong> retorna o valor na posição escolhida. Juntos, eles buscam dados em qualquer direção da tabela.' },
+        { tipo:'texto', titulo:'Macros: automatize tudo ⚙️', conteudo:'Macros são sequências de ações gravadas que podem ser executadas com um clique. Em vez de repetir 50 passos toda semana, você grava uma vez e repete infinitamente. Macros são escritas em VBA (Visual Basic for Applications) — sua primeira linguagem de programação dentro do Excel!' },
+        { tipo:'texto', titulo:'Excel no Mundo Real 🌍', conteudo:'Com o que você aprendeu, já consegue: controlar gastos pessoais, calcular notas de uma turma, fazer relatórios de vendas, criar dashboards coloridos e automatizar tarefas repetitivas. O Excel é a segunda habilidade mais pedida em currículos no Brasil, logo atrás de Word. Você está na frente da maioria!' }
+      ],
+      quiz: {
+        1: [
+          { tipo:'mc', q:'O que =SE(A1>=7, "Aprovado", "Reprovado") faz quando A1=8?', options:['Escreve "Reprovado"', 'Escreve "Aprovado"', 'Devolve 8'], correct:1 },
+          { tipo:'mc', q:'O que =CONT.SE(B1:B10, ">5") faz?', options:['Soma os valores maiores que 5', 'Conta quantas células têm valor maior que 5', 'Encontra o maior valor acima de 5'], correct:1 },
+          { tipo:'vf', q:'Na fórmula =SE, se a condição for falsa, o terceiro argumento é usado.', correct:true },
+          { tipo:'mc', q:'Qual operador significa "diferente de" no Excel?', options:['!=', '<>', '=/='], correct:1 },
+          { tipo:'mc', q:'=SOMASE(A1:A5, ">10", B1:B5) faz o quê?', options:['Soma todas as células de B1 a B5', 'Soma os valores em B correspondentes a células de A maiores que 10', 'Conta quantos valores de A são maiores que 10'], correct:1 }
+        ],
+        2: [
+          { tipo:'vf', q:'=E(A1>5, B1>5) é verdadeiro apenas se AMBAS as condições forem verdadeiras.', correct:true },
+          { tipo:'mc', q:'Para que serve a Formatação Condicional?', options:['Imprimir a planilha colorida', 'Pintar células automaticamente com base nos valores', 'Criar gráficos automáticos'], correct:1 },
+          { tipo:'mc', q:'=OU(A1>10, B1>10) — quando isso é verdadeiro?', options:['Só quando ambos A1 e B1 são maiores que 10', 'Quando pelo menos um dos dois é maior que 10', 'Quando nenhum é maior que 10'], correct:1 }
+        ],
+        3: [
+          { tipo:'mc', q:'O que são Macros no Excel?', options:['Atalhos de teclado padrão do programa', 'Sequências de ações automatizadas escritas em VBA', 'Tipos especiais de gráficos'], correct:1 },
+          { tipo:'vf', q:'=ÍNDICE + =CORRESP pode buscar dados em qualquer direção da tabela, ao contrário do =PROCV.', correct:true }
+        ]
+      }
     }
   }
 };
@@ -8653,6 +8781,414 @@ syncPull().then(() => {
     renderHome();
   }
 });
+
+// ================================================================
+// JOGO EXCEL — Planilha Interativa
+// ================================================================
+const BANCO_EXCEL_ATIVIDADES = [
+  {
+    id:1, titulo:'📚 Notas da Turma', dificuldade:'fácil',
+    desc:'Use =SOMA para somar todas as notas da turma!',
+    instrucao:'Clique em B8 (célula amarela) e calcule a soma das notas de B2 até B7.',
+    linhas: ['Aluno','Ana','Bruno','Carlos','Diana','Eduardo','Fernanda','TOTAL'],
+    cols: ['A','B'],
+    dados: {A1:'Aluno',B1:'Nota',A2:'Ana',B2:8,A3:'Bruno',B3:7,A4:'Carlos',B4:9,A5:'Diana',B5:6,A6:'Eduardo',B6:10,A7:'Fernanda',B7:8},
+    celAlvo: 'B8', labelAlvo: 'TOTAL',
+    formulaCorreta: ['=SOMA(B2:B7)', '=SOMA(B2:B8)', '=B2+B3+B4+B5+B6+B7'],
+    resultadoEsperado: 48,
+    pontos: 20
+  },
+  {
+    id:2, titulo:'📊 Média da Turma', dificuldade:'fácil',
+    desc:'Use =MÉDIA para calcular a nota média dos alunos.',
+    instrucao:'Clique em B8 e calcule a média das notas de B2 até B7.',
+    dados: {A1:'Aluno',B1:'Nota',A2:'Lucas',B2:7,A3:'Mariana',B3:9,A4:'Pedro',B4:8,A5:'Sofia',B5:6,A6:'Tomás',B6:10,A7:'Valentina',B7:7},
+    cols: ['A','B'],
+    celAlvo: 'B8', labelAlvo: 'MÉDIA',
+    formulaCorreta: ['=MÉDIA(B2:B7)', '=MEDIA(B2:B7)'],
+    resultadoEsperado: 7.833333333333333,
+    resultadoApprox: 7.83,
+    pontos: 20
+  },
+  {
+    id:3, titulo:'🏆 Campeão de Vendas', dificuldade:'fácil',
+    desc:'Encontre o vendedor que mais vendeu usando =MÁX.',
+    instrucao:'Clique em B7 e use =MÁX para encontrar o maior valor de B2 até B6.',
+    dados: {A1:'Vendedor',B1:'Vendas (R$)',A2:'Alice',B2:1200,A3:'Bob',B3:850,A4:'Carol',B4:1500,A5:'Dan',B5:980,A6:'Eva',B6:1350},
+    cols: ['A','B'],
+    celAlvo: 'B7', labelAlvo: 'MÁXIMO',
+    formulaCorreta: ['=MÁX(B2:B6)', '=MAX(B2:B6)'],
+    resultadoEsperado: 1500,
+    pontos: 20
+  },
+  {
+    id:4, titulo:'🌡️ Temperatura Mínima', dificuldade:'fácil',
+    desc:'Use =MÍN para encontrar a menor temperatura da semana.',
+    instrucao:'Clique em B9 e calcule a temperatura mínima de B2 até B8.',
+    dados: {A1:'Dia',B1:'Temp (°C)',A2:'Seg',B2:28,A3:'Ter',B3:25,A4:'Qua',B4:30,A5:'Qui',B5:22,A6:'Sex',B6:27,A7:'Sáb',B7:31,A8:'Dom',B8:24},
+    cols: ['A','B'],
+    celAlvo: 'B9', labelAlvo: 'MÍN',
+    formulaCorreta: ['=MÍN(B2:B8)', '=MIN(B2:B8)'],
+    resultadoEsperado: 22,
+    pontos: 20
+  },
+  {
+    id:5, titulo:'💰 Orçamento Mensal', dificuldade:'médio',
+    desc:'Some todos os gastos do mês na célula B8.',
+    instrucao:'Some os gastos de B2 até B7 na célula B8 usando =SOMA.',
+    dados: {A1:'Gasto',B1:'Valor (R$)',A2:'Aluguel',B2:800,A3:'Mercado',B3:350,A4:'Internet',B4:100,A5:'Transporte',B5:150,A6:'Lazer',B6:200,A7:'Outros',B7:120},
+    cols: ['A','B'],
+    celAlvo: 'B8', labelAlvo: 'TOTAL',
+    formulaCorreta: ['=SOMA(B2:B7)', '=B2+B3+B4+B5+B6+B7'],
+    resultadoEsperado: 1720,
+    pontos: 25
+  },
+  {
+    id:6, titulo:'✅ Aprovados na Prova', dificuldade:'médio',
+    desc:'Use =CONT.SE para contar quantos alunos tiraram nota >= 7.',
+    instrucao:'Na célula B8, use =CONT.SE(B2:B7,">=7") para contar aprovados.',
+    dados: {A1:'Aluno',B1:'Nota',A2:'Alex',B2:8,A3:'Bia',B3:5,A4:'Cleo',B4:7,A5:'Diego',B5:4,A6:'Elena',B6:9,A7:'Felipe',B7:6},
+    cols: ['A','B'],
+    celAlvo: 'B8', labelAlvo: 'APROVADOS',
+    formulaCorreta: ['=CONT.SE(B2:B7,">=7")', '=CONT.SE(B2:B7,\">=7\")'],
+    resultadoEsperado: 3,
+    pontos: 30
+  },
+  {
+    id:7, titulo:'🎮 Placar do Torneio', dificuldade:'médio',
+    desc:'Calcule a média dos pontos dos jogadores.',
+    instrucao:'Na célula B7, calcule a =MÉDIA dos pontos de B2 até B6.',
+    dados: {A1:'Jogador',B1:'Pontos',A2:'Player1',B2:1200,A3:'Player2',B3:980,A4:'Player3',B4:1450,A5:'Player4',B5:760,A6:'Player5',B6:1100},
+    cols: ['A','B'],
+    celAlvo: 'B7', labelAlvo: 'MÉDIA',
+    formulaCorreta: ['=MÉDIA(B2:B6)', '=MEDIA(B2:B6)'],
+    resultadoEsperado: 1098,
+    pontos: 25
+  },
+  {
+    id:8, titulo:'🚀 Operações Básicas', dificuldade:'fácil',
+    desc:'Calcule o preço final: preço × quantidade na célula C2.',
+    instrucao:'Clique em C2 e escreva =A2*B2 para calcular o total.',
+    dados: {A1:'Preço Unit.',B1:'Qtd',C1:'Total',A2:15,B2:8,C2:null},
+    cols: ['A','B','C'],
+    celAlvo: 'C2', labelAlvo: 'TOTAL',
+    formulaCorreta: ['=A2*B2', '=B2*A2'],
+    resultadoEsperado: 120,
+    pontos: 15
+  },
+  {
+    id:9, titulo:'📈 Crescimento Percentual', dificuldade:'difícil',
+    desc:'Calcule a variação: =((B2-A2)/A2)*100 para ver o crescimento em %.',
+    instrucao:'Na célula C2, calcule o crescimento percentual: =((B2-A2)/A2)*100',
+    dados: {A1:'Valor Inicial',B1:'Valor Final',C1:'Crescimento %',A2:200,B2:250,C2:null},
+    cols: ['A','B','C'],
+    celAlvo: 'C2', labelAlvo: '%',
+    formulaCorreta: ['=((B2-A2)/A2)*100', '=(B2-A2)/A2*100'],
+    resultadoEsperado: 25,
+    pontos: 35
+  },
+  {
+    id:10, titulo:'🎓 Situação dos Alunos', dificuldade:'difícil',
+    desc:'Use =SE para classificar: nota >= 7 = "Aprovado", senão = "Reprovado".',
+    instrucao:'Na célula C2, escreva =SE(B2>=7,"Aprovado","Reprovado")',
+    dados: {A1:'Aluno',B1:'Nota',C1:'Situação',A2:'Miguel',B2:9,C2:null},
+    cols: ['A','B','C'],
+    celAlvo: 'C2', labelAlvo: 'SITUAÇÃO',
+    formulaCorreta: ['=SE(B2>=7,"Aprovado","Reprovado")', '=SE(B2>=7,"Aprovado","Reprovado")', '=IF(B2>=7,"Aprovado","Reprovado")'],
+    resultadoEsperado: 'Aprovado',
+    pontos: 35
+  },
+  {
+    id:11, titulo:'🏅 Top 3 Atletas', dificuldade:'médio',
+    desc:'Some os pontos dos 3 melhores atletas usando =SOMA.',
+    instrucao:'Na célula B6, some os pontos dos atletas de B2 até B5.',
+    dados: {A1:'Atleta',B1:'Pontos',A2:'Ouro',B2:100,A3:'Prata',B3:75,A4:'Bronze',B4:50,A5:'4° lugar',B5:40},
+    cols: ['A','B'],
+    celAlvo: 'B6', labelAlvo: 'TOTAL PÓDIO',
+    formulaCorreta: ['=SOMA(B2:B5)', '=B2+B3+B4+B5'],
+    resultadoEsperado: 265,
+    pontos: 20
+  },
+  {
+    id:12, titulo:'🌍 Maior País', dificuldade:'fácil',
+    desc:'Use =MÁX para encontrar o maior PIB da lista.',
+    instrucao:'Na célula B7, use =MÁX para encontrar o maior PIB de B2 até B6.',
+    dados: {A1:'País',B1:'PIB (bilhões)',A2:'Brasil',B2:1800,A3:'Argentina',B3:450,A4:'Chile',B4:300,A5:'Colômbia',B5:320,A6:'Peru',B6:220},
+    cols: ['A','B'],
+    celAlvo: 'B7', labelAlvo: 'MAIOR PIB',
+    formulaCorreta: ['=MÁX(B2:B6)', '=MAX(B2:B6)'],
+    resultadoEsperado: 1800,
+    pontos: 20
+  }
+];
+
+let _excelState = {};
+
+function iniciarJogoExcel() {
+  _excelState = {
+    atividades: [...BANCO_EXCEL_ATIVIDADES].sort(() => Math.random() - 0.5).slice(0, 5),
+    idx: 0,
+    pontos: 0,
+    acertos: 0,
+    celSelecionada: null,
+    dados: {}
+  };
+  showScreen('screen-excel');
+  _excelRenderAtividade();
+}
+
+function sairJogoExcel() {
+  _registrarMissaoConcluida('jogo-excel');
+  goDashboard();
+}
+
+function _excelRenderAtividade() {
+  const s = _excelState;
+  const at = s.atividades[s.idx];
+  s.dados = { ...at.dados };
+
+  document.getElementById('excelPontos').textContent = s.pontos;
+  document.getElementById('excelAcertos').textContent = s.acertos;
+  document.getElementById('excelTarefaNum').textContent = `TAREFA ${s.idx + 1} de ${s.atividades.length}`;
+  document.getElementById('excelTarefaTitulo').textContent = at.titulo;
+  document.getElementById('excelTarefaDesc').textContent = at.instrucao;
+  document.getElementById('excelFeedback').style.display = 'none';
+  document.getElementById('excelFormulaBar').value = '';
+  document.getElementById('excelCelNome').textContent = at.celAlvo;
+  s.celSelecionada = at.celAlvo;
+
+  _excelRenderGrid(at);
+  _excelRenderProgresso();
+}
+
+function _excelRenderGrid(at) {
+  const cols = at.cols || ['A','B'];
+  const s = _excelState;
+  const maxRow = _excelMaxRow(s.dados, cols);
+  let html = '<thead><tr><th style="width:36px;background:#F1F5F9;border:1px solid #E2E8F0;padding:6px;font-size:12px;color:#94A3B8;"></th>';
+  cols.forEach(c => {
+    html += `<th style="background:#F1F5F9;border:1px solid #E2E8F0;padding:6px 16px;font-size:12px;font-weight:700;color:#475569;text-align:center;">${c}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  for (let r = 1; r <= maxRow + 1; r++) {
+    html += `<tr><td style="background:#F1F5F9;border:1px solid #E2E8F0;padding:6px 8px;font-size:12px;font-weight:700;color:#94A3B8;text-align:center;">${r}</td>`;
+    cols.forEach(c => {
+      const key = c + r;
+      const isAlvo = key === at.celAlvo;
+      const val = s.dados[key];
+      const isHeader = r === 1;
+      let bg = isHeader ? '#F8FAFC' : 'white';
+      let fw = isHeader ? '700' : '400';
+      let color = isHeader ? '#334155' : '#1E293B';
+      if (isAlvo) { bg = '#FEF9C3'; color = '#854D0E'; fw = '700'; }
+      const style = `background:${bg};border:1px solid #E2E8F0;padding:8px 12px;font-size:13px;font-weight:${fw};color:${color};cursor:${isAlvo?'pointer':'default'};min-width:90px;`;
+      const onclick = isAlvo ? `onclick="excelSelecionarCel('${key}')"` : '';
+      const displayVal = isAlvo && (val === null || val === undefined) ? `<span style="color:#A16207;opacity:.5;">${at.labelAlvo}</span>` : (val !== null && val !== undefined ? val : '');
+      html += `<td id="excell_${key}" style="${style}" ${onclick}>${displayVal}</td>`;
+    });
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  document.getElementById('excelGrid').innerHTML = html;
+}
+
+function _excelMaxRow(dados, cols) {
+  let max = 1;
+  Object.keys(dados).forEach(k => {
+    const r = parseInt(k.slice(1));
+    if (!isNaN(r) && r > max) max = r;
+  });
+  return max;
+}
+
+function excelSelecionarCel(key) {
+  const s = _excelState;
+  const at = s.atividades[s.idx];
+  if (key !== at.celAlvo) return;
+  s.celSelecionada = key;
+  document.getElementById('excelCelNome').textContent = key;
+  document.getElementById('excelFormulaBar').value = '';
+  document.getElementById('excelFormulaBar').focus();
+}
+
+function excelFormulaKeydown(e) {
+  if (e.key === 'Enter') excelConfirmar();
+}
+
+function excelConfirmar() {
+  const s = _excelState;
+  const at = s.atividades[s.idx];
+  const formula = document.getElementById('excelFormulaBar').value.trim();
+  if (!formula) return;
+
+  const resultado = _excelAvaliar(formula, s.dados);
+  const fb = document.getElementById('excelFeedback');
+
+  const corretas = at.formulaCorreta.map(f => f.toLowerCase().replace(/\s/g,''));
+  const formulaNorm = formula.toLowerCase().replace(/\s/g,'');
+  const formulaOk = corretas.includes(formulaNorm);
+
+  let valorOk = false;
+  if (resultado !== null && resultado !== undefined && !isNaN(Number(resultado)) && at.resultadoEsperado !== undefined) {
+    if (typeof at.resultadoEsperado === 'number') {
+      if (at.resultadoApprox) {
+        valorOk = Math.abs(Number(resultado) - at.resultadoEsperado) < 0.1;
+      } else {
+        valorOk = Math.abs(Number(resultado) - at.resultadoEsperado) < 0.001;
+      }
+    } else {
+      valorOk = String(resultado).toLowerCase() === String(at.resultadoEsperado).toLowerCase();
+    }
+  } else if (typeof at.resultadoEsperado === 'string' && resultado !== null) {
+    valorOk = String(resultado).toLowerCase() === String(at.resultadoEsperado).toLowerCase();
+  }
+
+  const acertou = formulaOk || valorOk;
+
+  if (acertou) {
+    s.dados[at.celAlvo] = resultado !== null ? resultado : at.resultadoEsperado;
+    const cel = document.getElementById('excell_' + at.celAlvo);
+    if (cel) {
+      cel.style.background = '#D1FAE5';
+      cel.style.color = '#065F46';
+      cel.style.fontWeight = '700';
+      cel.textContent = s.dados[at.celAlvo];
+    }
+    s.pontos += at.pontos;
+    s.acertos++;
+    document.getElementById('excelPontos').textContent = s.pontos;
+    document.getElementById('excelAcertos').textContent = s.acertos;
+    fb.style.display = 'block';
+    fb.style.background = '#D1FAE5';
+    fb.style.color = '#065F46';
+    fb.innerHTML = `✅ Correto! +${at.pontos} pontos 🎉`;
+    _excelRenderProgresso();
+    setTimeout(() => {
+      if (s.idx + 1 < s.atividades.length) {
+        s.idx++;
+        _excelRenderAtividade();
+      } else {
+        _excelTelaFinal();
+      }
+    }, 1800);
+  } else {
+    fb.style.display = 'block';
+    fb.style.background = '#FEE2E2';
+    fb.style.color = '#991B1B';
+    fb.innerHTML = `❌ Quase! Resultado obtido: <strong>${resultado !== null ? resultado : '?'}</strong>. Revise a fórmula e tente novamente.`;
+  }
+}
+
+function _excelTelaFinal() {
+  const s = _excelState;
+  const pct = Math.round((s.acertos / s.atividades.length) * 100);
+  const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '😊' : '💪';
+  document.getElementById('screen-excel').innerHTML = `
+    <div class="container" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;">
+      <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
+      <h2 style="font-size:28px;font-weight:900;color:#1E293B;margin-bottom:8px;">Planilha Concluída!</h2>
+      <div style="font-size:18px;color:#64748B;margin-bottom:24px;">${s.acertos} de ${s.atividades.length} atividades corretas</div>
+      <div style="font-size:48px;font-weight:900;color:#8B5CF6;margin-bottom:8px;">${s.pontos}</div>
+      <div style="font-size:14px;color:#94A3B8;font-weight:700;margin-bottom:32px;">PONTOS TOTAIS</div>
+      <button class="btn success" onclick="sairJogoExcel()" style="font-size:16px;padding:14px 32px;">✅ Finalizar</button>
+    </div>
+  `;
+  _registrarMissaoConcluida('jogo-excel');
+}
+
+function _excelRenderProgresso() {
+  const s = _excelState;
+  let html = '';
+  s.atividades.forEach((at, i) => {
+    const concluida = i < s.idx || (i === s.idx && s.acertos > (s.idx - (s.atividades.length - s.atividades.slice(s.idx).length)));
+    const atual = i === s.idx;
+    const bg = concluida ? '#D1FAE5' : atual ? '#EDE9FE' : '#F1F5F9';
+    const color = concluida ? '#065F46' : atual ? '#6D28D9' : '#94A3B8';
+    const fw = atual ? '700' : '500';
+    html += `<div style="background:${bg};color:${color};font-weight:${fw};font-size:12px;border-radius:20px;padding:4px 12px;">${i+1}. ${at.titulo.split(' ').slice(0,2).join(' ')}</div>`;
+  });
+  document.getElementById('excelProgresso').innerHTML = html;
+}
+
+function _excelAvaliar(formula, dados) {
+  if (!formula.startsWith('=')) return formula;
+  let expr = formula.slice(1);
+  // Normaliza nomes PT → EN internos
+  expr = expr.replace(/\bSOMA\b/gi, 'SUM').replace(/\bMÉDIA\b/gi, 'AVG').replace(/\bMEDIA\b/gi, 'AVG')
+    .replace(/\bMÁX\b/gi, 'MAX').replace(/\bMÍN\b/gi, 'MIN').replace(/\bCONT\.SE\b/gi, 'COUNTIF')
+    .replace(/\bCONT\.NÚM\b/gi, 'COUNTA').replace(/\bSOMASE\b/gi, 'SUMIF')
+    .replace(/\bSE\b/gi, 'IF').replace(/\bIF\b/g, 'IF');
+  // Resolve funções
+  expr = _excelResolveFunc(expr, dados);
+  // Resolve referências de células restantes
+  expr = expr.replace(/([A-Z]+)(\d+)/g, (_, col, row) => {
+    const v = dados[col + row];
+    return (v !== null && v !== undefined) ? v : '0';
+  });
+  try {
+    // eslint-disable-next-line no-new-func
+    const result = Function('"use strict"; return (' + expr + ')')();
+    return typeof result === 'number' ? Math.round(result * 100) / 100 : result;
+  } catch(e) { return null; }
+}
+
+function _excelResolveFunc(expr, dados) {
+  // SUM(range)
+  expr = expr.replace(/SUM\(([A-Z]+\d+):([A-Z]+\d+)\)/gi, (_, from, to) => {
+    return _excelRangeVals(from, to, dados).reduce((a,b)=>a+b,0);
+  });
+  // AVG(range)
+  expr = expr.replace(/AVG\(([A-Z]+\d+):([A-Z]+\d+)\)/gi, (_, from, to) => {
+    const vals = _excelRangeVals(from, to, dados);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+  // MAX(range)
+  expr = expr.replace(/MAX\(([A-Z]+\d+):([A-Z]+\d+)\)/gi, (_, from, to) => {
+    const vals = _excelRangeVals(from, to, dados);
+    return vals.length ? Math.max(...vals) : 0;
+  });
+  // MIN(range)
+  expr = expr.replace(/MIN\(([A-Z]+\d+):([A-Z]+\d+)\)/gi, (_, from, to) => {
+    const vals = _excelRangeVals(from, to, dados);
+    return vals.length ? Math.min(...vals) : 0;
+  });
+  // COUNTIF(range, crit)
+  expr = expr.replace(/COUNTIF\(([A-Z]+\d+):([A-Z]+\d+),"([^"]+)"\)/gi, (_, from, to, crit) => {
+    const vals = _excelRangeVals(from, to, dados);
+    const m = crit.match(/^(>=|<=|>|<|<>|=?)(.+)$/);
+    if (!m) return vals.filter(v=>String(v)===crit).length;
+    const [, op, num] = m; const n = parseFloat(num);
+    return vals.filter(v => {
+      if (op==='>') return v>n; if (op==='<') return v<n;
+      if (op==='>=') return v>=n; if (op==='<=') return v<=n;
+      if (op==='<>') return v!=n; return v==n;
+    }).length;
+  });
+  // IF(cond, t, f)
+  expr = expr.replace(/IF\((.+?),(".*?"|[^,]+),(".*?"|[^)]+)\)/gi, (_, cond, t, f) => {
+    try {
+      const condResolved = cond.replace(/([A-Z]+\d+)/g, (m) => dados[m] !== undefined ? dados[m] : 0);
+      // eslint-disable-next-line no-new-func
+      const result = Function('"use strict"; return (' + condResolved + ')')();
+      return result ? t : f;
+    } catch(e) { return f; }
+  });
+  return expr;
+}
+
+function _excelRangeVals(from, to, dados) {
+  const colFrom = from.replace(/\d/g,''), rowFrom = parseInt(from.replace(/\D/g,''));
+  const colTo = to.replace(/\d/g,''), rowTo = parseInt(to.replace(/\D/g,''));
+  const vals = [];
+  for (let r = rowFrom; r <= rowTo; r++) {
+    for (let c = colFrom.charCodeAt(0); c <= colTo.charCodeAt(0); c++) {
+      const key = String.fromCharCode(c) + r;
+      const v = dados[key];
+      if (v !== null && v !== undefined && !isNaN(Number(v))) vals.push(Number(v));
+    }
+  }
+  return vals;
+}
 </script>
 
 </body>
