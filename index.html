@@ -3770,7 +3770,7 @@ function _hookQuizFim(moduloId) {
     if (!missaoId) return;
     const m = MISSOES_CATALOGO[missaoId];
     if (!m || m.completionTrigger !== 'quiz_finish') return;
-    const mapa = { 'quiz-hw':'hardware','quiz-sw':'software','quiz-nav':'navegadores','quiz-av':'antivirus','quiz-mem':'memoria','prova-final':'prova' };
+    const mapa = { 'quiz-hw':'hardware','quiz-sw':'software','quiz-nav':'navegadores','quiz-av':'antivirus','quiz-mem':'memoria','quiz-redes':'redes','quiz-excel-basico':'excel-basico','quiz-excel-inter':'excel-inter','prova-final':'prova' };
     if (moduloId && mapa[missaoId] && mapa[missaoId] !== moduloId) return;
     if (_missaoStatus(alunoId, missaoId) !== 'completed') _missaoMarcarStatus(alunoId, missaoId, 'completed');
     localStorage.removeItem('lusca_missao_ativa');
@@ -4472,7 +4472,7 @@ function renderDashboard() {
     let liberado = i === 0 || (a.progresso[_ordemMods[i - 1]]?.quizDone) || prog.quizDone;
 
     if (prog.quizDone) {
-      const scorePctDone = Math.round((prog.quizScore / prog.quizTotal) * 100);
+      const scorePctDone = prog.quizTotal ? Math.round((prog.quizScore / prog.quizTotal) * 100) : 0;
       const estrelas = scorePctDone >= 90 ? '⭐⭐⭐' : scorePctDone >= 70 ? '⭐⭐' : '⭐';
       statusHtml = `<span class="modulo-status" style="color:#065F46;background:#D1FAE5;border-radius:6px;padding:2px 8px;">${estrelas} Concluído · ${scorePctDone}% — <strong>Refazer</strong></span>`;
     } else if (prog.aulaVista) {
@@ -9097,14 +9097,13 @@ function _excelTelaFinal() {
       <button class="btn success" onclick="sairJogoExcel()" style="font-size:16px;padding:14px 32px;">✅ Finalizar</button>
     </div>
   `;
-  _missaoConcluidaCallback();
 }
 
 function _excelRenderProgresso() {
   const s = _excelState;
   let html = '';
   s.atividades.forEach((at, i) => {
-    const concluida = i < s.idx || (i === s.idx && s.acertos > (s.idx - (s.atividades.length - s.atividades.slice(s.idx).length)));
+    const concluida = i < s.idx;
     const atual = i === s.idx;
     const bg = concluida ? '#D1FAE5' : atual ? '#EDE9FE' : '#F1F5F9';
     const color = concluida ? '#065F46' : atual ? '#6D28D9' : '#94A3B8';
