@@ -3469,6 +3469,7 @@ const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memo
 // Sequências de módulos por turma+nível — sobrescreve ORDEM_MODULOS quando definida
 const ORDEM_MODULOS_TURMA = {
   'T1_n1': ["excel-basico", "excel-inter", "redes", "hardware"],
+  'T3_n3': ["excel-basico", "excel-inter", "redes", "hardware", "software", "navegadores"],
 };
 
 function _getOrdemModulos(turmaKey, nivel) {
@@ -3643,7 +3644,7 @@ const MISSOES_CATALOGO = {
   'quiz-av':       { titulo:'Quiz de Antivírus',        tipo:'quiz',      emoji:'🛡️', desc:'Segurança digital e proteção do PC.',            pontos:25,  acao:"iniciarQuizModulo('antivirus')",     completionTrigger:'quiz_finish' },
   'quiz-mem':      { titulo:'Quiz de Memória',          tipo:'quiz',      emoji:'🧠', desc:'RAM, HD, SSD — armazenamento do PC.',            pontos:25,  acao:"iniciarQuizModulo('memoria')",       completionTrigger:'quiz_finish' },
   'quiz-redes':    { titulo:'Quiz de Redes',            tipo:'quiz',      emoji:'🌐', desc:'Internet, Wi-Fi, IP — como tudo se conecta.',   pontos:25,  acao:"iniciarQuizModulo('redes')",         completionTrigger:'quiz_finish' },
-  'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return', inativo:true },
+  'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return' },
   'jogo-rede':     { titulo:'Reparar a Rede',           tipo:'jogo',      emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30,  acao:"iniciarRedePuzzle()",                completionTrigger:'activity_return', inativo:true },
   'jogo-atirador': { titulo:'Atirador de Palavras',     tipo:'jogo',      emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!',       pontos:20,  acao:"iniciarAtiradorPalavras()",          completionTrigger:'activity_return' },
   'jogo-runner':   { titulo:'Hacker Runner',            tipo:'jogo',      emoji:'🎮', desc:'Fase de plataforma pixel art.',                  pontos:20,  acao:"abrirJogo('hacker-runner','hardware')", completionTrigger:'activity_return', inativo:true },
@@ -3665,8 +3666,8 @@ const PLANO_SEMANA = {
   // T3 — planos individuais por nível (aula 14/06)
   // Nível 1: João (8a) e Guilherme (10a) — memória + antivírus (não viram ainda) + digitação + atirador
   'T3_n1':  ['quiz-mem', 'quiz-av', 'dig-fileiras', 'jogo-atirador', 'dig-treino'],
-  // Nível 3: Luiz (15a) — memória + ranqueado + redes nível avançado + atirador
-  'T3_n3':  ['quiz-mem', 'dig-rank', 'quiz-redes', 'jogo-atirador', 'quiz-av'],
+  // Nível 3: Luiz (15a) — começa Excel + digitação ranqueada + atirador
+  'T3_n3':  ['quiz-excel-basico', 'jogo-excel', 'dig-rank', 'jogo-atirador', 'quiz-excel-inter'],
   // T1 — Miguel (10 anos, nível 1) — plano Excel
   'T1_n1':  ['quiz-excel-basico', 'jogo-excel', 'quiz-excel-inter', 'quiz-redes', 'jogo-atirador', 'dig-fileiras'],
 };
