@@ -3656,7 +3656,7 @@ const PLANO_SEMANA = {
   // Nível 1: João e Guilherme — revisão erros (HW/Word/Redes) + estreia Excel
   'T3_n1':  ['quiz-hw', 'quiz-sw', 'quiz-redes', 'quiz-nav', 'quiz-av', 'quiz-mem', 'jogo-memoria', 'quiz-excel-basico', 'jogo-excel', 'jogo-atirador', 'dig-fileiras', 'dig-treino'],
   // Nível 3: Luiz — Excel + revisão geral + digitação
-  'T3_n3':  ['quiz-excel-basico', 'jogo-excel', 'quiz-excel-inter', 'quiz-hw', 'quiz-sw', 'quiz-nav', 'quiz-redes', 'jogo-memoria', 'dig-rank', 'jogo-atirador', 'dig-fileiras'],
+  'T3_n3':  ['quiz-excel-basico', 'jogo-excel', 'quiz-excel-inter', 'quiz-sw', 'quiz-nav', 'quiz-redes', 'jogo-memoria', 'dig-rank', 'jogo-atirador', 'dig-fileiras'],
   // T1 — Miguel (10 anos, nível 1) — plano Excel
   'T1_n1':  ['quiz-excel-basico', 'jogo-excel', 'quiz-excel-inter', 'quiz-redes', 'jogo-atirador', 'dig-fileiras'],
 };
@@ -8949,6 +8949,62 @@ const BANCO_EXCEL_ATIVIDADES = [
     formulaCorreta: ['=MÁX(B2:B6)', '=MAX(B2:B6)'],
     resultadoEsperado: 1800,
     pontos: 20
+  },
+  // ── atividades avançadas (nivel 2-3) ──
+  {
+    id:13, titulo:'💼 Bônus por Vendas', dificuldade:'difícil',
+    desc:'Use =SE para calcular bônus: vendas > 1000 recebe R$200, senão R$50.',
+    instrucao:'Na célula C2, use =SE(B2>1000,200,50) para calcular o bônus de Ana.',
+    dados: {A1:'Vendedora',B1:'Vendas (R$)',C1:'Bônus',A2:'Ana',B2:1200,C2:null,A3:'Bia',B3:800,C3:null},
+    cols: ['A','B','C'],
+    celAlvo: 'C2', labelAlvo: 'BÔNUS',
+    formulaCorreta: ['=SE(B2>1000,200,50)', '=IF(B2>1000,200,50)'],
+    resultadoEsperado: 200,
+    pontos: 40
+  },
+  {
+    id:14, titulo:'📦 Total de Estoque', dificuldade:'difícil',
+    desc:'Use =SOMASE para somar só os produtos da categoria "Eletrônico".',
+    instrucao:'Na célula B8, use =SOMASE(A2:A7,"Eletrônico",B2:B7).',
+    dados: {A1:'Categoria',B1:'Qtd',A2:'Eletrônico',B2:15,A3:'Roupa',B3:30,A4:'Eletrônico',B4:22,A5:'Roupa',B5:18,A6:'Eletrônico',B6:10,A7:'Roupa',B7:25},
+    cols: ['A','B'],
+    celAlvo: 'B8', labelAlvo: 'TOTAL ELET.',
+    formulaCorreta: ['=SOMASE(A2:A7,"Eletrônico",B2:B7)'],
+    resultadoEsperado: 47,
+    pontos: 45
+  },
+  {
+    id:15, titulo:'📊 Reprovados na Turma', dificuldade:'difícil',
+    desc:'Conte quantos alunos tiraram nota abaixo de 6 usando =CONT.SE.',
+    instrucao:'Na célula B8, use =CONT.SE(B2:B7,"<6") para contar os reprovados.',
+    dados: {A1:'Aluno',B1:'Nota',A2:'Arthur',B2:8,A3:'Beatriz',B3:4,A4:'Carlos',B4:5,A5:'Débora',B5:9,A6:'Eduardo',B6:3,A7:'Flávia',B7:7},
+    cols: ['A','B'],
+    celAlvo: 'B8', labelAlvo: 'REPROVADOS',
+    formulaCorreta: ['=CONT.SE(B2:B7,"<6")'],
+    resultadoEsperado: 3,
+    pontos: 40
+  },
+  {
+    id:16, titulo:'💰 Lucro da Empresa', dificuldade:'difícil',
+    desc:'Calcule o lucro: receita - custos. Use referências de células.',
+    instrucao:'Na célula C2, calcule =A2-B2 para obter o lucro.',
+    dados: {A1:'Receita (R$)',B1:'Custos (R$)',C1:'Lucro (R$)',A2:8500,B2:3200,C2:null},
+    cols: ['A','B','C'],
+    celAlvo: 'C2', labelAlvo: 'LUCRO',
+    formulaCorreta: ['=A2-B2'],
+    resultadoEsperado: 5300,
+    pontos: 30
+  },
+  {
+    id:17, titulo:'🎯 Meta Atingida?', dificuldade:'difícil',
+    desc:'Use =SE para verificar: vendas >= meta mostra "Sim", senão "Não".',
+    instrucao:'Na célula C2, escreva =SE(B2>=A2,"Sim","Não").',
+    dados: {A1:'Meta (R$)',B1:'Vendas (R$)',C1:'Atingiu?',A2:5000,B2:6200,C2:null},
+    cols: ['A','B','C'],
+    celAlvo: 'C2', labelAlvo: 'META?',
+    formulaCorreta: ['=SE(B2>=A2,"Sim","Não")', '=SE(B2>=A2,"Sim","Não")', '=IF(B2>=A2,"Sim","Não")'],
+    resultadoEsperado: 'Sim',
+    pontos: 40
   }
 ];
 
@@ -8956,7 +9012,15 @@ let _excelState = {};
 
 function iniciarJogoExcel() {
   _excelState = {
-    atividades: [...BANCO_EXCEL_ATIVIDADES].sort(() => Math.random() - 0.5).slice(0, 5),
+    atividades: (() => {
+      const nivel = alunoAtivo?.nivel || 1;
+      const pool = nivel >= 3
+        ? BANCO_EXCEL_ATIVIDADES.filter(a => a.dificuldade === 'difícil')
+        : nivel === 2
+          ? BANCO_EXCEL_ATIVIDADES.filter(a => a.dificuldade !== 'fácil')
+          : BANCO_EXCEL_ATIVIDADES.filter(a => a.dificuldade === 'fácil');
+      return [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
+    })(),
     idx: 0,
     pontos: 0,
     acertos: 0,
