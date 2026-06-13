@@ -3643,11 +3643,11 @@ const MISSOES_CATALOGO = {
   'quiz-av':       { titulo:'Quiz de Antivírus',        tipo:'quiz',      emoji:'🛡️', desc:'Segurança digital e proteção do PC.',            pontos:25,  acao:"iniciarQuizModulo('antivirus')",     completionTrigger:'quiz_finish' },
   'quiz-mem':      { titulo:'Quiz de Memória',          tipo:'quiz',      emoji:'🧠', desc:'RAM, HD, SSD — armazenamento do PC.',            pontos:25,  acao:"iniciarQuizModulo('memoria')",       completionTrigger:'quiz_finish' },
   'quiz-redes':    { titulo:'Quiz de Redes',            tipo:'quiz',      emoji:'🌐', desc:'Internet, Wi-Fi, IP — como tudo se conecta.',   pontos:25,  acao:"iniciarQuizModulo('redes')",         completionTrigger:'quiz_finish' },
-  'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return' },
-  'jogo-rede':     { titulo:'Reparar a Rede',           tipo:'jogo',      emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30,  acao:"iniciarRedePuzzle()",                completionTrigger:'activity_return' },
+  'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return', inativo:true },
+  'jogo-rede':     { titulo:'Reparar a Rede',           tipo:'jogo',      emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30,  acao:"iniciarRedePuzzle()",                completionTrigger:'activity_return', inativo:true },
   'jogo-atirador': { titulo:'Atirador de Palavras',     tipo:'jogo',      emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!',       pontos:20,  acao:"iniciarAtiradorPalavras()",          completionTrigger:'activity_return' },
-  'jogo-runner':   { titulo:'Hacker Runner',            tipo:'jogo',      emoji:'🎮', desc:'Fase de plataforma pixel art.',                  pontos:20,  acao:"abrirJogo('hacker-runner','hardware')", completionTrigger:'activity_return' },
-  'jogo-ram':      { titulo:'Gerenciador de RAM',       tipo:'jogo',      emoji:'⚙️',  desc:'Processos invadem a memória — encerre-os.',     pontos:20,  acao:"abrirJogo('ram-manager','memoria')",    completionTrigger:'activity_return' },
+  'jogo-runner':   { titulo:'Hacker Runner',            tipo:'jogo',      emoji:'🎮', desc:'Fase de plataforma pixel art.',                  pontos:20,  acao:"abrirJogo('hacker-runner','hardware')", completionTrigger:'activity_return', inativo:true },
+  'jogo-ram':      { titulo:'Gerenciador de RAM',       tipo:'jogo',      emoji:'⚙️',  desc:'Processos invadem a memória — encerre-os.',     pontos:20,  acao:"abrirJogo('ram-manager','memoria')",    completionTrigger:'activity_return', inativo:true },
   'prova-final':   { titulo:'Prova Final',              tipo:'boss',      emoji:'🏅', desc:'Desafio completo! Só para quem concluiu todos os módulos.', pontos:100, acao:"iniciarProva()", completionTrigger:'quiz_finish' },
   'quiz-excel-basico': { titulo:'Quiz Excel Básico',    tipo:'quiz',      emoji:'📊', desc:'SOMA, MÉDIA e as primeiras fórmulas da planilha.', pontos:30, acao:"iniciarQuizModulo('excel-basico')", completionTrigger:'quiz_finish' },
   'quiz-excel-inter':  { titulo:'Quiz Excel Intermediário', tipo:'quiz',  emoji:'🚀', desc:'=SE, =CONT.SE, condições e análise avançada.', pontos:35, acao:"iniciarQuizModulo('excel-inter')", completionTrigger:'quiz_finish' },
@@ -3662,11 +3662,11 @@ const PLANO_SEMANA = {
   T2:       ['dig-fileiras', 'quiz-nav', 'quiz-av',  'jogo-atirador', 'dig-rank'],
   T3:       ['dig-treino',   'quiz-mem', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
   SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
-  // T3 — planos individuais por nível (aula de hoje 17/06)
-  // Nível 1: João (8a) e Guilherme (10a) — sem ranqueado, foco em redes + quizzes + atirador
-  'T3_n1':  ['quiz-redes', 'quiz-hw', 'dig-fileiras', 'jogo-atirador', 'quiz-sw', 'dig-treino', 'quiz-nav'],
-  // Nível 3: Luiz (15a) — redes + quizzes completos + ranqueado + atirador
-  'T3_n3':  ['quiz-redes', 'quiz-av', 'quiz-nav', 'quiz-sw', 'quiz-hw', 'dig-rank', 'jogo-atirador'],
+  // T3 — planos individuais por nível (aula 14/06)
+  // Nível 1: João (8a) e Guilherme (10a) — memória + antivírus (não viram ainda) + digitação + atirador
+  'T3_n1':  ['quiz-mem', 'quiz-av', 'dig-fileiras', 'jogo-atirador', 'dig-treino'],
+  // Nível 3: Luiz (15a) — memória + ranqueado + redes nível avançado + atirador
+  'T3_n3':  ['quiz-mem', 'dig-rank', 'quiz-redes', 'jogo-atirador', 'quiz-av'],
   // T1 — Miguel (10 anos, nível 1) — plano Excel
   'T1_n1':  ['quiz-excel-basico', 'jogo-excel', 'quiz-excel-inter', 'quiz-redes', 'jogo-atirador', 'dig-fileiras'],
 };
@@ -3682,14 +3682,12 @@ const PLANO_NIVEL = {
 };
 
 // Retorna o plano certo para o aluno: turma+nível específico > nível > turma
+// Filtra missões inativas do catálogo
 function _getMissoesPlan(turmaKey, nivel) {
-  // 1. turma + nível específico (professor pode definir T1_n2, etc.)
   const especifico = PLANO_SEMANA[turmaKey + '_n' + nivel];
-  if (especifico) return especifico;
-  // 2. plano por nível (adapta automaticamente)
-  if (PLANO_NIVEL[nivel]) return PLANO_NIVEL[nivel];
-  // 3. fallback: plano da turma geral
-  return PLANO_SEMANA[turmaKey] || PLANO_SEMANA['SEM_TURMA'];
+  if (especifico) return especifico.filter(id => !MISSOES_CATALOGO[id]?.inativo);
+  if (PLANO_NIVEL[nivel]) return PLANO_NIVEL[nivel].filter(id => !MISSOES_CATALOGO[id]?.inativo);
+  return (PLANO_SEMANA[turmaKey] || PLANO_SEMANA['SEM_TURMA']).filter(id => !MISSOES_CATALOGO[id]?.inativo);
 }
 
 function _semanaISO() {
