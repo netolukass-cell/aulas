@@ -4623,19 +4623,9 @@ function renderDashboard() {
   }
   grid.innerHTML = html;
 
-  // seção compacta de módulos já concluídos
+  // módulos concluídos não aparecem no dashboard do aluno (dados preservados para professor/estrelas)
   const concGrid = document.getElementById('modulosConcluidos');
-  if (concGrid) {
-    if (modulosConcluidos.length) {
-      concGrid.innerHTML = `
-        <div style="font-size:11px;font-weight:800;color:#16A34A;letter-spacing:1px;margin-bottom:8px;padding:0 2px;">✅ CONCLUÍDOS — clique para refazer</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">${modulosConcluidos.join('')}</div>`;
-      concGrid.style.display = 'block';
-    } else {
-      concGrid.innerHTML = '';
-      concGrid.style.display = 'none';
-    }
-  }
+  if (concGrid) { concGrid.innerHTML = ''; concGrid.style.display = 'none'; }
 
   // prova
   const provaCard = document.getElementById("provaCard");
