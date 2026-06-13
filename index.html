@@ -3736,7 +3736,15 @@ function _missaoMarcarStatus(alunoId, missaoId, novoStatus) {
 function _missaoJaFeita(alunoId, missaoId) {
   if (MISSOES_CATALOGO[missaoId]?.repetivel) return false;
   const a = getAlunos().find(x => x.id === alunoId);
-  return a?.progresso?.missoesFeitas?.includes(missaoId) || false;
+  if (!a) return false;
+  // 1. rastreamento permanente novo
+  if (a.progresso?.missoesFeitas?.includes(missaoId)) return true;
+  // 2. cruzamento com progresso de módulo existente (dados antigos)
+  const moduloDoQuiz = { 'quiz-hw':'hardware','quiz-sw':'software','quiz-nav':'navegadores','quiz-av':'antivirus','quiz-mem':'memoria','quiz-redes':'redes','quiz-excel-basico':'excel-basico','quiz-excel-inter':'excel-inter' };
+  const mod = moduloDoQuiz[missaoId];
+  if (mod && a.progresso?.[mod]?.quizDone) return true;
+  return false;
+}
 }
 function _missoesConcluidasNaSemana(alunoId, semana) {
   return _missaoSemana(alunoId, semana || _semanaISO()).completed;
