@@ -8954,7 +8954,7 @@ function iniciarJogoExcel() {
 }
 
 function sairJogoExcel() {
-  _registrarMissaoConcluida('jogo-excel');
+  _missaoConcluidaCallback();
   goDashboard();
 }
 
@@ -9109,7 +9109,7 @@ function _excelTelaFinal() {
       <button class="btn success" onclick="sairJogoExcel()" style="font-size:16px;padding:14px 32px;">✅ Finalizar</button>
     </div>
   `;
-  _registrarMissaoConcluida('jogo-excel');
+  _missaoConcluidaCallback();
 }
 
 function _excelRenderProgresso() {
