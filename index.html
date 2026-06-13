@@ -3456,6 +3456,7 @@ const ORDEM_MODULOS = ["hardware", "software", "navegadores", "antivirus", "memo
 // Sequências de módulos por turma+nível — sobrescreve ORDEM_MODULOS quando definida
 const ORDEM_MODULOS_TURMA = {
   'T1_n1': ["excel-basico", "excel-inter", "redes", "hardware"],
+  'T3_n1': ["excel-basico", "hardware", "software", "redes", "navegadores", "antivirus", "memoria"],
   'T3_n3': ["excel-basico", "excel-inter", "redes", "hardware", "software", "navegadores"],
 };
 
@@ -3651,8 +3652,8 @@ const PLANO_SEMANA = {
   T3:       ['dig-treino',   'quiz-mem', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
   SEM_TURMA:['dig-fileiras', 'quiz-hw',  'jogo-atirador', 'dig-rank'],
   // T3 — planos individuais por nível (aula 14/06)
-  // Nível 1: João (8a) e Guilherme (10a) — memória + antivírus (não viram ainda) + digitação + atirador
-  'T3_n1':  ['quiz-mem', 'quiz-av', 'dig-fileiras', 'jogo-atirador', 'dig-treino'],
+  // Nível 1: João e Guilherme — revisão erros (HW/Word/Redes) + estreia Excel
+  'T3_n1':  ['quiz-hw', 'quiz-sw', 'quiz-redes', 'quiz-excel-basico', 'jogo-excel', 'jogo-atirador'],
   // Nível 3: Luiz (15a) — começa Excel + digitação ranqueada + atirador
   'T3_n3':  ['quiz-excel-basico', 'jogo-excel', 'dig-rank', 'jogo-atirador', 'quiz-excel-inter'],
   // T1 — Miguel (10 anos, nível 1) — plano Excel
