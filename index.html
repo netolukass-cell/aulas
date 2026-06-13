@@ -3745,7 +3745,6 @@ function _missaoJaFeita(alunoId, missaoId) {
   if (mod && a.progresso?.[mod]?.quizDone) return true;
   return false;
 }
-}
 function _missoesConcluidasNaSemana(alunoId, semana) {
   return _missaoSemana(alunoId, semana || _semanaISO()).completed;
 }
@@ -4584,36 +4583,23 @@ function renderDashboard() {
     const scorePct = prog.quizDone ? Math.round((prog.quizScore / prog.quizTotal || 0) * 100) : 0;
     const estrelas = scorePct >= 90 ? '⭐⭐⭐' : scorePct >= 70 ? '⭐⭐' : '⭐';
 
-    if (prog.quizDone) {
-      // módulo concluído → linha compacta clicável para refazer
-      modulosConcluidos.push(`
-        <div onclick="iniciarModulo('${m}')" style="display:flex;align-items:center;gap:12px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:10px 14px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#DCFCE7'" onmouseout="this.style.background='#F0FDF4'">
-          <div style="font-size:22px;flex-shrink:0;">${mod.icone}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:14px;color:#065F46;text-decoration:line-through;opacity:.8;">${mod.titulo}</div>
-            <div style="font-size:11px;color:#16A34A;font-weight:600;">${estrelas} ${scorePct}%</div>
+    html += `
+      <div class="${classes}" data-m="${m}" ${onClick}>
+        <div class="modulo-card-banner">
+          <span class="modulo-card-banner-num">0${i+1}</span>
+          <div class="modulo-card-icon-wrap"><iconify-icon icon="${iconName}"></iconify-icon></div>
+          ${decoSVG[m] || ""}
+        </div>
+        <div class="modulo-card-body">
+          <div class="modulo-card-num">MÓDULO ${i+1}</div>
+          <div class="modulo-card-title">${mod.titulo}</div>
+          <div class="modulo-card-desc">${mod.desc}</div>
+          ${statusHtml}
+          <div class="modulo-card-score-bar" style="margin-top:12px;" title="${scorePct}% no quiz">
+            <div class="modulo-card-score-fill" style="width:${scorePct}%"></div>
           </div>
-          <div style="font-size:11px;color:#16A34A;font-weight:700;white-space:nowrap;">Refazer →</div>
-        </div>`);
-    } else {
-      html += `
-        <div class="${classes}" data-m="${m}" ${onClick}>
-          <div class="modulo-card-banner">
-            <span class="modulo-card-banner-num">0${i+1}</span>
-            <div class="modulo-card-icon-wrap"><iconify-icon icon="${iconName}"></iconify-icon></div>
-            ${decoSVG[m] || ""}
-          </div>
-          <div class="modulo-card-body">
-            <div class="modulo-card-num">MÓDULO ${i+1}</div>
-            <div class="modulo-card-title">${mod.titulo}</div>
-            <div class="modulo-card-desc">${mod.desc}</div>
-            ${statusHtml}
-            <div class="modulo-card-score-bar" style="margin-top:12px;" title="${scorePct}% no quiz">
-              <div class="modulo-card-score-fill" style="width:${scorePct}%"></div>
-            </div>
-          </div>
-        </div>`;
-    }
+        </div>
+      </div>`;
   });
   // se todos os módulos foram concluídos mas a grade ficou vazia, mostra mensagem
   if (!html) {
