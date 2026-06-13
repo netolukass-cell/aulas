@@ -3624,9 +3624,9 @@ const MISSOES_KEY = 'lusca_missoes';
 
 // completionTrigger: 'activity_return' | 'quiz_finish' | 'manual'
 const MISSOES_CATALOGO = {
-  'dig-treino':    { titulo:'Aquecimento de Digitação', tipo:'digitacao', emoji:'⌨️', desc:'Treine no seu ritmo por alguns minutos.',       pontos:15,  acao:"abrirJogo('digitacao','')",          completionTrigger:'activity_return' },
-  'dig-fileiras':  { titulo:'Aprender por Fileira',     tipo:'digitacao', emoji:'🏫', desc:'Lições progressivas pela fileira do teclado.',   pontos:20,  acao:"abrirFileiras()",                    completionTrigger:'activity_return' },
-  'dig-rank':      { titulo:'Digitação Ranqueada',      tipo:'digitacao', emoji:'🏆', desc:'Cronômetro ativo! Suba no ranking da turma.',    pontos:40,  acao:"iniciarDigitacao('ranqueado')",      completionTrigger:'activity_return' },
+  'dig-treino':    { titulo:'Aquecimento de Digitação', tipo:'digitacao', emoji:'⌨️', desc:'Treine no seu ritmo por alguns minutos.',       pontos:15,  acao:"abrirJogo('digitacao','')",          completionTrigger:'activity_return', repetivel:true },
+  'dig-fileiras':  { titulo:'Aprender por Fileira',     tipo:'digitacao', emoji:'🏫', desc:'Lições progressivas pela fileira do teclado.',   pontos:20,  acao:"abrirFileiras()",                    completionTrigger:'activity_return', repetivel:true },
+  'dig-rank':      { titulo:'Digitação Ranqueada',      tipo:'digitacao', emoji:'🏆', desc:'Cronômetro ativo! Suba no ranking da turma.',    pontos:40,  acao:"iniciarDigitacao('ranqueado')",      completionTrigger:'activity_return', repetivel:true },
   'quiz-hw':       { titulo:'Quiz de Hardware',         tipo:'quiz',      emoji:'🖥️',  desc:'O que é hardware? Prove que sabe!',              pontos:25,  acao:"iniciarQuizModulo('hardware')",      completionTrigger:'quiz_finish' },
   'quiz-sw':       { titulo:'Quiz de Software',         tipo:'quiz',      emoji:'💻', desc:'Sistemas operacionais e programas.',             pontos:25,  acao:"iniciarQuizModulo('software')",      completionTrigger:'quiz_finish' },
   'quiz-nav':      { titulo:'Quiz de Navegadores',      tipo:'quiz',      emoji:'🌐', desc:'Chrome, Edge, Firefox — você entende?',          pontos:25,  acao:"iniciarQuizModulo('navegadores')",   completionTrigger:'quiz_finish' },
@@ -3635,7 +3635,7 @@ const MISSOES_CATALOGO = {
   'quiz-redes':    { titulo:'Quiz de Redes',            tipo:'quiz',      emoji:'🌐', desc:'Internet, Wi-Fi, IP — como tudo se conecta.',   pontos:25,  acao:"iniciarQuizModulo('redes')",         completionTrigger:'quiz_finish' },
   'jogo-memoria':  { titulo:'Jogo da Memória',          tipo:'jogo',      emoji:'🃏', desc:'Encontre os pares. Menos jogadas = mais pontos.',pontos:20,  acao:"iniciarJogoMemoria()",               completionTrigger:'activity_return' },
   'jogo-rede':     { titulo:'Reparar a Rede',           tipo:'jogo',      emoji:'🔧', desc:'Responda perguntas para salvar os nós da rede.', pontos:30,  acao:"iniciarRedePuzzle()",                completionTrigger:'activity_return', inativo:true },
-  'jogo-atirador': { titulo:'Atirador de Palavras',     tipo:'jogo',      emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!',       pontos:20,  acao:"iniciarAtiradorPalavras()",          completionTrigger:'activity_return' },
+  'jogo-atirador': { titulo:'Atirador de Palavras',     tipo:'jogo',      emoji:'🎯', desc:'Palavras voam pela tela — digite rápido!',       pontos:20,  acao:"iniciarAtiradorPalavras()",          completionTrigger:'activity_return', repetivel:true },
   'jogo-runner':   { titulo:'Hacker Runner',            tipo:'jogo',      emoji:'🎮', desc:'Fase de plataforma pixel art.',                  pontos:20,  acao:"abrirJogo('hacker-runner','hardware')", completionTrigger:'activity_return', inativo:true },
   'jogo-ram':      { titulo:'Gerenciador de RAM',       tipo:'jogo',      emoji:'⚙️',  desc:'Processos invadem a memória — encerre-os.',     pontos:20,  acao:"abrirJogo('ram-manager','memoria')",    completionTrigger:'activity_return', inativo:true },
   'prova-final':   { titulo:'Prova Final',              tipo:'boss',      emoji:'🏅', desc:'Desafio completo! Só para quem concluiu todos os módulos.', pontos:100, acao:"iniciarProva()", completionTrigger:'quiz_finish' },
@@ -3718,6 +3718,25 @@ function _missaoMarcarStatus(alunoId, missaoId, novoStatus) {
   ['completed','initiated','delivered'].forEach(k => { s[k] = s[k].filter(x => x !== missaoId); });
   if (['completed','initiated','delivered'].includes(novoStatus)) s[novoStatus].push(missaoId);
   _missaoGravarSemana(alunoId, sem, s);
+  // rastreamento permanente: missão não-repetível concluída vai pro progresso do aluno
+  if (novoStatus === 'completed' && !MISSOES_CATALOGO[missaoId]?.repetivel) {
+    const alunos = getAlunosLocal();
+    const a = alunos.find(x => x.id === alunoId);
+    if (a) {
+      if (!a.progresso) a.progresso = {};
+      if (!Array.isArray(a.progresso.missoesFeitas)) a.progresso.missoesFeitas = [];
+      if (!a.progresso.missoesFeitas.includes(missaoId)) {
+        a.progresso.missoesFeitas.push(missaoId);
+        saveAlunosLocal(alunos);
+      }
+    }
+  }
+}
+
+function _missaoJaFeita(alunoId, missaoId) {
+  if (MISSOES_CATALOGO[missaoId]?.repetivel) return false;
+  const a = getAlunos().find(x => x.id === alunoId);
+  return a?.progresso?.missoesFeitas?.includes(missaoId) || false;
 }
 function _missoesConcluidasNaSemana(alunoId, semana) {
   return _missaoSemana(alunoId, semana || _semanaISO()).completed;
@@ -3784,7 +3803,9 @@ function renderAulaHoje() {
 
   const turmaKey = getTurmaDeAluno(alunoAtivo.id) || 'SEM_TURMA';
   const nivel = alunoAtivo.nivel || 1;
-  const missaoIds = _getMissoesPlan(turmaKey, nivel).filter(id => MISSOES_CATALOGO[id]);
+  const missaoIds = _getMissoesPlan(turmaKey, nivel)
+    .filter(id => MISSOES_CATALOGO[id])
+    .filter(id => !_missaoJaFeita(alunoAtivo.id, id));
   const completasIds = _missoesConcluidasNaSemana(alunoAtivo.id);
   const totalCompletas = missaoIds.filter(id => completasIds.includes(id)).length;
   const pct = missaoIds.length ? Math.round(totalCompletas / missaoIds.length * 100) : 0;
