@@ -4676,7 +4676,10 @@ function emj(e){
 function renderAula() {
   const m = aulaState.modulo;
   const n = alunoAtivo.nivel;
-  const paginas = MODULOS[m].paginas[n];
+  // Módulos Excel: conteúdo sequencial, todos os níveis veem paginas[1] (base completa)
+  const MODULOS_SEQUENCIAIS = ['excel-basico', 'excel-inter'];
+  const paginasNivel = MODULOS[m].paginas;
+  const paginas = MODULOS_SEQUENCIAIS.includes(m) ? paginasNivel[1] : (paginasNivel[n] || paginasNivel[1]);
   const idx = aulaState.pagina;
   const pag = paginas[idx];
   const total = paginas.length;
